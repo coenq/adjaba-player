@@ -1,0 +1,46 @@
+<resources>
+    <!--    <string name="server_client_id">152027521814-c1ac5rg42adce573a9m6v65i5d221uin.apps.googleusercontent.com</string>-->
+    <!--    <string name="server_client_id">152027521814-m26p98qupp12npipne19ccb8dt9qjldt.apps.googleusercontent.com</string>-->
+    <string name="server_client_id">152027521814-c1ac5rg42adce573a9m6v65i5d221uin.apps.googleusercontent.com</string>
+    <string name="app_name">Adjaba</string>
+    <string name="sign_in_to_start">LOGIN TO START</string>
+    <string name="booking">Age and Gender Estimation</string>
+    <string name="login">Play</string>
+    <string name="remember_me">Remember me</string>
+    <string name="password">Pin</string>
+    <string name="user_name">Screen Id</string>
+
+    <string name="kelvin_to_celcius">273.15</string>
+
+    <string name="screen_prompt">Select Screen Mode</string>
+    <string name="select_screen_prompt">Select Screen</string>
+    <string name="interval_prompt">Select Interval</string>
+
+    <string-array name="screen_arrays">
+        <item>Forced Portrait</item>
+        <item>Portrait</item>
+        <item>Landscape</item>
+    </string-array>
+
+    <!--    <string-array name="screen_arrays">-->
+    <!--        <item>Forced Portrait</item>-->
+    <!--        <item>Portrait</item>-->
+    <!--        <item>Landscape</item>-->
+    <!--    </string-array>-->
+
+    <string name="weather_api_key">f25f4b0523edc3fa3bbc112751beeffe</string>
+    <!--    <string name="weather_api_key">ad383392c3e9e7c1a59f59c5ccd2fdd4</string>-->
+    <string name="weather_url">http://api.openweathermap.org/</string>
+    <string name="weather_icon_url">http://api.openweathermap.org/img/w/</string>
+
+    <string-array name="interval_arrays">
+        <item>Every 1 min</item>
+        <item>Every 5 min</item>
+        <item>Every 30 min</item>
+        <item>Every 60 min</item>
+        <item>Never</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

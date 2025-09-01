@@ -1,0 +1,29 @@
+<resources>
+    <!-- قيم عامة -->
+    <dimen name="weather_margin">16dp</dimen>
+
+    <!-- الجزء الأيسر -->
+    <dimen name="location_text_size">24sp</dimen>
+    <dimen name="weather_icon_size">80dp</dimen>
+    <dimen name="weather_icon_margin_top">24dp</dimen>
+    <dimen name="status_text_size">20sp</dimen>
+    <dimen name="status_margin">8dp</dimen>
+    <dimen name="weather_metric_icon_size">24dp</dimen>
+    <dimen name="weather_metric_text_size">20sp</dimen>
+    <dimen name="weather_metric_text_margin">4dp</dimen>
+    <dimen name="separator_text_size">30sp</dimen>
+
+    <!-- الجزء الأيمن -->
+    <dimen name="temp_text_size">80sp</dimen>
+    <dimen name="temp_margin_top">24dp</dimen>
+    <dimen name="forecast_label_text_size">20sp</dimen>
+    <dimen name="forecast_label_margin">12dp</dimen>
+    <dimen name="forecast_card_height">120dp</dimen>
+    <dimen name="forecast_card_margin">8dp</dimen>
+    <dimen name="forecast_card_radius">12dp</dimen>
+    <dimen name="forecast_card_content_margin">12dp</dimen>
+    <dimen name="forecast_time_text_size">14sp</dimen>
+    <dimen name="forecast_icon_size">28dp</dimen>
+    <dimen name="forecast_temp_text_size">22sp</dimen>
+    <dimen name="forecast_temp_margin_top">8dp</dimen>
+</resources>

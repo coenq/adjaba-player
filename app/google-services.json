@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "936876684507",
+    "project_id": "adjaba-412114",
+    "storage_bucket": "adjaba-412114.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936876684507:android:7f983780f29cb007c648fe",
+        "android_client_info": {
+          "package_name": "com.adjaba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "936876684507-g4nu6n6agsnb9454askd3v5ujflk31oj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.adjaba",
+            "certificate_hash": "e471583fda85ed15c948524266c7675acc789233"
+          }
+        },
+        {
+          "client_id": "936876684507-i95k7e9al8n1aiar4ct1pghmg8ohdobu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXsxHpD_bFcilOufBn2R8NgdXEcH1F6Tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "936876684507-i95k7e9al8n1aiar4ct1pghmg8ohdobu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

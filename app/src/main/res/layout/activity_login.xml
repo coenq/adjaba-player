@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/background_port">
+
+    <RelativeLayout
+        android:id="@+id/loginrootlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/logo1" />
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_toRightOf="@+id/logo"
+            android:background="@null" />
+
+        <ImageView
+            android:id="@+id/picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logo"
+            android:layout_centerHorizontal="true"
+            android:scaleType="center"
+            android:src="@mipmap/picture" />
+
+
+        <RelativeLayout
+            android:id="@+id/middle_lay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/picture"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="500dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/logo_lay"
+                    android:elevation="10dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="Sign In"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+
+                    <EditText
+                        android:id="@+id/edt_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_margin="15dp"
+                        android:background="@drawable/edt_text_custom"
+
+                        android:entries="@array/screen_arrays"
+                        android:hint="Email"
+                        android:padding="8dp"
+                        android:prompt="@string/screen_prompt"
+                        android:textSize="15sp" />
+
+
+                    <EditText
+                        android:id="@+id/edt_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_margin="15dp"
+                        android:background="@drawable/edt_text_custom"
+                        android:hint="Password"
+                        android:inputType="textPassword"
+                        android:padding="8dp"
+                        android:prompt="@string/screen_prompt"
+                        android:textSize="15sp" />
+
+                    <ProgressBar
+                        android:id="@+id/progressBarLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/middle_lay"
+                        android:layout_alignParentEnd="true"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <CheckBox
+                        android:id="@+id/rememberMeCheckBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginStart="15dp"
+                        android:text="Remember Me" />
+
+                    <!--        <LinearLayout-->
+                    <!--            android:layout_width="match_parent"-->
+                    <!--            android:layout_height="wrap_content"-->
+                    <!--            android:orientation="horizontal">-->
+
+                    <!--          <CheckBox-->
+                    <!--              android:id="@+id/camera"-->
+                    <!--              android:layout_weight="1"-->
+                    <!--              android:layout_width="wrap_content"-->
+                    <!--              android:layout_height="wrap_content"-->
+                    <!--              android:layout_marginTop="5dp"-->
+                    <!--              app:buttonTint="@color/black"-->
+                    <!--              android:textColor="@color/black"-->
+                    <!--              android:text="Camera"/>-->
+
+
+                    <!--          <CheckBox-->
+                    <!--              android:id="@+id/onlyCamera"-->
+                    <!--              android:layout_weight="1"-->
+                    <!--              android:layout_width="wrap_content"-->
+                    <!--              android:layout_height="wrap_content"-->
+                    <!--              android:layout_marginTop="5dp"-->
+                    <!--              android:textColor="@color/black"-->
+                    <!--              app:buttonTint="@color/black"-->
+                    <!--              android:text="Only Camera"/>-->
+
+                    <!--          <CheckBox-->
+                    <!--              android:id="@+id/debug"-->
+                    <!--              android:layout_weight="1"-->
+                    <!--              android:layout_width="wrap_content"-->
+                    <!--              android:layout_height="wrap_content"-->
+                    <!--              android:layout_marginTop="5dp"-->
+                    <!--              android:textColor="@color/black"-->
+                    <!--              app:buttonTint="@color/black"-->
+                    <!--              android:visibility="gone"-->
+                    <!--              android:text="Debug Mode"/>-->
+                    <!--        </LinearLayout>-->
+
+
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_margin="20dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_login_selector"
+                    android:elevation="10dp"
+                    android:gravity="center"
+                    android:text="Sign In"
+                    android:textAllCaps="false"
+                    android:textAppearance="@android:style/TextAppearance.Medium"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,7 @@
+<resources>
+    <!-- تعديل القيم للوضع العمودي -->
+    <dimen name="weather_margin">12dp</dimen>
+    <dimen name="location_text_size">20sp</dimen>
+    <dimen name="temp_text_size">70sp</dimen>
+    <dimen name="forecast_card_height">100dp</dimen>
+</resources>

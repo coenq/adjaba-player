@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_creat"
+        android:title="Create Screen"
+        android:icon="@drawable/ic_add_screen" />
+
+    <item android:id="@+id/log_out"
+        android:title="Logout"
+        android:icon="@drawable/ic_add_screen" />
+
+</menu>
