@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backColor">
+
+
+    <com.rnd.camera.CameraSourcePreview
+        android:id="@+id/camera_source_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.rnd.others.GraphicOverlay
+            android:id="@+id/graphics_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.rnd.camera.CameraSourcePreview>
+
+
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#59ffffff"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:padding="15dp">
+
+            <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/key_age"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/value_age"
+                android:layout_toRightOf="@+id/key_age"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/key_object"
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+
+                <TextView
+                    android:id="@+id/value_object"
+                    android:layout_toRightOf="@+id/key_object"
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </RelativeLayout>
+                <TextView
+                    android:id="@+id/value_txt"
+                    android:textColor="@color/backColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+
+        </LinearLayout>
+
+
+</RelativeLayout>

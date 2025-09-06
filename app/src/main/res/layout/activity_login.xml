@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loginrootlayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backColor"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/middle_lay"
+            android:layout_width="500dp"
+            android:padding="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:background="@color/colorFormBg"
+            android:orientation="vertical">
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logo_lay"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.4"
+            android:elevation="10dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="12dp"
+                android:text="Choose Screen Orientation"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:padding="1dp"
+                android:background="@drawable/list_bg">
+
+            <Spinner
+                android:id="@+id/spinner1"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:entries="@array/screen_arrays"
+                android:prompt="@string/screen_prompt" />
+            </LinearLayout>
+
+
+
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/back_camera"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Back Camera"/>
+
+
+
+
+            </LinearLayout>
+
+
+
+
+
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/bot_lay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+
+            <Button
+                android:layout_marginTop="8dp"
+                android:id="@+id/loginbtn"
+                android:layout_width="300dp"
+                android:layout_height="55dp"
+                android:background="@drawable/btn_login_selector"
+                android:elevation="10dp"
+                android:gravity="center"
+                android:text="Start"
+                android:textAllCaps="true"
+                android:textAppearance="@android:style/TextAppearance.Medium"
+                android:textColor="@color/white" />
+
+
+</LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

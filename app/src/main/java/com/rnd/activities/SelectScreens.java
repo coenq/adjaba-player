@@ -1,0 +1,359 @@
+package com.rnd.activities;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.rnd.R;
+import com.rnd.newmodels.MediaModel;
+import com.rnd.newmodels.Root;
+import com.rnd.newmodels.WatchingModel;
+import com.rnd.utilities.AuthManager;
+import com.rnd.utilities.RetrofitBuilder;
+import com.rnd.utilities.TinyDB;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class SelectScreens extends AppCompatActivity {
+    List<WatchingModel> adList;
+    RetrofitBuilder retrofitBuilder;
+    Toolbar topAppBar;
+    List<MediaModel> mediaModels = new ArrayList<>();
+    Context context;
+    Activity ac;
+    TinyDB tinyDb;
+
+    Map<String, String> screenPlayerMap, screenLocationMap, screenDeviceMap, screenLocation;
+    Map<String, List<String>> screenTags;
+    RelativeLayout loginrootlayout;
+    Spinner spinner1, spinner2, spinnerID;
+    ProgressBar loadingBar;
+    CheckBox rememberMe, displayText, businessRules;
+    List<String> screenOptions1;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+
+    List<String> screenOptions = new ArrayList<>();
+    ArrayAdapter<String> spinnerAdapter;
+    Button play, logOut;
+    String orient, screen_id = "";
+    String screenDirection = "0";
+
+
+    @SuppressLint("MissingInflatedId")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_select_screen);
+        context = this;
+        ac = this;
+        screenOptions = new ArrayList<>();
+        findViews();
+        screenOptions.add("Select Screen"); // العنصر الأول الثابت
+        //screenOptions1.add("Select Screen");
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, screenOptions);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerID.setAdapter(spinnerAdapter);
+        tinyDb = new TinyDB(ac);
+        prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        editor = prefs.edit();
+        context = this;
+        ac = this;
+        loadingBar = findViewById(R.id.loadingBar);
+        logOut = findViewById(R.id.logOut);
+        screenOptions1 = new ArrayList<>();
+        retrofitBuilder = new RetrofitBuilder();
+        adList = new ArrayList<>();
+        screenPlayerMap = new HashMap<>();
+        mediaModels = new ArrayList<>();
+        screenDeviceMap = new HashMap<>();
+        screenLocation = new HashMap<>();
+        screenLocationMap = new HashMap<>();
+        screenTags = new HashMap<>();
+        String[] directionOptions = {"Direction", "Front", "Back"};
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                directionOptions
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner2.setAdapter(spinnerAdapter);
+        String[] orientationOptions = {"Orientation", "Landscape", "Portrait"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                orientationOptions
+        );
+
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        int spinner1Pos = prefs.getInt("spinner1_position", 0);
+        int spinner2Pos = prefs.getInt("spinner2_position", 0);
+
+        rememberMe.setChecked(true);
+        SharedPreferences prefsw = getSharedPreferences("SpinnerPrefs", MODE_PRIVATE);
+        int savedPositionw = prefsw.getInt("spinner2_position", 0);
+
+
+        spinner1.setAdapter(adapter);
+        getIDs(context, () -> {
+
+            if (rememberMe.isChecked()) {
+                spinner1.setSelection(spinner1Pos);
+                if (savedPositionw < screenOptions.size()) {
+                    spinnerID.setSelection(savedPositionw);
+                }
+                spinner2.setSelection(spinner2Pos);
+            }
+        });
+
+// Spinner 1
+        spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (rememberMe.isChecked()) {
+                    editor.putInt("spinner1_position", position);
+                    editor.apply();
+                }
+                orient = orientationOptions[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        spinnerID.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (rememberMe.isChecked()) {
+                    getSharedPreferences("SpinnerPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putInt("spinner2_position", position)
+                            .apply();
+                }
+                screen_id = screenOptions.get(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+// Spinner 2
+        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (rememberMe.isChecked()) {
+                    editor.putInt("spinner2_position", position);
+                    editor.apply();
+                }
+                screenDirection=directionOptions[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!screenDirection.equals("Direction") && !orient.equals("Orientation")&&!screen_id.equals("Select Screen")) {
+                    if (screenDirection.equals("Back")) {
+                        tinyDb.putBoolean("BackCamera", true);
+                    } else {
+                        tinyDb.putBoolean("BackCamera", false);
+                    }
+                    if (orient.equals("Portrait")) {
+                        tinyDb.putInt("Orientation", 0);
+                    } else {
+                        tinyDb.putInt("Orientation", 1);
+                    }
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        Dexter.withActivity(ac)
+                                .withPermissions(
+                                        Manifest.permission.CAMERA,
+                                        Manifest.permission.READ_EXTERNAL_STORAGE
+                                ).withListener(new MultiplePermissionsListener() {
+                                    @Override
+                                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                        // check if all permissions are granted
+                                        if (report.areAllPermissionsGranted()) {
+
+                                            Intent intent = new Intent(getApplicationContext(), TestCamera.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(intent);
+
+                                        }
+
+                                        // check for permanent denial of any permission
+                                        if (report.isAnyPermissionPermanentlyDenied()) {
+                                            // permission is denied permenantly, navigate user to app settings
+                                            AlertDialog.Builder builder1 = new AlertDialog.Builder(ac);
+                                            builder1.setMessage("App will not work properly, please allow all permission");
+                                            builder1.setCancelable(true);
+
+                                            builder1.setPositiveButton(
+                                                    "OK",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            dialog.cancel();
+                                                        }
+                                                    });
+                                            AlertDialog alert11 = builder1.create();
+                                            alert11.show();
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                        token.continuePermissionRequest();
+                                    }
+
+                                }).check();
+
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), TestCamera.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+
+                    }
+                } else {
+                    Toast.makeText(context, "Please select Orientation and Screen ,Direction", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+        rememberMe.setOnCheckedChangeListener((buttonView, isChecked) ->
+
+        {
+
+            if (isChecked) {
+                if (savedPositionw < directionOptions.length) {
+                    spinnerID.setSelection(savedPositionw);
+                }
+                spinner1.setSelection(spinner1Pos);
+                spinner2.setSelection(spinner2Pos);
+
+            } else {
+                spinner1.setSelection(0);
+                spinner2.setSelection(0);
+                spinnerID.setSelection(0);
+
+            }
+        });
+    }
+    List<String> getIDs(Context context, Runnable onFinish) {
+        retrofitBuilder.apiCalls().getScreenResponse("Bearer " + AuthManager.getToken(this)).enqueue(new Callback<List<Root>>() {
+            @Override
+            public void onResponse(Call<List<Root>> call, Response<List<Root>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (int screen = 0; screen < response.body().size(); screen++) {
+                        //screenOptions1.add(response.body().get(screen).screenId);
+                      /*  screenPlayerMap.put(response.body().get(screen).screenId, response.body().get(screen).screenPlayer);
+                        screenDeviceMap.put(response.body().get(screen).screenId, response.body().get(screen).screenDevice);
+                        screenTags.put(response.body().get(screen).screenId, response.body().get(screen).screenTags);
+                        screenLocation.put(response.body().get(screen).screenId, response.body().get(screen).location);
+*/
+                        screenOptions.add(response.body().get(screen).getScreenId());
+                    }
+                    spinnerAdapter.notifyDataSetChanged();
+
+                    // تحميل القيمة المحفوظة لو موجودة
+                    SharedPreferences prefs = getSharedPreferences("SpinnerPrefs", MODE_PRIVATE);
+                    boolean rememberState = prefs.getBoolean("remember_state", false);
+                    if (rememberState) {
+                        int savedPosition = prefs.getInt("spinner2_position", 0);
+                        if (savedPosition < screenOptions.size()) {
+                            if (rememberMe.isChecked()) {
+                                spinnerID.setSelection(savedPosition);
+
+                            }
+                        }
+                    }
+                }
+                onFinish.run();
+            }
+
+            @Override
+            public void onFailure(Call<List<Root>> call, Throwable t) {
+                onFinish.run();
+            }
+        });
+        return screenOptions;
+    }
+
+    private void findViews() {
+        businessRules = findViewById(R.id.business_rule);
+        displayText = findViewById(R.id.text_display);
+        rememberMe = findViewById(R.id.rememberMeCh);
+        topAppBar = findViewById(R.id.topAppBar);
+        spinner1 = findViewById(R.id.spinner1);
+        spinner2 = findViewById(R.id.spinner2);
+        spinnerID=findViewById(R.id.spinnerID);
+//        spinner_select_screen=findViewById( R.id.spinner_select_screen);
+        play = findViewById(R.id.loginbtn);
+        loginrootlayout = findViewById(R.id.loginrootlayout);
+    }
+}

@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Only Camera</string>
+    <string name="sign_in_to_start">LOGIN TO START</string>
+    <string name="booking">Age and Gender Estimation</string>
+
+    <string name="login">LOGIN</string>
+    <string name="remember_me">Remember me</string>
+    <string name="password">Pin</string>
+    <string name="user_name">Screen Id</string>
+
+    <string name="screen_prompt">Choose Screen Mode</string>
+    <string name="interval_prompt">Select Interval</string>
+
+    <string-array name="screen_arrays">
+        <item>Portrait</item>
+        <item>Landscape</item>
+        <item>Forced Portrait</item>
+    </string-array>
+
+
+
+
+</resources>
