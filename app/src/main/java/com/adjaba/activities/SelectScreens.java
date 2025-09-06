@@ -569,7 +569,6 @@ public class SelectScreens extends AppCompatActivity {
                                     Toast.makeText(context, "Download error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });
                             }*/
-
                         if (localPath != null) {
                             if (Objects.equals(path, "") || isImage(path)) {
                                 mediaFormat = "Image";
@@ -806,7 +805,6 @@ public class SelectScreens extends AppCompatActivity {
             if (connection != null) connection.disconnect();
         }
     }
-
     /*public static String getFilePath() {
 
         File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "CrashReports" + File.separator);
