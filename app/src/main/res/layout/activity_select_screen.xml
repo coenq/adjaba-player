@@ -119,7 +119,6 @@
                                 android:id="@+id/spinnerID"
                                 android:layout_width="match_parent"
                                 android:layout_height="50dp"
-                                android:entries="@array/screen_arrays"
                                 android:prompt="@string/screen_prompt" />
                         </LinearLayout>
 

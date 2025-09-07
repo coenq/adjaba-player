@@ -23,18 +23,18 @@ import android.os.Bundle;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.media3.common.C;
-import androidx.media3.common.MediaItem;
-import androidx.media3.common.PlaybackException;
-import androidx.media3.common.Player;
-import androidx.media3.common.util.UnstableApi;
-import androidx.media3.exoplayer.DefaultLoadControl;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.LoadControl;
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
-import androidx.media3.exoplayer.trackselection.TrackSelector;
-import androidx.media3.ui.AspectRatioFrameLayout;
-import androidx.media3.ui.PlayerView;
+
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.LoadControl;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -801,7 +801,9 @@ public class AdvertWatching extends AppCompatActivity {
         return false;
     }
 
+/*
     @OptIn(markerClass = {UnstableApi.class, UnstableApi.class, UnstableApi.class})
+*/
     private void setupExoPlayer(String url, Animation inAnim, Animation outAnim) {
 
         releaseExoPlayer();
@@ -962,7 +964,9 @@ public class AdvertWatching extends AppCompatActivity {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
+/*
     @OptIn(markerClass = UnstableApi.class)
+*/
     private void setupPlayerResizeMode(PlayerView playerView) {
         int uiMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_TYPE_MASK;
 

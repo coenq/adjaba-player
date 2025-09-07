@@ -40,7 +40,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Transparent"
         tools:ignore="ExtraText,MissingTvBanner"
-        android:banner="@mipmap/app_icon">
+        android:banner="@mipmap/app_icon"
+        tools:targetApi="23">
         android:hardwareAccelerated="true"
 
         <!-- شاشة المعاينة -->

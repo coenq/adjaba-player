@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
             adDatabase.adDao().deleteAllAds();
         });
         // Access SharedPreferences
-         checkBox.setChecked(true);
+        checkBox.setChecked(true);
         SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (checkBox.isChecked()) {
@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
             if (isChecked) {
                 String savedEmail = sharedPreferences.getString("email", "");
                 String savedPassword = sharedPreferences.getString("password", "");
-
+                Log.d("sayed_ll", savedPassword);
                 etEmail.setText(savedEmail);
                 etPassword.setText(savedPassword);
             } else {
@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         apiCalls.login(request).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                Log.d("sayed_api9", userId + " " + password);
                 if (response.isSuccessful()) {
                     if (checkBox.isChecked()) {
                         editor.putString("email", etEmail.getText().toString());
