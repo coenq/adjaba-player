@@ -1,0 +1,21 @@
+package com.rnd.room;
+
+import androidx.room.TypeConverter;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class TagsConverter {
+    @TypeConverter
+    public String fromList(List<String> list) {
+        return list != null ? String.join(",", list) : "";
+    }
+
+    @TypeConverter
+    public List<String> toList(String data) {
+        return data != null && !data.isEmpty()
+                ? Arrays.asList(data.split(","))
+                : Collections.emptyList();
+    }
+}

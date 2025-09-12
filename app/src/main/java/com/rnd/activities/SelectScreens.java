@@ -10,10 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.view.LayoutInflater;
+
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
@@ -206,7 +203,7 @@ public class SelectScreens extends AppCompatActivity {
                     editor.putInt("spinner2_position", position);
                     editor.apply();
                 }
-                screenDirection=directionOptions[position];
+                screenDirection = directionOptions[position];
             }
 
             @Override
@@ -217,7 +214,7 @@ public class SelectScreens extends AppCompatActivity {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!screenDirection.equals("Direction") && !orient.equals("Orientation")&&!screen_id.equals("Select Screen")) {
+                if (!screenDirection.equals("Direction") && !orient.equals("Orientation") && !screen_id.equals("Select Screen")) {
                     if (screenDirection.equals("Back")) {
                         tinyDb.putBoolean("BackCamera", true);
                     } else {
@@ -230,49 +227,11 @@ public class SelectScreens extends AppCompatActivity {
                     }
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                        Dexter.withActivity(ac)
-                                .withPermissions(
-                                        Manifest.permission.CAMERA,
-                                        Manifest.permission.READ_EXTERNAL_STORAGE
-                                ).withListener(new MultiplePermissionsListener() {
-                                    @Override
-                                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                        // check if all permissions are granted
-                                        if (report.areAllPermissionsGranted()) {
-
-                                            Intent intent = new Intent(getApplicationContext(), TestCamera.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            startActivity(intent);
-
-                                        }
-
-                                        // check for permanent denial of any permission
-                                        if (report.isAnyPermissionPermanentlyDenied()) {
-                                            // permission is denied permenantly, navigate user to app settings
-                                            AlertDialog.Builder builder1 = new AlertDialog.Builder(ac);
-                                            builder1.setMessage("App will not work properly, please allow all permission");
-                                            builder1.setCancelable(true);
-
-                                            builder1.setPositiveButton(
-                                                    "OK",
-                                                    new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int id) {
-                                                            dialog.cancel();
-                                                        }
-                                                    });
-                                            AlertDialog alert11 = builder1.create();
-                                            alert11.show();
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                        token.continuePermissionRequest();
-                                    }
-
-                                }).check();
-
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            setPermissions(Manifest.permission.READ_MEDIA_IMAGES);
+                        } else {
+                            setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        }
                     } else {
                         Intent intent = new Intent(getApplicationContext(), TestCamera.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -304,6 +263,7 @@ public class SelectScreens extends AppCompatActivity {
             }
         });
     }
+
     List<String> getIDs(Context context, Runnable onFinish) {
         retrofitBuilder.apiCalls().getScreenResponse("Bearer " + AuthManager.getToken(this)).enqueue(new Callback<List<Root>>() {
             @Override
@@ -351,9 +311,54 @@ public class SelectScreens extends AppCompatActivity {
         topAppBar = findViewById(R.id.topAppBar);
         spinner1 = findViewById(R.id.spinner1);
         spinner2 = findViewById(R.id.spinner2);
-        spinnerID=findViewById(R.id.spinnerID);
+        spinnerID = findViewById(R.id.spinnerID);
 //        spinner_select_screen=findViewById( R.id.spinner_select_screen);
         play = findViewById(R.id.loginbtn);
         loginrootlayout = findViewById(R.id.loginrootlayout);
+    }
+
+    public void setPermissions(String mediaPermission) {
+        Dexter.withActivity(ac)
+                .withPermissions(
+                        Manifest.permission.CAMERA,
+                        mediaPermission
+                ).withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        // check if all permissions are granted
+                        if (report.areAllPermissionsGranted()) {
+
+                            Intent intent = new Intent(getApplicationContext(), TestCamera.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+
+                        }
+
+                        // check for permanent denial of any permission
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+                            // permission is denied permenantly, navigate user to app settings
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(ac);
+                            builder1.setMessage("App will not work properly, please allow all permission");
+                            builder1.setCancelable(true);
+
+                            builder1.setPositiveButton(
+                                    "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog alert11 = builder1.create();
+                            alert11.show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+
+                }).check();
     }
 }

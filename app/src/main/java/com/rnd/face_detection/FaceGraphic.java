@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.rnd.others.GraphicOverlay;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+
 import java.text.DecimalFormat;
 import java.math.RoundingMode;
 
@@ -31,72 +32,72 @@ import java.math.RoundingMode;
  */
 public class FaceGraphic extends GraphicOverlay.Graphic {
 
-  private static final int FACE_COLOR = Color.YELLOW;
-  private static final int TEXT_COLOR = Color.CYAN;
-  private static final float STROKE_WIDTH = 7.0f;
-  private static final float TEXT_STROKE_WIDTH = 6.0f;
+    private static final int FACE_COLOR = Color.YELLOW;
+    private static final int TEXT_COLOR = Color.CYAN;
+    private static final float STROKE_WIDTH = 7.0f;
+    private static final float TEXT_STROKE_WIDTH = 6.0f;
 
-  private final Paint rectPaint;
-  private final Paint textPaint;
-  private final FirebaseVisionFace face;
-  private final Bitmap bitmap;
-  private final String gender;
-  private final String ageRange;
-  private static final float TEXT_SIZE = 40.0f;
-  private boolean frontFacingCamera;
+    private final Paint rectPaint;
+    private final Paint textPaint;
+    private final FirebaseVisionFace face;
+    private final Bitmap bitmap;
+    private final String gender;
+    private final String ageRange;
+    private static final float TEXT_SIZE = 40.0f;
+    private boolean frontFacingCamera;
+    private final String mood;
+    private DecimalFormat df;
 
-  private DecimalFormat df;
+    FaceGraphic(GraphicOverlay overlay, FirebaseVisionFace face, Bitmap bitmap, String gender, String ageRange, boolean frontFacingCamera, String mood) {
+        super(overlay);
 
-  FaceGraphic(GraphicOverlay overlay, FirebaseVisionFace face, Bitmap bitmap, String gender, String ageRange, boolean frontFacingCamera) {
-    super(overlay);
+        this.gender = gender;
+        this.bitmap = bitmap;
+        this.face = face;
+        this.ageRange = ageRange;
+        this.frontFacingCamera = frontFacingCamera;
+        this.mood = mood;
+        rectPaint = new Paint();
+        rectPaint.setColor(FACE_COLOR);
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(STROKE_WIDTH);
 
-    this.gender = gender;
-    this.bitmap = bitmap;
-    this.face = face;
-    this.ageRange = ageRange;
-    this.frontFacingCamera = frontFacingCamera;
+        textPaint = new Paint();
+        textPaint.setColor(TEXT_COLOR);
+        textPaint.setTextSize(TEXT_SIZE);
+        textPaint.setStrokeWidth(TEXT_STROKE_WIDTH);
 
-    rectPaint = new Paint();
-    rectPaint.setColor(FACE_COLOR);
-    rectPaint.setStyle(Paint.Style.STROKE);
-    rectPaint.setStrokeWidth(STROKE_WIDTH);
-
-    textPaint = new Paint();
-    textPaint.setColor(TEXT_COLOR);
-    textPaint.setTextSize(TEXT_SIZE);
-    textPaint.setStrokeWidth(TEXT_STROKE_WIDTH);
-
-    // Redraw the overlay, as this graphic has been added.
-    postInvalidate();
-  }
-
-  /** Draws the text block annotations for position, size, and raw value on the supplied canvas. */
-  @Override
-  public void draw(Canvas canvas) {
-
-
-    System.out.println("Age Range "+ageRange+" Gender:- "+gender);
-    if (face == null) {
-      throw new IllegalStateException("Attempting to draw a null face.");
+        // Redraw the overlay, as this graphic has been added.
+        postInvalidate();
     }
 
-    // Draws the bounding box around the face.
-    RectF rect = new RectF(face.getBoundingBox());
-    rect.left = translateX(rect.left);
-    rect.top = translateY(rect.top);
-    rect.right = translateX(rect.right);
-    rect.bottom = translateY(rect.bottom);
-    canvas.drawRect(rect, rectPaint);
+    /** Draws the text block annotations for position, size, and raw value on the supplied canvas. */
+    @Override
+    public void draw(Canvas canvas) {
 
-    // For debugging
-    // canvas.drawBitmap(this.bitmap, this.bitmap.getScaledWidth(canvas), this.bitmap.getScaledHeight(canvas), rectPaint);
+
+        System.out.println("Age Range " + ageRange + " Gender:- " + gender);
+        if (face == null) {
+            throw new IllegalStateException("Attempting to draw a null face.");
+        }
+
+        // Draws the bounding box around the face.
+        RectF rect = new RectF(face.getBoundingBox());
+        rect.left = translateX(rect.left);
+        rect.top = translateY(rect.top);
+        rect.right = translateX(rect.right);
+        rect.bottom = translateY(rect.bottom);
+        canvas.drawRect(rect, rectPaint);
+
+        // For debugging
+        // canvas.drawBitmap(this.bitmap, this.bitmap.getScaledWidth(canvas), this.bitmap.getScaledHeight(canvas), rectPaint);
 
 //    Toast.makeText(getApplicationContext(), "Age Range "+ageRange+" Gender:- "+gender, Toast.LENGTH_SHORT).show();
 //    System.out.println("Age Range "+ageRange+" Gender:- "+gender);
-    if(frontFacingCamera) {
-      canvas.drawText(ageRange + " " + gender, rect.left, rect.top, textPaint);
-    } else {
-      canvas.drawText(ageRange + " " + gender, rect.left, rect.top, textPaint);
+        if (frontFacingCamera) {
+            canvas.drawText(ageRange + " " + gender+" "+mood, rect.left, rect.top, textPaint);
+        } else {
+            canvas.drawText(ageRange + " " + gender+" "+mood, rect.left, rect.top, textPaint);
+        }
     }
-  }
 }
