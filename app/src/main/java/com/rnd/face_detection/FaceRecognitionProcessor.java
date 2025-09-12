@@ -20,7 +20,13 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
 import androidx.annotation.NonNull;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.TextView;
@@ -29,6 +35,14 @@ import android.widget.Toast;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceDetection;
+import com.google.mlkit.vision.face.FaceDetector;
+import com.google.mlkit.vision.face.FaceDetectorOptions;
+import com.rnd.newmodels.MediaModel;
+import com.rnd.others.APIImpression;
+import com.rnd.others.DataHolder;
 import com.rnd.others.FrameMetadata;
 import com.rnd.others.GraphicOverlay;
 
@@ -40,6 +54,8 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.rnd.room.AdDatabase;
+import com.rnd.room.ImpressionEntity;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -52,14 +68,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,68 +91,78 @@ import static com.rnd.activities.TestCamera.key_object;
 import static com.rnd.activities.TestCamera.value_age;
 import static com.rnd.activities.TestCamera.value_object;
 import static com.rnd.activities.TestCamera.value_txt;
+import static com.rnd.activities.TestCamera.mood_txt;
+import static com.rnd.activities.TestCamera.orient;
 
 public class FaceRecognitionProcessor {
 
-	private ByteBuffer imgData;
+    private ByteBuffer imgData;
     private Interpreter tflite;
     private int[] intValuesDetection;
-	private float[][][] outputLocations;
-	private float[][] outputClasses;
-	private float[][] outputScores;
-	private float[] numDetections;
+    private float[][][] outputLocations;
+    private float[][] outputClasses;
+    private float[][] outputScores;
+    private float[] numDetections;
+    public static Handler handler = new Handler(Looper.getMainLooper());
+    public static Runnable runnable;
     private Vector<String> labels = new Vector<String>();
 
-	private static final String TAG = "TextRecProc";
+    private static final String TAG = "TextRecProc";
 
-	private final FirebaseVisionFaceDetector detector;
+    private final FirebaseVisionFaceDetector detector;
+    private EmotionClassifier emotionClassifier;
+    private String detectedMood = "N/A";
+    private TensorFlowInferenceInterface genderIinferenceInterface;
+    private TensorFlowInferenceInterface ageInferenceInterface;
+    private final int CARNIE_DIM = 227;
+    private float[] floatValues = new float[64 * 64 * 3];
+    private int[] intValues = new int[64 * 64];
+    private float[] floatValuesCarnie = new float[CARNIE_DIM * CARNIE_DIM * 3];
+    private int[] intValuesCarnie = new int[CARNIE_DIM * CARNIE_DIM];
+    private final List<String> AGE_LIST = Arrays.asList("(0, 2)", "(4, 6)", "(8, 12)", "(15, 20)", "(25, 32)", "(38, 43)", "(48, 53)", "(60, 100)");
+    private final int[] ageListMapping = {0, 0, 0, 0, 1, 2, 3, 4};
+    private final List<String> AGE_LIST_2 = Arrays.asList("(0, 20)", "(20, 32)", "(32, 43)", "(43, 53)", "(53, 100)");
 
-	private TensorFlowInferenceInterface genderIinferenceInterface;
-	private TensorFlowInferenceInterface ageInferenceInterface;
-	private final int CARNIE_DIM = 227;
-	private float[] floatValues = new float[64 * 64 * 3];
-	private int[] intValues = new int[64*64];
-	private float[] floatValuesCarnie = new float[CARNIE_DIM*CARNIE_DIM*3];
-	private int[] intValuesCarnie = new int[CARNIE_DIM*CARNIE_DIM];
-	private final List<String> AGE_LIST = Arrays.asList("(0, 2)","(4, 6)","(8, 12)","(15, 20)","(25, 32)","(38, 43)","(48, 53)","(60, 100)");
-	private final int[] ageListMapping = {0, 0, 0, 0, 1, 2, 3, 4};
-	private final List<String> AGE_LIST_2 = Arrays.asList("(0, 20)","(20, 32)","(32, 43)","(43, 53)","(53, 100)");
+    private float[] genderOutputs = new float[1];
+    private float[] ageOutputs = new float[8];
+    private boolean frontFacingCamera;
+    public static String detectedGender = "N/A";
+    public static String detectedAgeRange = "N/A";
+    private List<String> viewList = new ArrayList<>();
 
-	private float[] genderOutputs = new float[1];
-	private float[] ageOutputs = new float[8];
-	private boolean frontFacingCamera;
-	public static String detectedGender = "N/A";
-	public static  String detectedAgeRange = "N/A";
-	private List<String> viewList = new ArrayList<>();
-
-	public  static  List<String> viewCountList = new ArrayList<>();
-	 String textFound = "";
+    public static List<String> viewCountList = new ArrayList<>();
+    String textFound = "";
 
 
-	// Whether we should ignore process(). This is usually caused by feeding input data faster than
-	// the model can handle.
-	private final AtomicBoolean shouldThrottle = new AtomicBoolean(false);
-	private Context context;
+    // Whether we should ignore process(). This is usually caused by feeding input data faster than
+    // the model can handle.
+    private final AtomicBoolean shouldThrottle = new AtomicBoolean(false);
+    private Context context;
 
-	public FaceRecognitionProcessor(AssetManager assetManager, boolean frontFacingCamera, Context mainActivity){
-		this.genderIinferenceInterface = new TensorFlowInferenceInterface(assetManager, "gender_model.pb");
-		this.ageInferenceInterface = new TensorFlowInferenceInterface(assetManager, "rude_carnie_age_model.pb");
-		try {
-			this.tflite = new Interpreter(loadModelFile(assetManager, "detect.tflite"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.frontFacingCamera = frontFacingCamera;
+    public FaceRecognitionProcessor(AssetManager assetManager, boolean frontFacingCamera, Context mainActivity) {
+        this.genderIinferenceInterface = new TensorFlowInferenceInterface(assetManager, "gender_model.pb");
+        this.ageInferenceInterface = new TensorFlowInferenceInterface(assetManager, "rude_carnie_age_model.pb");
+        try {
+            this.tflite = new Interpreter(loadModelFile(assetManager, "detect.tflite"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            this.emotionClassifier = new EmotionClassifier(assetManager, "model.tflite");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.frontFacingCamera = frontFacingCamera;
 
-		detector = FirebaseVision.getInstance().getVisionFaceDetector();
-		this.imgData = ByteBuffer.allocateDirect(300 * 300 * 3);
-		this.imgData.order(ByteOrder.nativeOrder());
-		this.intValuesDetection = new int[300*300];
-		this.outputLocations = new float[1][10][4];
-		this.outputClasses = new float[1][10];
-		this.outputScores = new float[1][10];
-		this.numDetections = new float[1];
-		this.context = mainActivity;
+        detector = FirebaseVision.getInstance().getVisionFaceDetector();
+        this.imgData = ByteBuffer.allocateDirect(300 * 300 * 3);
+        this.imgData.order(ByteOrder.nativeOrder());
+        this.intValuesDetection = new int[300 * 300];
+        this.outputLocations = new float[1][10][4];
+        this.outputClasses = new float[1][10];
+        this.outputScores = new float[1][10];
+        this.numDetections = new float[1];
+        this.context = mainActivity;
 
         InputStream labelsInput = null;
         String actualFilename = "labelmap.txt";
@@ -144,7 +174,7 @@ public class FaceRecognitionProcessor {
 
         String line = "";
         BufferedReader br = null;
-		br = new BufferedReader(new InputStreamReader(labelsInput));
+        br = new BufferedReader(new InputStreamReader(labelsInput));
         while (true) {
             try {
                 if (!((line = br.readLine()) != null)) break;
@@ -160,57 +190,58 @@ public class FaceRecognitionProcessor {
         }
     }
 
-	public void stop() {
-		try {
-			detector.close();
-		} catch (IOException e) {
-			Log.e(TAG, "Exception thrown while trying to close Text Detector: " + e);
-		}
-	}
+    public void stop() {
+        try {
+            detector.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Exception thrown while trying to close Text Detector: " + e);
+        }
+    }
 
-	public void process(ByteBuffer data, FrameMetadata frameMetadata, GraphicOverlay graphicOverlay) {
+    public void process(ByteBuffer data, FrameMetadata frameMetadata, GraphicOverlay graphicOverlay) {
 
-		if (shouldThrottle.get()) {
-			return;
-		}
-		FirebaseVisionImageMetadata metadata =
-				new FirebaseVisionImageMetadata.Builder()
-						.setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-						.setWidth(frameMetadata.getWidth())
-						.setHeight(frameMetadata.getHeight())
-						.setRotation(frameMetadata.getRotation())
-						.build();
+        if (shouldThrottle.get()) {
+            return;
+        }
+        FirebaseVisionImageMetadata metadata =
+                new FirebaseVisionImageMetadata.Builder()
+                        .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+                        .setWidth(frameMetadata.getWidth())
+                        .setHeight(frameMetadata.getHeight())
+                        .setRotation(frameMetadata.getRotation())
+                        .build();
 
-		detectInVisionImage(FirebaseVisionImage.fromByteBuffer(data, metadata), frameMetadata, graphicOverlay, data);
-	}
+        detectInVisionImage(FirebaseVisionImage.fromByteBuffer(data, metadata), frameMetadata, graphicOverlay, data);
+    }
 
-	//endregion
+    //endregion
 
-	//region ----- Helper Methods -----
+    //region ----- Helper Methods -----
 
-	protected Task<List<FirebaseVisionFace>> detectInImage(FirebaseVisionImage image) {
-		return detector.detectInImage(image);
-	}
+    protected Task<List<FirebaseVisionFace>> detectInImage(FirebaseVisionImage image) {
+        return detector.detectInImage(image);
+    }
 
 
-	protected void onSuccess(@NonNull List<FirebaseVisionFace> results, @NonNull FrameMetadata frameMetadata, @NonNull GraphicOverlay graphicOverlay, @NonNull Bitmap bitmap) {
+    protected void onSuccess(@NonNull List<FirebaseVisionFace> results, @NonNull FrameMetadata frameMetadata, @NonNull GraphicOverlay graphicOverlay, @NonNull Bitmap bitmap) {
 
-		graphicOverlay.clear();
+        graphicOverlay.clear();
 
-		try {
-			key_age.setText("");
-			value_age.setText("");
-			value_object.setText("");
-			value_txt.setText("");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        try {
+            key_age.setText("");
+            value_age.setText("");
+            value_object.setText("");
+            value_txt.setText("");
+            mood_txt.setText("");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-		Bitmap scaledBitmap;
+        Bitmap scaledBitmap;
 
-		for (FirebaseVisionFace result : results) {
-			// crop face bitmap
-			Rect rect = result.getBoundingBox();
+        for (FirebaseVisionFace result : results) {
+            // crop face bitmap
+            Rect rect = result.getBoundingBox();
 
 //			// Crop even more off (the api returns a bounding box that encompasses more than just face)
 //			int dw = rect.width()/12;
@@ -222,131 +253,135 @@ public class FaceRecognitionProcessor {
 //			rect.top = rect.top + dh;
 //			rect.bottom = rect.bottom - dh;
 
-			if(rect.left + rect.width() >= bitmap.getWidth()) {
-				rect.right = bitmap.getWidth();
-			}
-			if(rect.top + rect.height() >= bitmap.getHeight()) {
-				rect.bottom = bitmap.getHeight();
-			}
-			if(rect.top < 0) {
-				rect.top = 0;
-			}
-			if(rect.left < 0) {
-				rect.left = 0;
-			}
+            if (rect.left + rect.width() >= bitmap.getWidth()) {
+                rect.right = bitmap.getWidth();
+            }
+            if (rect.top + rect.height() >= bitmap.getHeight()) {
+                rect.bottom = bitmap.getHeight();
+            }
+            if (rect.top < 0) {
+                rect.top = 0;
+            }
+            if (rect.left < 0) {
+                rect.left = 0;
+            }
 
-			Bitmap resultBmp = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
-			// process bitmap here
-			scaledBitmap = Bitmap.createScaledBitmap(resultBmp, 64, 64, false);
+            Bitmap resultBmp = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+            // process bitmap here
+            scaledBitmap = Bitmap.createScaledBitmap(resultBmp, 64, 64, false);
 
-			scaledBitmap.getPixels(intValues, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
-			for (int i = 0; i < intValues.length; ++i) {
-				final int val = intValues[i];
-				floatValues[i * 3 + 2] = (((val >> 16) & 0xFF));
-				floatValues[i * 3 + 1] = (((val >> 8) & 0xFF));
-				floatValues[i * 3 + 0] = ((val & 0xFF));
-			}
+            scaledBitmap.getPixels(intValues, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
+            for (int i = 0; i < intValues.length; ++i) {
+                final int val = intValues[i];
+                floatValues[i * 3 + 2] = (((val >> 16) & 0xFF));
+                floatValues[i * 3 + 1] = (((val >> 8) & 0xFF));
+                floatValues[i * 3 + 0] = ((val & 0xFF));
+            }
 
-			String inputName = "input_2";
-			String outputName = "pred/mul_33";
+            String inputName = "input_2";
+            String outputName = "pred/mul_33";
 
-			/*** Run Gender Detection Model First ***/
+            /*** Run Gender Detection Model First ***/
+            if (emotionClassifier != null) {
+                detectedMood = emotionClassifier.predictEmotion(scaledBitmap);
+                Log.d("EMOTION", "Detected Mood: " + detectedMood);
+                mood_txt.setText(detectedMood);
+            }
+            // Copy the input data into TensorFlow.
+            genderIinferenceInterface.feed(inputName, floatValues, 1, 64, 64, 3);
 
-			// Copy the input data into TensorFlow.
-			genderIinferenceInterface.feed(inputName, floatValues, 1, 64, 64, 3);
+            // Run the inference call.
+            genderIinferenceInterface.run(new String[]{outputName});
 
-			// Run the inference call.
-			genderIinferenceInterface.run(new String[]{outputName});
+            // Copy the output Tensor back into the output array.
+            genderIinferenceInterface.fetch(outputName, genderOutputs);
 
-			// Copy the output Tensor back into the output array.
-			genderIinferenceInterface.fetch(outputName, genderOutputs);
+            if (genderOutputs[0] <= 0.72) {
+                detectedGender = "F";
+            } else {
+                detectedGender = "M";
+            }
 
-			if(genderOutputs[0] <= 0.72) {
-				detectedGender = "F";
-			} else {
-				detectedGender = "M";
-			}
+            /*** Run Age Detection Model ***/
+            inputName = "Placeholder";
+            outputName = "output/output";
 
-			/*** Run Age Detection Model ***/
-			inputName = "Placeholder";
-			outputName = "output/output";
+            // Rude carnie expects different input dimensions
+            scaledBitmap = Bitmap.createScaledBitmap(resultBmp, CARNIE_DIM, CARNIE_DIM, false);
 
-			// Rude carnie expects different input dimensions
-			scaledBitmap = Bitmap.createScaledBitmap(resultBmp, CARNIE_DIM, CARNIE_DIM, false);
+            scaledBitmap.getPixels(intValuesCarnie, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
+            for (int i = 0; i < intValuesCarnie.length; ++i) {
+                final int val = intValuesCarnie[i];
+                // Rude Carnie is in RGB Format
+                floatValuesCarnie[i * 3 + 0] = (((val >> 16) & 0xFF));
+                floatValuesCarnie[i * 3 + 1] = (((val >> 8) & 0xFF));
+                floatValuesCarnie[i * 3 + 2] = ((val & 0xFF));
+            }
 
-			scaledBitmap.getPixels(intValuesCarnie, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
-			for (int i = 0; i < intValuesCarnie.length; ++i) {
-				final int val = intValuesCarnie[i];
-				// Rude Carnie is in RGB Format
-				floatValuesCarnie[i * 3 + 0] = (((val >> 16) & 0xFF));
-				floatValuesCarnie[i * 3 + 1] = (((val >> 8) & 0xFF));
-				floatValuesCarnie[i * 3 + 2] = ((val & 0xFF));
-			}
+            // Copy the input data into TensorFlow.
+            ageInferenceInterface.feed(inputName, floatValuesCarnie, 1, CARNIE_DIM, CARNIE_DIM, 3);
 
-			// Copy the input data into TensorFlow.
-			ageInferenceInterface.feed(inputName, floatValuesCarnie, 1, CARNIE_DIM, CARNIE_DIM, 3);
+            // Run the inference call.
+            ageInferenceInterface.run(new String[]{outputName});
 
-			// Run the inference call.
-			ageInferenceInterface.run(new String[]{outputName});
-
-			// Copy the output Tensor back into the output array.
-			ageInferenceInterface.fetch(outputName, ageOutputs);
-
-			
-			int maxAt = 0;
-
-			for (int i = 0; i < ageOutputs.length; i++) {
-				maxAt = ageOutputs[i] > ageOutputs[maxAt] ? i : maxAt;
-			}
-
-			detectedAgeRange = AGE_LIST_2.get(ageListMapping[maxAt]);
+            // Copy the output Tensor back into the output array.
+            ageInferenceInterface.fetch(outputName, ageOutputs);
 
 
-			System.out.println("AgeRange"+detectedAgeRange+" Gender"+detectedGender);
-			try {
-				key_age.setText("AgeRange: "+detectedAgeRange);
-				value_age.setText(String.valueOf("Gender: "+detectedGender));
-			} catch (Exception e) {
-				try {
-					key_age.setText("");
-					value_age.setText("");
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-			viewList.add(detectedAgeRange+"#"+detectedGender);
+            int maxAt = 0;
+
+            for (int i = 0; i < ageOutputs.length; i++) {
+                maxAt = ageOutputs[i] > ageOutputs[maxAt] ? i : maxAt;
+            }
+
+            detectedAgeRange = AGE_LIST_2.get(ageListMapping[maxAt]);
 
 
-			try {
-				// filter the distinct
-				Set<String> setWithUniqueValues = new HashSet<>(viewList);
-				viewCountList = new ArrayList<>(setWithUniqueValues);
+            System.out.println("AgeRange" + detectedAgeRange + " Gender" + detectedGender);
+            try {
+                key_age.setText(detectedAgeRange);
+                value_age.setText(String.valueOf(detectedGender));
+            } catch (Exception e) {
+                try {
+                    key_age.setText("");
+                    value_age.setText("");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            viewList.add(detectedAgeRange + "#" + detectedGender);
+
+
+            try {
+                // filter the distinct
+                Set<String> setWithUniqueValues = new HashSet<>(viewList);
+                viewCountList = new ArrayList<>(setWithUniqueValues);
 
 //				System.out.println("Face Reco data "+MainActivity.viewCountList);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-			// add graphic overlay
-			GraphicOverlay.Graphic faceGraphic = new FaceGraphic(graphicOverlay, result, scaledBitmap, detectedGender, detectedAgeRange, frontFacingCamera);
-			graphicOverlay.add(faceGraphic);
+            // add graphic overlay
+            GraphicOverlay.Graphic faceGraphic = new FaceGraphic(graphicOverlay, result, scaledBitmap, detectedGender, detectedAgeRange, frontFacingCamera, detectedMood);
+            graphicOverlay.add(faceGraphic);
 
-			try {
+            try {
 //				cameraSource.release();
-			} catch (Exception e) {
-				try {
+            } catch (Exception e) {
+                try {
 //					TestCamera.cameraSource.release();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
 
-		/* * This is Text Recognition Section
-		 */
+        /* * This is Text Recognition Section
+         */
 
-		TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
         try {
             if (!textRecognizer.isOperational()) {
                 new AlertDialog.
@@ -381,100 +416,101 @@ public class FaceRecognitionProcessor {
                     detectedText.append("\n");
                 }
             }
-           textFound = detectedText.toString();
-			try {
-				value_txt.setText(String.valueOf(textFound));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			Log.d(TAG, detectedText.toString());
-        }
-        finally {
+            textFound = detectedText.toString();
+            try {
+                value_txt.setText(String.valueOf(textFound));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, detectedText.toString());
+        } finally {
             textRecognizer.release();
         }
 
 
-		/*
-			* This is Object Detection Section
-			* */
-
-			scaledBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, false);
-			scaledBitmap.getPixels(intValuesDetection, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
-
-			imgData.rewind();
-			for (int i = 0; i < 300; ++i) {
-				for (int j = 0; j < 300; ++j) {
-					int pixelValue = intValuesDetection[i * 300 + j];
-						imgData.put((byte) ((pixelValue >> 16) & 0xFF));
-						imgData.put((byte) ((pixelValue >> 8) & 0xFF));
-						imgData.put((byte) (pixelValue & 0xFF));
-				}
-			}
+        /*
+         * This is Object Detection Section
+         * */
 
 
-			Object[] inputArray = {imgData};
-			outputLocations = new float[1][10][4];
-			outputClasses = new float[1][10];
-			outputScores = new float[1][10];
-			numDetections = new float[1];
 
-			Map<Integer, Object> outputMap = new HashMap<>();
-			outputMap.put(0, outputLocations); //You can draw bounding boxes from using these locations
-			outputMap.put(1, outputClasses);
-			outputMap.put(2, outputScores);
-			outputMap.put(3, numDetections);
+        scaledBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, false);
+        scaledBitmap.getPixels(intValuesDetection, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
 
-
-			// Running Model
-			tflite.runForMultipleInputsOutputs(inputArray, outputMap);
-
-            final ArrayList<Recognition> recognitions = new ArrayList<>(10);
-            for (int i = 0; i < 10; ++i) {
-                final RectF detection =
-                        new RectF(
-                                outputLocations[0][i][1] * 300,
-                                outputLocations[0][i][0] * 300,
-                                outputLocations[0][i][3] * 300,
-                                outputLocations[0][i][2] * 300);
-                // SSD Mobilenet V1 Model assumes class 0 is background class
-                // in label file and class labels start from 1 to number_of_classes+1,
-                // while outputClasses correspond to class index from 0 to number_of_classes
-                int labelOffset = 1;
-                recognitions.add(
-                        new Recognition(
-                                "" + i,
-                                labels.get((int) outputClasses[0][i] + labelOffset),
-                                outputScores[0][i],
-                                detection));
+        imgData.rewind();
+        for (int i = 0; i < 300; ++i) {
+            for (int j = 0; j < 300; ++j) {
+                int pixelValue = intValuesDetection[i * 300 + j];
+                imgData.put((byte) ((pixelValue >> 16) & 0xFF));
+                imgData.put((byte) ((pixelValue >> 8) & 0xFF));
+                imgData.put((byte) (pixelValue & 0xFF));
             }
+        }
 
-            // List which stores type and number of objects detected
-            Map<String, Integer> counts = new HashMap<String, Integer>();
 
-            for(Recognition r : recognitions){
-                final RectF location = r.getLocation();
-                if (location != null && r.getConfidence() >= 0.5f){
-                    if(counts.containsKey(r.getTitle())){
-                        counts.put(r.getTitle(), counts.get(r.getTitle()) + 1);
-                    }else{
-                        counts.put(r.getTitle(), 1);
-                    }
+        Object[] inputArray = {imgData};
+        outputLocations = new float[1][10][4];
+        outputClasses = new float[1][10];
+        outputScores = new float[1][10];
+        numDetections = new float[1];
+
+        Map<Integer, Object> outputMap = new HashMap<>();
+        outputMap.put(0, outputLocations); //You can draw bounding boxes from using these locations
+        outputMap.put(1, outputClasses);
+        outputMap.put(2, outputScores);
+        outputMap.put(3, numDetections);
+
+
+        // Running Model
+        tflite.runForMultipleInputsOutputs(inputArray, outputMap);
+
+        final ArrayList<Recognition> recognitions = new ArrayList<>(10);
+        for (int i = 0; i < 10; ++i) {
+            final RectF detection =
+                    new RectF(
+                            outputLocations[0][i][1] * 300,
+                            outputLocations[0][i][0] * 300,
+                            outputLocations[0][i][3] * 300,
+                            outputLocations[0][i][2] * 300);
+            // SSD Mobilenet V1 Model assumes class 0 is background class
+            // in label file and class labels start from 1 to number_of_classes+1,
+            // while outputClasses correspond to class index from 0 to number_of_classes
+            int labelOffset = 1;
+            recognitions.add(
+                    new Recognition(
+                            "" + i,
+                            labels.get((int) outputClasses[0][i] + labelOffset),
+                            outputScores[0][i],
+                            detection));
+        }
+
+        // List which stores type and number of objects detected
+        Map<String, Integer> counts = new HashMap<String, Integer>();
+
+        for (Recognition r : recognitions) {
+            final RectF location = r.getLocation();
+            if (location != null && r.getConfidence() >= 0.5f) {
+                if (counts.containsKey(r.getTitle())) {
+                    counts.put(r.getTitle(), counts.get(r.getTitle()) + 1);
+                } else {
+                    counts.put(r.getTitle(), 1);
                 }
             }
+        }
 
-            //Just for Debugging, Printing list of counts
-            for (Map.Entry<String, Integer> entry : counts.entrySet()) {
-                String key = entry.getKey();
-                Integer count = entry.getValue();
-                Log.d(TAG, key + " : " + count);
+        //Just for Debugging, Printing list of counts
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            String key = entry.getKey();
+            Integer count = entry.getValue();
+            Log.d(TAG, key + " : " + count);
 //				Toast.makeText(ac, key + " : " + count, Toast.LENGTH_SHORT).show();
-				try {
-					key_object.setText(key);
-					value_object.setText(String.valueOf(count));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+            try {
+                key_object.setText(key);
+                value_object.setText(String.valueOf(count));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
 			/*
 			Till Here
@@ -483,52 +519,52 @@ public class FaceRecognitionProcessor {
     static TextView key_object, value_object;
     static TextView key_txt, value_txt
 			 */
-	}
+    }
 
-	protected void onFailure(@NonNull Exception e) {
-		Log.w(TAG, "Face detection failed." + e);
-	}
+    protected void onFailure(@NonNull Exception e) {
+        Log.w(TAG, "Face detection failed." + e);
+    }
 
-	private void detectInVisionImage( FirebaseVisionImage image, final FrameMetadata metadata, final GraphicOverlay graphicOverlay, final ByteBuffer data) {
-		viewList.clear();
+    private void detectInVisionImage(FirebaseVisionImage image, final FrameMetadata metadata, final GraphicOverlay graphicOverlay, final ByteBuffer data) {
+        viewList.clear();
 
-		final Bitmap bm = image.getBitmap();
-		detectInImage(image)
-				.addOnSuccessListener(
-						new OnSuccessListener<List<FirebaseVisionFace>>() {
-							@Override
-							public void onSuccess(List<FirebaseVisionFace> results) {
-								shouldThrottle.set(false);
-								com.rnd.face_detection.FaceRecognitionProcessor.this.onSuccess(results, metadata, graphicOverlay, bm);
-							}
-						})
-				.addOnFailureListener(
-						new OnFailureListener() {
-							@Override
-							public void onFailure(@NonNull Exception e) {
-								shouldThrottle.set(false);
-								com.rnd.face_detection.FaceRecognitionProcessor.this.onFailure(e);
-							}
-						});
-		// Begin throttling until this frame of input has been processed, either in onSuccess or
-		// onFailure.
-		shouldThrottle.set(true);
+        final Bitmap bm = image.getBitmap();
+        detectInImage(image)
+                .addOnSuccessListener(
+                        new OnSuccessListener<List<FirebaseVisionFace>>() {
+                            @Override
+                            public void onSuccess(List<FirebaseVisionFace> results) {
+                                shouldThrottle.set(false);
+                                com.rnd.face_detection.FaceRecognitionProcessor.this.onSuccess(results, metadata, graphicOverlay, bm);
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                shouldThrottle.set(false);
+                                com.rnd.face_detection.FaceRecognitionProcessor.this.onFailure(e);
+                            }
+                        });
+        // Begin throttling until this frame of input has been processed, either in onSuccess or
+        // onFailure.
+        shouldThrottle.set(true);
 
-	}
+    }
 
 
-	//endregion
+    //endregion
 
     // Object Detection Utils
-	private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
-			throws IOException {
-		AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
-		FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-		FileChannel fileChannel = inputStream.getChannel();
-		long startOffset = fileDescriptor.getStartOffset();
-		long declaredLength = fileDescriptor.getDeclaredLength();
-		return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-	}
+    private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
+            throws IOException {
+        AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
 
     public class Recognition {
         /**
@@ -599,4 +635,77 @@ public class FaceRecognitionProcessor {
         }
     }
 
+    public void saveAndSendImpression(MediaModel media, long durationMs, Context context) {
+        ImpressionEntity impression = new ImpressionEntity();
+
+        impression.impressionId = DataHolder.getInstance().screenID + String.format("%03d", new Random().nextInt(1000));
+
+        impression.advertId = null;
+        impression.amountSettled = false;
+        impression.contractId = media.getContractId(); // ممكن تغيرها لو عندك بيانات ديناميكية
+        impression.currency = media.getCurrency();      // ممكن تغيرها لو عندك بيانات من JSON
+        impression.dayHour = Integer.parseInt(getCurrentHourFormatted());
+        impression.playSec = 0;
+        impression.format = null;
+        impression.locationType = DataHolder.getInstance().locationTypes; // ممكن تغيرها لو عندك بيانات من JSON
+        impression.maxBid = media.getMaxBid();             // ممكن تتجاهلها أو تغيرها
+        impression.orientation = orient;
+        impression.playTimeStamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).format(new Date());
+        impression.screenDevice = DataHolder.getInstance().screenDevice;
+        impression.screenPlayer = DataHolder.getInstance().screenPlayer;
+        impression.screenId = DataHolder.getInstance().screenID;
+
+        // لو tags عندك List<String> بدل String، عدّل هنا
+        impression.tags = DataHolder.getInstance().tags;
+
+        // حفظ في Room (تأكد من ان ImpressionDatabase معرف بشكل صحيح)
+        AdDatabase db = AdDatabase.getInstance(context);
+        new Thread(() -> {
+            db.impDao().insertImpression(impression);
+
+            // رفع البيانات لو فيه إنترنت
+            if (isInternetAvailable(context)) {
+                AdDatabase adDatabase = AdDatabase.getInstance(context);
+                List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
+                for (ImpressionEntity impression1 : impressions) {
+                    APIImpression.sendImpression(context, impression1);
+                }
+            }
+        }).start();
+    }
+
+    private boolean isInternetAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    private String getCurrentHourFormatted() {
+        return new SimpleDateFormat("H", Locale.getDefault()).format(new Date());
+    }
+
+    public void startScheduler() {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                myFunction();
+
+                handler.postDelayed(this, 10 * 60 * 1000);
+            }
+        };
+
+        // أول استدعاء يبدأ فورًا
+        handler.post(runnable);
+    }
+
+    public void stopScheduler() {
+        if (runnable != null) {
+            handler.removeCallbacks(runnable);
+        }
+    }
+
+    private void myFunction() {
+        // الكود اللي عايز تنفذه كل 10 دقايق
+        System.out.println("Function executed at: " + System.currentTimeMillis());
+    }
 }

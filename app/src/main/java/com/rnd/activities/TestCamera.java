@@ -1,14 +1,17 @@
 package com.rnd.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.widget.TextView;
 
@@ -20,6 +23,8 @@ import com.rnd.others.GraphicOverlay;
 import com.rnd.utilities.TinyDB;
 
 import java.io.IOException;
+import static com.rnd.face_detection.FaceRecognitionProcessor.handler;
+import static com.rnd.face_detection.FaceRecognitionProcessor.runnable;
 
 public class TestCamera extends AppCompatActivity {
 
@@ -37,8 +42,10 @@ public class TestCamera extends AppCompatActivity {
     public static TextView key_age, value_age;
     public static TextView key_object;
     public static TextView value_object;
-    public static TextView value_txt;
+    public static TextView value_txt, mood_txt;
+    public static String orient;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +57,11 @@ public class TestCamera extends AppCompatActivity {
         orientation = tinyDb.getInt("Orientation");
         back_camera = tinyDb.getBoolean("BackCamera");
         if (orientation == 0) {
+            orient="portrait";
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            orient="landscape";
         }
         preview = findViewById(R.id.camera_source_preview);
 
@@ -64,7 +73,7 @@ public class TestCamera extends AppCompatActivity {
         value_object = findViewById(R.id.value_object);
 
         value_txt = findViewById(R.id.value_txt);
-
+        mood_txt = findViewById(R.id.mood_tv);
         if (preview == null) {
             Log.d(TAG, "Preview is null");
         }
@@ -88,6 +97,9 @@ public class TestCamera extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+        if (runnable != null) {
+            handler.removeCallbacks(runnable);
+        }
     }
 
     @Override
@@ -156,9 +168,11 @@ public class TestCamera extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     createCameraSource();
                     startCameraSource();
-                } else {}
+                } else {
+                }
                 return;
             }
         }
     }
+
 }

@@ -36,46 +36,107 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/key_age"
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
+                android:text="Age Range: "
                 android:layout_height="wrap_content"/>
 
-            <TextView
-                android:id="@+id/value_age"
-                android:layout_toRightOf="@+id/key_age"
-                android:textColor="@color/black"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/key_age"
+                    android:layout_marginStart="90dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black" />
 
         </RelativeLayout>
-
             <RelativeLayout
                 android:orientation="horizontal"
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/key_object"
                     android:textColor="@color/black"
                     android:layout_width="wrap_content"
+                    android:text="Gender : "
+
                     android:layout_height="wrap_content"/>
 
+                <TextView
+                    android:id="@+id/value_age"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="70dp"
+                    android:textColor="@color/black" />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:text="Mood : "
+
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/mood_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="70dp"
+                    android:textColor="@color/black" />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:text="Object Type :"
+                    android:layout_height="wrap_content"/>
+
+
+                <TextView
+                    android:id="@+id/key_object"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="100dp"
+                    android:textColor="@color/black" />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textColor="@color/black"
+                    android:text="Object Number : "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
 
                 <TextView
                     android:id="@+id/value_object"
-                    android:layout_toRightOf="@+id/key_object"
-                    android:textColor="@color/black"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="120dp"
+                    android:textColor="@color/black" />
 
             </RelativeLayout>
-                <TextView
-                    android:id="@+id/value_txt"
-                    android:textColor="@color/backColor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/value_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:layout_gravity="center"
+                android:textColor="@color/backColor" />
 
 
 
