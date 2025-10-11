@@ -9,7 +9,7 @@ public class DataHolder {
     public String time, orient, screenID, location;
 
     public int displayFlag;
-
+    public String currency;
     public int targetHoursFlag;
     public String locationTypes;
     public String screenPlayer;

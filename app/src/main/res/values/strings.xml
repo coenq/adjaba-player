@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Only Camera</string>
+    <string name="app_name"> RetailAI</string>
     <string name="sign_in_to_start">LOGIN TO START</string>
     <string name="booking">Age and Gender Estimation</string>
 
@@ -16,8 +16,6 @@
         <item>Landscape</item>
         <item>Forced Portrait</item>
     </string-array>
-
-
 
 
 </resources>

@@ -1,8 +1,6 @@
 package com.rnd.utilities;
 
 
-
-
 import com.rnd.newmodels.LoginRequest;
 import com.rnd.newmodels.LoginResponse;
 import com.rnd.newmodels.Root;
@@ -11,6 +9,8 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -28,6 +28,35 @@ public interface ApiCalls {
 
     @GET("get_screen_by_user")
     Call<List<Root>> getScreenResponse(@Header("Authorization") String authHeader);
+    @FormUrlEncoded
+    @POST("create_screenview")
+    Call<Void> sendCameraData(@Header("Authorization") String authHeader, @Field("screenId") String screenId,
+                                       @Field("screenViewId") String screenViewId,
+                                       @Field("amountSettled") boolean amountSettled,
+                                       @Field("currency") String currency,
+                                       @Field("dayHour") long dayHour,
+                                       @Field("playSec") double playSec,
+                                       @Field("female20") int female20,
+                                       @Field("female32") int female32,
+                                       @Field("female40") int female40,
+                                       @Field("female50") int female50,
+                                       @Field("female50plus") int female50plus,
+                                       @Field("format") String format,
+                                       @Field("impressionCost") double impressionCost,
+                                       @Field("locationType") String locationType,
+                                       @Field("male20") int male20,
+                                       @Field("male32") int male32,
+                                       @Field("male40") int male40,
+                                       @Field("male50") int male50,
+                                       @Field("male50plus") int male50plus,
+                                       @Field("objectDetected") List<String> objectDetected, // هنا تبعتها كـ String: "car,person"
+                                       @Field("orientation") String orientation,
+                                       @Field("playTimeStamp") String playTimeStamp,
+                                       @Field("screenDevice") String screenDevice,
+                                       @Field("screenPlayer") String screenPlayer,
+                                       @Field("tags") List<String> tags, // "ad1,promo"
+                                       @Field("textDetected") List<String> textDetected, // "SALE,50% OFF"
+                                       @Field("viewCount") int viewCount);
 //
 //    @GET("get_advert_by_user")
 //    Call<List<GetAdvertsResponse>> getAdvertResponse(@Header("Authorization") String authHeader);
