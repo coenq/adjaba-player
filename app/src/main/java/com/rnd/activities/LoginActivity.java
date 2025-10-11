@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText etEmail, etPassword;
     Button btnLogin;
     ProgressBar progressBar;
+    TextView termsTv;
     CheckBox checkBox;
     String token = "null";
 
@@ -51,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.edt_email);
         btnLogin = findViewById(R.id.btn_login);
         progressBar = findViewById(R.id.progressBarLogin);
+        termsTv=findViewById(R.id.terms_tv);
         checkBox = findViewById(R.id.rememberMeCheckBox);
         progressBar.getIndeterminateDrawable().setColorFilter(
                 ContextCompat.getColor(this, R.color.colorRed),
@@ -71,6 +74,13 @@ public class LoginActivity extends AppCompatActivity {
             etEmail.setText("");
             etPassword.setText("");
         }
+        termsTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TermsActivity.class);
+                startActivity(intent);
+            }
+        });
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 String savedEmail = sharedPreferences.getString("email", "");

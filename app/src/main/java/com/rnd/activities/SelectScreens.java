@@ -8,9 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
@@ -38,6 +41,11 @@ import com.rnd.R;
 import com.rnd.newmodels.MediaModel;
 import com.rnd.newmodels.Root;
 import com.rnd.newmodels.WatchingModel;
+import com.rnd.others.APIImpression;
+import com.rnd.others.DataHolder;
+import com.rnd.report.ReportDashboardActivity;
+import com.rnd.room.AdDatabase;
+import com.rnd.room.ImpressionEntity;
 import com.rnd.utilities.AuthManager;
 import com.rnd.utilities.RetrofitBuilder;
 import com.rnd.utilities.TinyDB;
@@ -87,9 +95,11 @@ public class SelectScreens extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     List<String> screenOptions = new ArrayList<>();
+    List<String> screenCurrency = new ArrayList<>();
+
     ArrayAdapter<String> spinnerAdapter;
-    Button play, logOut;
-    String orient, screen_id = "";
+    Button play, logOut, syncData,reportBt;
+    String orient, screen_id, currency = "";
     String screenDirection = "0";
 
 
@@ -98,6 +108,7 @@ public class SelectScreens extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_screen);
+        syncData = findViewById(R.id.syncData);
         context = this;
         ac = this;
         screenOptions = new ArrayList<>();
@@ -108,6 +119,7 @@ public class SelectScreens extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
         tinyDb = new TinyDB(ac);
+        reportBt=findViewById(R.id.report_bt);
         prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         editor = prefs.edit();
         context = this;
@@ -137,6 +149,18 @@ public class SelectScreens extends AppCompatActivity {
                 android.R.layout.simple_spinner_item,
                 orientationOptions
         );
+        AdDatabase adDatabase = AdDatabase.getInstance(context);
+
+        new Thread(() -> {
+            int impressionsCount = adDatabase.impDao().getAllImpressions().size();
+            runOnUiThread(() -> {
+                if (impressionsCount > 0) {
+                    syncData.setVisibility(View.VISIBLE);
+                } else {
+                    syncData.setVisibility(View.GONE);
+                }
+            });
+        }).start();
 
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -186,7 +210,7 @@ public class SelectScreens extends AppCompatActivity {
                             .apply();
                 }
                 screen_id = screenOptions.get(position);
-
+                //currency = screenCurrency.get(position);
 
             }
 
@@ -210,7 +234,12 @@ public class SelectScreens extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
+reportBt.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        startActivity(new Intent(context, ReportDashboardActivity.class));
+    }
+});
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,7 +254,9 @@ public class SelectScreens extends AppCompatActivity {
                     } else {
                         tinyDb.putInt("Orientation", 1);
                     }
-
+                    Log.d("sayedyy", screen_id);
+                    DataHolder.getInstance().screenID = screen_id;
+                    DataHolder.getInstance().currency = currency;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             setPermissions(Manifest.permission.READ_MEDIA_IMAGES);
@@ -262,6 +293,45 @@ public class SelectScreens extends AppCompatActivity {
 
             }
         });
+
+        syncData.setOnClickListener(v -> {
+            Log.d("sayed-sync", "Clicked Sync Button");
+            if (isInternetAvailable(context)) {
+                Toast.makeText(context, "Uploading...", Toast.LENGTH_LONG).show();
+                loadingBar.setVisibility(View.VISIBLE);
+                new Thread(() -> {
+                    try {
+                        List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
+                        for (ImpressionEntity impression1 : impressions) {
+                            APIImpression.sendImpression(context, impression1);
+                        }
+
+                        runOnUiThread(() -> {
+                                    Toast.makeText(context, "Successfully Uploaded", Toast.LENGTH_LONG).show();
+                                    syncData.setVisibility(View.GONE);
+                                    loadingBar.setVisibility(View.GONE);
+
+                                }
+                        );
+                    } catch (Exception e) {
+                        Log.e("sayed-sync", "Error: ", e);
+                    }
+
+                }).start();
+            } else {
+                runOnUiThread(() -> {
+                            Toast.makeText(context, "Check Internet !", Toast.LENGTH_LONG).show();
+                        }
+                );
+            }
+        });
+    }
+
+
+    private boolean isInternetAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     List<String> getIDs(Context context, Runnable onFinish) {
@@ -276,6 +346,7 @@ public class SelectScreens extends AppCompatActivity {
                         screenTags.put(response.body().get(screen).screenId, response.body().get(screen).screenTags);
                         screenLocation.put(response.body().get(screen).screenId, response.body().get(screen).location);
 */
+                        screenCurrency.add(response.body().get(screen).currency);
                         screenOptions.add(response.body().get(screen).getScreenId());
                     }
                     spinnerAdapter.notifyDataSetChanged();
@@ -360,5 +431,22 @@ public class SelectScreens extends AppCompatActivity {
                     }
 
                 }).check();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        AdDatabase adDatabase = AdDatabase.getInstance(context);
+
+        new Thread(() -> {
+            int impressionsCount = adDatabase.impDao().getAllImpressions().size();
+            runOnUiThread(() -> {
+                if (impressionsCount > 0) {
+                    syncData.setVisibility(View.VISIBLE);
+                } else {
+                    syncData.setVisibility(View.GONE);
+                }
+            });
+        }).start();
     }
 }

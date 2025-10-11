@@ -173,6 +173,15 @@
                     android:textAppearance="@android:style/TextAppearance.Medium"
                     android:textColor="@color/white" />
 
+                <TextView
+                    android:id="@+id/terms_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="&amp; Terms and Conditions (T&amp;C)"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorRed"
+                    />
             </LinearLayout>
         </RelativeLayout>
 

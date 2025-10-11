@@ -7,6 +7,43 @@
     android:background="@mipmap/background_port"
     android:padding="15dp">
 
+
+
+    <Button
+        android:id="@+id/syncData"
+        android:layout_width="130dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView"
+        android:background="@drawable/btn_login_selector"
+        android:elevation="10dp"
+        android:gravity="center"
+        android:drawableStart="@drawable/baseline_file_upload_24"
+        android:padding="15dp"
+        android:text="Sync"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        />
+
+    <Button
+        android:id="@+id/report_bt"
+        android:layout_width="130dp"
+        android:layout_height="60dp"
+        android:background="@drawable/btn_login_selector"
+        android:drawableStart="@drawable/baseline_menu_book_24"
+        android:elevation="10dp"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="Report"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+
     <ProgressBar
         android:id="@+id/loadingBar"
         android:layout_width="wrap_content"
@@ -14,8 +51,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"

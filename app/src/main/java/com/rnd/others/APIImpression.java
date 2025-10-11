@@ -4,36 +4,82 @@ import android.content.Context;
 import android.util.Log;
 
 
+import com.google.gson.Gson;
 import com.rnd.room.AdDatabase;
 import com.rnd.utilities.AuthManager;
+import com.rnd.utilities.RetrofitBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class APIImpression {
     private static final String BASE_URL = "https://api.buyir.uk/";
 
+    /*public static void sendImpression(Context context, com.rnd.room.ImpressionEntity impression) {
+        RetrofitBuilder retrofitBuilder = new RetrofitBuilder();
+        new Thread(() -> {
+            Gson gson = new Gson();
+
+            Log.d("SayedAPISS", gson.toJson(impression));
+
+            retrofitBuilder.apiCalls().sendCameraData("Bearer " + AuthManager.getToken(context), impression).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("SayedAPISS", "Impression sent successfully");
+                        AdDatabase adDatabase = AdDatabase.getInstance(context);
+                        adDatabase.impDao().clearImpressions();
+                    } else {
+                        try {
+                            Log.d("SayedAPISS", "Impression Error Code " + response.code() + " " + response.errorBody().string());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AdDatabase adDatabase = AdDatabase.getInstance(context);
+                                adDatabase.impDao().clearImpressions();
+
+                            }
+                        }).start();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.d("SayedAPISS", "Impression Failed " + t.getMessage());
+                }
+            });
+        }).start();
+
+    }*/
     public static void sendImpression(Context context, com.rnd.room.ImpressionEntity impression) {
         new Thread(() -> {
             try {
-                URL url = new URL(BASE_URL + "create_impression");
+                URL url = new URL(BASE_URL + "create_screenview");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Authorization", "Bearer " + AuthManager.getToken(context));
                 conn.setDoOutput(true);
-
                 JSONObject json = new JSONObject();
                 try {
-                    json.put("impressionId", impression.impressionId);
-                    json.put("advertId", impression.advertId);
+                    json.put("screenId", impression.screenId);
+                    json.put("screenViewId", impression.screenViewId);
                     json.put("amountSettled", impression.amountSettled);
-                    json.put("contractId", impression.contractId);
                     json.put("currency", impression.currency);
                     json.put("dayHour", impression.dayHour);
                     json.put("playSec", impression.playSec);
@@ -44,6 +90,9 @@ public class APIImpression {
                     json.put("female40", impression.female40);
                     json.put("female50", impression.female50);
                     json.put("female50plus", impression.female50plus);
+                    json.put("format", impression.format);
+                    json.put("impressionCost", impression.impressionCost);
+                    json.put("locationType", impression.locationType);
 
                     // male counts
                     json.put("male20", impression.male20);
@@ -51,12 +100,6 @@ public class APIImpression {
                     json.put("male40", impression.male40);
                     json.put("male50", impression.male50);
                     json.put("male50plus", impression.male50plus);
-
-                    json.put("format", impression.format);
-                    json.put("impressionCost", impression.impressionCost);
-                    json.put("isActiveContract", impression.isActiveContract);
-                    json.put("locationType", impression.locationType);
-                    json.put("maxBid", impression.maxBid);
 
                     // arrays
                     if (impression.objectDetected != null) {
@@ -73,10 +116,8 @@ public class APIImpression {
                     json.put("playTimeStamp", impression.playTimeStamp);
                     json.put("screenDevice", impression.screenDevice);
                     json.put("screenPlayer", impression.screenPlayer);
-                    json.put("screenId", impression.screenId);
-
                     json.put("viewCount", impression.viewCount);
-
+                    Log.d("sayed_json",json+"");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -87,11 +128,13 @@ public class APIImpression {
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
-                    Log.d("SayedAPI", "Impression sent successfully");
+                    Log.d("SayedAPISS", "Impression sent successfully");
                     AdDatabase adDatabase=AdDatabase.getInstance(context);
-                    adDatabase.impDao().deleteAdById(impression.impressionId);
+                    adDatabase.impDao().deleteAdById(impression.screenViewId);
                 } else {
-                    Log.e("API", "Failed to send impression: " + responseCode);
+                    Log.e("saAPI", "Failed to send impression: " + responseCode);
+                    AdDatabase adDatabase=AdDatabase.getInstance(context);
+                    adDatabase.impDao().deleteAdById(impression.screenViewId);
                 }
 
                 conn.disconnect();

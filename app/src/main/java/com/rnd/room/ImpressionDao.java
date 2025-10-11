@@ -12,7 +12,7 @@ public interface ImpressionDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertImpression(ImpressionEntity impression);
-    @Query("DELETE FROM impressions WHERE impressionId = :id")
+    @Query("DELETE FROM impressions WHERE screenViewId = :id")
     void deleteAdById(String id);
     @Query("SELECT * FROM impressions")
     List<ImpressionEntity> getAllImpressions();

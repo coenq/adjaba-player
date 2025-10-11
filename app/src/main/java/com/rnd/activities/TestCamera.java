@@ -13,29 +13,34 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rnd.R;
 import com.rnd.camera.CameraSource;
 import com.rnd.camera.CameraSourcePreview;
 import com.rnd.face_detection.FaceRecognitionProcessor;
+import com.rnd.others.DataHolder;
 import com.rnd.others.GraphicOverlay;
 import com.rnd.utilities.TinyDB;
 
 import java.io.IOException;
+
 import static com.rnd.face_detection.FaceRecognitionProcessor.handler;
 import static com.rnd.face_detection.FaceRecognitionProcessor.runnable;
 
 public class TestCamera extends AppCompatActivity {
 
 
-    private CameraSource cameraSource = null;
+    public static CameraSource cameraSource = null;
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
     private static String TAG = "Test Camera";
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     boolean back_camera = false;
     int orientation;
+    public static TestCamera instance;
+    public static LinearLayout container;
 
     public static Activity ac;
     TinyDB tinyDb;
@@ -43,6 +48,7 @@ public class TestCamera extends AppCompatActivity {
     public static TextView key_object;
     public static TextView value_object;
     public static TextView value_txt, mood_txt;
+    FaceRecognitionProcessor faceRecognitionProcessor;
     public static String orient;
 
     @SuppressLint("MissingInflatedId")
@@ -50,18 +56,18 @@ public class TestCamera extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
-
+        instance = this;
         ac = this;
         tinyDb = new TinyDB(ac);
-
+        container=findViewById(R.id.ageContainer);
         orientation = tinyDb.getInt("Orientation");
         back_camera = tinyDb.getBoolean("BackCamera");
         if (orientation == 0) {
-            orient="portrait";
+            orient = "portrait";
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            orient="landscape";
+            orient = "landscape";
         }
         preview = findViewById(R.id.camera_source_preview);
 
@@ -74,6 +80,7 @@ public class TestCamera extends AppCompatActivity {
 
         value_txt = findViewById(R.id.value_txt);
         mood_txt = findViewById(R.id.mood_tv);
+        faceRecognitionProcessor = new FaceRecognitionProcessor(getAssets(), false, this);
         if (preview == null) {
             Log.d(TAG, "Preview is null");
         }
@@ -94,31 +101,35 @@ public class TestCamera extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
         if (runnable != null) {
             handler.removeCallbacks(runnable);
         }
+
+        if (cameraSource == null) {
+            createCameraSource();
+        }
+        startCameraSource(); // ✅ نشغل الكاميرا كل مرة نرجع للشاشة
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        preview.stop();
-    }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (cameraSource != null) {
-            try {
-                cameraSource.release();
-            } catch (Exception e) {
-                e.printStackTrace();
+    protected void onStop() {
+        super.onStop();
+        try {
+            if (cameraSource != null) {
+                cameraSource.release(); // يقفل الكاميرا والـ Threadات
+                cameraSource = null;
             }
-            cameraSource = null;
+            if (preview != null) {
+                preview.stop();
+                preview.release();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -130,7 +141,7 @@ public class TestCamera extends AppCompatActivity {
     private void createCameraSource(boolean frontFacingCamera) {
 
         if (cameraSource != null) {
-            onPause();
+            cameraSource.stop();
             cameraSource.release();
         }
         cameraSource = new CameraSource(this, graphicOverlay);
@@ -139,7 +150,7 @@ public class TestCamera extends AppCompatActivity {
         } else {
             cameraSource.setFacing(frontFacingCamera ? CameraSource.CAMERA_FACING_FRONT : CameraSource.CAMERA_FACING_FRONT);
         }
-        cameraSource.setMachineLearningFrameProcessor(new FaceRecognitionProcessor(getAssets(), frontFacingCamera, this));
+        cameraSource.setMachineLearningFrameProcessor(faceRecognitionProcessor);
     }
 
     private void startCameraSource() {
@@ -160,6 +171,7 @@ public class TestCamera extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -174,5 +186,65 @@ public class TestCamera extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCameraAndProcessor();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopCameraAndProcessor();
+    }
+
+    @Override
+    public void onBackPressed() {
+        stopCameraAndProcessor();
+        finish();
+        super.onBackPressed();
+    }
+
+    private void stopCameraAndProcessor() {
+        try {
+            // أوقف الـ faceRecognitionProcessor لو شغال
+            if (faceRecognitionProcessor != null) {
+                faceRecognitionProcessor.stop1();
+
+                if (handler != null && faceRecognitionProcessor.runnableCode != null) {
+                    handler.removeCallbacks(faceRecognitionProcessor.runnableCode);
+                    faceRecognitionProcessor.runnableCode = null;
+                }
+
+                faceRecognitionProcessor.stop();  // لو عندك stop عام
+                faceRecognitionProcessor = null;  // مهم عشان ما يتندهش عليه تاني
+            }
+
+            // أوقف الـ Runnable العام (لو فيه غير اللي في faceRecognitionProcessor)
+            if (handler != null && runnable != null) {
+                handler.removeCallbacks(runnable);
+                runnable = null;
+            }
+
+            // أوقف الكاميرا نفسها
+            if (cameraSource != null) {
+                cameraSource.stop();     // يوقف الـ preview
+                cameraSource.release();  // يحرر الموارد
+                cameraSource = null;
+            }
+
+            // أوقف الـ Preview (SurfaceView/TextureView)
+            if (preview != null) {
+                preview.stop();
+                preview = null;
+            }
+
+            Log.d("CameraDebug", "Camera + Processor stopped successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
