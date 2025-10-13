@@ -149,21 +149,26 @@ public class AdvertWatching extends AppCompatActivity {
         boolean isDataLoaded = prefs.getBoolean("data_loaded", false);
         orient = DataHolder.getInstance().orient.toLowerCase();
         int currentOrientation = getResources().getConfiguration().orientation;
+        qrImage = findViewById(R.id.qrCodeImage);
+        logoImage = findViewById(R.id.logoImage);
 
         if ("landscape".equalsIgnoreCase(orient)) {
             if (currentOrientation != Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 prefs.edit().remove("data_loaded").apply();
-
             }
-        } else {
+        } else if ("portrait".equalsIgnoreCase(orient)) {
             if (currentOrientation != Configuration.ORIENTATION_PORTRAIT) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 prefs.edit().remove("data_loaded").apply();
             }
+        } else if ("forced portrait".equalsIgnoreCase(orient)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            logoImage.setRotation(90f);
+            qrImage.setRotation(90f);
+            prefs.edit().remove("data_loaded").apply();
         }
         // --- على مستوى الكلاس (fields) ---
-        logoImage = findViewById(R.id.logoImage);
         displayText = findViewById(R.id.displayText);
         context = this;
         advertHoursMap = new HashMap<>();
@@ -184,7 +189,6 @@ public class AdvertWatching extends AppCompatActivity {
         screenId = DataHolder.getInstance().screenID;
         location = DataHolder.getInstance().location;
         qrImageDimension = qrCodeImageDimension();
-        qrImage = findViewById(R.id.qrCodeImage);
 
         logoImage.setOnClickListener(new View.OnClickListener() {
             private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 300ms
@@ -268,7 +272,7 @@ public class AdvertWatching extends AppCompatActivity {
         Log.d("time_refresh 15", AuthManager.getToken(this) + "");
         List<MediaModel> mediaModels = new ArrayList<>();
         screenLoc = location;
-        if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape")) {
+        if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape")||orient.equals("forced portrait")) {
 
                 /*AdDatabase db = AdDatabase.getInstance(context);
                 //db.adDao().deleteAllAds();
@@ -801,9 +805,9 @@ public class AdvertWatching extends AppCompatActivity {
         return false;
     }
 
-/*
-    @OptIn(markerClass = {UnstableApi.class, UnstableApi.class, UnstableApi.class})
-*/
+    /*
+        @OptIn(markerClass = {UnstableApi.class, UnstableApi.class, UnstableApi.class})
+    */
     private void setupExoPlayer(String url, Animation inAnim, Animation outAnim) {
 
         releaseExoPlayer();
@@ -964,9 +968,9 @@ public class AdvertWatching extends AppCompatActivity {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-/*
-    @OptIn(markerClass = UnstableApi.class)
-*/
+    /*
+        @OptIn(markerClass = UnstableApi.class)
+    */
     private void setupPlayerResizeMode(PlayerView playerView) {
         int uiMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_TYPE_MASK;
 

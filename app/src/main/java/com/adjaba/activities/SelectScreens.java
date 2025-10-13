@@ -38,6 +38,7 @@ import com.adjaba.models.newmodels.WatchingModel;
 import com.adjaba.others.TargetHours;
 import com.adjaba.room.AdDatabase;
 import com.adjaba.room.AdEntity;
+import com.adjaba.room.InfoEntity;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.RetrofitBuilder;
 
@@ -88,7 +89,7 @@ public class SelectScreens extends AppCompatActivity {
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
     CheckBox rememberMe, displayText, businessRules;
-    ImageView logo, picture;
+    ImageView adsInfo, picture;
     List<String> screenOptions1;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
@@ -132,7 +133,7 @@ public class SelectScreens extends AppCompatActivity {
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, screenOptions);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
-        String[] orientationOptions = {"Orientation", "Landscape", "Portrait"};
+        String[] orientationOptions = {"Orientation", "Landscape", "Portrait","Forced Portrait"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -157,7 +158,12 @@ public class SelectScreens extends AppCompatActivity {
             }
         });
 // تحميل البيانات من السيرف);
-
+adsInfo.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        startActivity(new Intent(context,InfoActivity.class));
+    }
+});
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -627,14 +633,17 @@ public class SelectScreens extends AppCompatActivity {
                         } else {
                             // فشل التحميل
                             loadedCount[0]++;
-                            new Handler(Looper.getMainLooper()).post(() -> {
+                            AdDatabase db = AdDatabase.getInstance(context);
+                            db.infoDao().insertInfo(new InfoEntity("Failed to download media: " + path));
+                            /*new Handler(Looper.getMainLooper()).post(() -> {
+
                                 Toast.makeText(context, "Failed to download media: " + path, Toast.LENGTH_SHORT).show();
                                 // ممكن تحويّل السلوك: حاول إعادة المحاولة أو تتابع بدون الملف
                                 if (loadedCount[0] == totalCount) {
                                     // dismissDownloadDialog();
                                     // تعامل كما في حالة الاكتمال
                                 }
-                            });
+                            });*/
                         }
                     });
                 } else {
@@ -851,6 +860,7 @@ public class SelectScreens extends AppCompatActivity {
         topAppBar = findViewById(R.id.topAppBar);
         bot_lay = findViewById(R.id.bot_lay);
         spinner1 = findViewById(R.id.spinner1);
+        adsInfo=findViewById(R.id.ads_info);
         spinnerID = findViewById(R.id.spinnerID);
         progressBar = findViewById(R.id.progressSignOut);
         spinner2 = findViewById(R.id.spinner2);

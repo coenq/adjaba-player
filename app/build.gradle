@@ -8,7 +8,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     namespace 'com.adjaba'
 
-    compileSdkVersion 35
+    compileSdkVersion 36
     defaultConfig {
         applicationId "com.adjaba"
         minSdkVersion 21
@@ -60,12 +60,14 @@ android {
 }*/
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.android.material:material:1.13.0' // أو آخر نسخة متاحة عندك
 
     // AndroidX core
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.activity:activity:1.11.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
