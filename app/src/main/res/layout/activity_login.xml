@@ -77,11 +77,11 @@
                         android:layout_height="50dp"
                         android:layout_margin="15dp"
                         android:background="@drawable/edt_text_custom"
-
                         android:entries="@array/screen_arrays"
                         android:hint="Email"
                         android:padding="8dp"
                         android:prompt="@string/screen_prompt"
+                        android:singleLine="true"
                         android:textSize="15sp" />
 
 
@@ -94,6 +94,7 @@
                         android:hint="Password"
                         android:inputType="textPassword"
                         android:padding="8dp"
+                        android:singleLine="true"
                         android:prompt="@string/screen_prompt"
                         android:textSize="15sp" />
 

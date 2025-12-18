@@ -4,39 +4,32 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.PorterDuff;
-import android.graphics.Shader;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import com.adjaba.Interface.ApiCalls;
 import com.adjaba.R;
 import com.adjaba.models.newmodels.LoginRequest;
 import com.adjaba.models.newmodels.LoginResponse;
 import com.adjaba.room.AdDatabase;
-import com.adjaba.room.AdEntity;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.RetrofitBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -88,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
             if (isChecked) {
                 String savedEmail = sharedPreferences.getString("email", "");
                 String savedPassword = sharedPreferences.getString("password", "");
-                Log.d("sayed_ll", savedPassword);
                 etEmail.setText(savedEmail);
                 etPassword.setText(savedPassword);
             } else {
@@ -101,12 +93,12 @@ public class LoginActivity extends AppCompatActivity {
         if (Objects.equals(token, "null")) {
             token = AuthManager.getToken(this);
         }
-        /*if (!isInternetAvailable()) {
-            Log.d("sayed", AuthManager.getToken(this));
-        }*/
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                btnLogin.setVisibility(View.GONE);
                 attemptLogin(editor);
             }
         });
@@ -119,7 +111,6 @@ public class LoginActivity extends AppCompatActivity {
         apiCalls.login(request).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                Log.d("sayed_api9", userId + " " + password);
                 if (response.isSuccessful()) {
                     if (checkBox.isChecked()) {
                         editor.putString("email", etEmail.getText().toString());
@@ -128,12 +119,39 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     progressBar.setVisibility(View.GONE);
                     LoginResponse data = response.body();
-                    Log.d("LOGIN_SUCCESS", "Token: " + data.loginToken);
-                    SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
-                    prefs.edit().putString("token", data.loginToken).apply();
+                    MasterKey masterKey = null;
+                    try {
+                        masterKey = new MasterKey.Builder(getApplicationContext())
+                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                                .build();
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    SharedPreferences securePrefs = null;
+                    try {
+                        securePrefs = EncryptedSharedPreferences.create(
+                                getApplicationContext(),
+                                "auth",
+                                masterKey,
+                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                        );
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    securePrefs.edit()
+                            .putString("token", data.loginToken)
+                            .apply();
                     intentToPreview();
 
                 } else {
+                    btnLogin.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Failed Data!", Toast.LENGTH_LONG).show();
                 }
@@ -141,6 +159,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                btnLogin.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(LoginActivity.this, "Connection Error!", Toast.LENGTH_LONG).show();
             }
@@ -169,6 +188,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (!isValidInput(userId, password)) {
+            btnLogin.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -203,4 +223,9 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        btnLogin.setVisibility(View.VISIBLE);
+    }
 }

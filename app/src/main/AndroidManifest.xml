@@ -5,36 +5,13 @@
     tools:ignore="MissingLeanbackLauncher,MissingLeanbackSupport">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/> -->
-    <uses-permission android:name="android.permission.ACCESS_GPS" />
-    <uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
-    <uses-permission android:name="android.permission.ACCESS_LOCATION" />
-
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature
-        android:name="android.hardware.camera2.full"
-        tools:ignore="UnsupportedTvHardware" />
-    <uses-feature android:name="android.hardware.usb.host" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera"
-        tools:ignore="UnsupportedTvHardware" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        tools:ignore="UnsupportedTvHardware" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -51,9 +28,11 @@
         tools:ignore="ExtraText,MissingTvBanner"
         tools:targetApi="23">
         <activity
-            android:name=".activities.InfoActivity"
+            android:name=".activities.AdvertLandWatch"
             android:exported="false" />
-        <!-- شاشة المعاينة -->
+        <activity
+            android:name=".activities.InfoActivity"
+            android:exported="false" /> <!-- شاشة المعاينة -->
         <activity
             android:name=".activities.PreviewAds"
             android:exported="true" /> <!-- شاشة تسجيل الدخول، هي Main للموبايل وTV -->
@@ -78,7 +57,9 @@
         </activity> <!-- شاشة عرض الإعلانات -->
         <activity
             android:name=".activities.AdvertWatching"
-            android:exported="true" />
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true"
+            />
         <activity
             android:name=".activities.SelectScreens"
             android:exported="true" />

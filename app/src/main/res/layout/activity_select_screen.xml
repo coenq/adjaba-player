@@ -4,8 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainSelectedScreenLayout"
     android:background="@mipmap/background_port"
-    android:padding="15dp">
+    android:padding="16dp">
+
+
+    <ImageView
+        android:id="@+id/waitingLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:src="@mipmap/app_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ProgressBar
         android:id="@+id/loadingBar"
         android:layout_width="wrap_content"
@@ -14,6 +29,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/loadingLogo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@mipmap/logo1"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nestedScrollView" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
@@ -41,17 +67,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_toRightOf="@+id/logo"
-                android:background="@null" >
+                android:background="@null">
+
                 <ImageView
                     android:id="@+id/ads_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:background="@drawable/baseline_info_24"
-                    />
+                    android:background="@drawable/baseline_info_24" />
             </androidx.appcompat.widget.Toolbar>
 
             <!--app:menu="@menu/select_screen_top_menu"-->
+
 
             <ImageView
                 android:id="@+id/picture"
@@ -310,6 +337,18 @@
         </RelativeLayout>
 
     </androidx.core.widget.NestedScrollView>
+    <LinearLayout
+        android:id="@+id/logosLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

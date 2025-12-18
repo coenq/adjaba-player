@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -46,12 +45,10 @@ public class PreviewAds extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
         context = this;
         retrofitBuilder = new RetrofitBuilder();
-        Log.d("sayed_token", "PreviewAds : " + AuthManager.getToken(this));
         retrofitBuilder.apiCalls().getScreenResponse("Bearer " + AuthManager.getToken(this)).enqueue(new Callback<List<Root>>() {
             @Override
             public void onResponse(Call<List<Root>> call, Response<List<Root>> response) {
                 if (response.isSuccessful()) {
-                    Log.d("sayed_res", response.body().get(0).aboutScreen);
                     mainAdsAdapter = new MainAdsAdapter(response.body(), context,fragmentManager);
                     recyclerView.setAdapter(mainAdsAdapter);
                 }

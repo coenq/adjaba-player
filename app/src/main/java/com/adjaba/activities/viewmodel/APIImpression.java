@@ -1,7 +1,6 @@
 package com.adjaba.activities.viewmodel;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.adjaba.room.AdDatabase;
 import com.adjaba.room.ImpressionEntity;
@@ -13,8 +12,7 @@ import org.json.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class APIImpression {
     private static final String BASE_URL = "https://api.buyir.uk/";
@@ -33,9 +31,25 @@ public class APIImpression {
                 json.put("impressionId", impression.impressionId);
                 json.put("advertId", impression.advertId);
                 json.put("amountSettled", impression.amountSettled);
-                json.put("contractId", impression.contractId);
-                json.put("currency", impression.currency);
+                json.put("contractId", impression.currency);
+                json.put("duration", 5);
+                json.put("currency", "USD");
                 json.put("dayHour", impression.dayHour);
+                json.put("female20", 0);
+                json.put("female32", 0);
+                json.put("female40", 0);
+                json.put("female50", 0);
+                json.put("female50plus", 0);
+                json.put("male20", 0);
+                json.put("male32", 0);
+                json.put("male40", 0);
+                json.put("male50", 0);
+                json.put("male50plus", 0);
+                json.put("objectdetected", "");
+                json.put("impressioncost", 0);
+                json.put("isactivecontract", 0);
+                json.put("textdetected", "");
+                json.put("totalview", 0);
                 json.put("playSec", impression.playSec);
                 json.put("format", impression.format);
                 json.put("locationType", impression.locationType);
@@ -46,18 +60,15 @@ public class APIImpression {
                 json.put("screenPlayer", impression.screenPlayer);
                 json.put("screenId", impression.screenId);
                 json.put("tags", new JSONArray(impression.tags));
-
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(json.toString().getBytes());
                 }
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
-                    Log.d("SayedAPI", "Impression sent successfully");
                     AdDatabase adDatabase=AdDatabase.getInstance(context);
                     adDatabase.impDao().deleteAdById(impression.impressionId);
                 } else {
-                    Log.e("API", "Failed to send impression: " + responseCode);
                 }
 
                 conn.disconnect();
