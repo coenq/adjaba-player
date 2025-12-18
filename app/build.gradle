@@ -1,10 +1,18 @@
 apply plugin: 'com.android.application'
-/*apply plugin: 'org.jetbrains.kotlin.kapt'
-apply plugin: 'org.jetbrains.kotlin.android'*/
+apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-android'
 apply plugin: 'realm-android'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
 
+def WEATHER_API_KEY = ""
+Properties properties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    properties.load(new FileInputStream(localPropertiesFile))
+    WEATHER_API_KEY = properties.getProperty("WEATHER_API_KEY", "")
+}
 android {
     namespace 'com.adjaba'
 
@@ -19,6 +27,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
+        buildConfigField "String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\""
     }
     buildTypes {
         release {
@@ -38,26 +47,16 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-//    dexOptions {
-//        incremental = true;
-//        preDexLibraries = false
-//        javaMaxHeapSize "4g" // 2g should be also OK
-//    }
-//    aaptOptions.cruncherEnabled = false
-//    aaptOptions.useNewCruncher = false
     lintOptions {
         abortOnError false
         checkReleaseBuilds false
     }
-   /* kotlinOptions {
-        jvmTarget = '17'
-    }*/
-}
-/*configurations.all {
-    resolutionStrategy {
-        force 'com.google.android.gms:play-services-vision-common:20.0.0'
+
+    buildFeatures {
+        buildConfig = true
     }
-}*/
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.13.0' // أو آخر نسخة متاحة عندك
@@ -71,19 +70,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    /*// ML Kit Face Detection (الجديد)
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.mlkit:image-labeling:17.0.7'
-    implementation 'com.google.mlkit:text-recognition:16.0.0'
-    implementation 'com.google.mlkit:face-detection:16.1.5'
-    implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.1.1'
-
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:32.7.1')
-    implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'*/
 
     // Retrofit + GSON + OkHttp
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -93,7 +79,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3'
     implementation 'com.google.code.gson:gson:2.10'
 
-     // RxJava
+    // RxJava
     implementation "io.reactivex.rxjava2:rxjava:2.2.21"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
     implementation "androidx.room:room-rxjava2:2.6.1"
@@ -105,46 +91,17 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
-    /*// File Downloader
-    implementation 'com.github.huxq17:Pump:1.3.10'
+    //logo animation
+    implementation "com.airbnb.android:lottie:6.0.0"
 
-
-    // Progress Circle
-    implementation 'com.github.lzyzsd:circleprogress:1.2.1'*/
-
-    /*// Permissions
-    implementation 'com.karumi:dexter:6.2.3'
-
-    // Fresco
-    implementation 'com.facebook.fresco:fresco:2.6.0'
-    implementation 'com.facebook.fresco:animated-gif:2.6.0'
-*/
-    /*// Crash Reporter
-    implementation 'com.google.firebase:firebase-crashlytics'
-
-    // Auto Start
-    implementation 'com.github.judemanutd:autostarter:1.1.0'*/
+    //shimmer animation
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
 
     // QR Code
     implementation 'com.github.androidmads:QRGenerator:1.0.1'
     implementation 'com.google.zxing:core:3.5.1'
 
-    // Fancy Dialog
-    // implementation 'com.github.mejdi14:Flat-Dialog-Android:1.0.5'
-
-    /*// Google Sign In
-    implementation 'com.google.android.gms:play-services-auth:21.4.0'
-    implementation 'com.google.android.gms:play-services-vision:20.0.0'*/
-
-    /*// Testing
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'*/
-
-    // Media3 core
-    /*implementation 'androidx.media3:media3-exoplayer:1.4.1'
-    implementation 'androidx.media3:media3-ui:1.4.1'*/
 
     implementation "com.google.android.exoplayer:exoplayer:2.19.1"
     implementation "com.google.android.exoplayer:exoplayer-ui:2.19.1"
@@ -156,6 +113,8 @@ dependencies {
 
 // Optional: لو هتستخدم RxJava أو Coroutines
     implementation "androidx.room:room-ktx:2.6.1"
+    kapt "androidx.room:room-compiler:2.6.1"
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
 
 
     implementation "com.airbnb.android:lottie:6.1.0"

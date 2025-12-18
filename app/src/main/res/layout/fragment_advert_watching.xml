@@ -1,14 +1,27 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainConstLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/waitingLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@mipmap/app_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/adImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +43,8 @@
         android:id="@+id/weatherLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/weather_back"
+        android:visibility="gone"
+        android:background="@color/new_black"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +62,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/weatherLoc"
@@ -57,36 +71,62 @@
                     android:drawableStart="@drawable/baseline_location_pin_24"
                     android:text="London"
                     android:textColor="#FFFFFF"
-                    android:textSize="@dimen/location_text_size" />
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/timeNow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="15:05"
+                    android:textColor="@color/white"
+                    android:textSize="65sp" />
+
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/currentWeatherImg"
-                android:layout_width="@dimen/weather_icon_size"
-                android:layout_height="@dimen/weather_icon_size"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/weather_icon_margin_top"
-                tools:srcCompat="@tools:sample/avatars" />
-
-            <TextView
-                android:id="@+id/weatherTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/temp_margin_top"
-                android:text="10°"
-                android:textColor="@color/white"
-                android:textSize="@dimen/temp_text_size" />
-
-            <TextView
-                android:id="@+id/currentStatus"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/status_margin"
                 android:gravity="center"
-                android:text="Sunny"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/status_text_size" />
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/currentWeatherImg"
+                    android:layout_width="@dimen/weather_icon_size"
+                    android:layout_height="@dimen/weather_icon_size"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="@dimen/weather_icon_margin_top"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <LinearLayout
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:orientation="vertical"
+
+                    >
+
+                    <TextView
+                        android:id="@+id/weatherTemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/temp_margin_top"
+                        android:text="10°"
+                        android:textColor="@color/white"
+                        android:textSize="50.sp" />
+
+                    <TextView
+                        android:id="@+id/currentStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/status_margin"
+                        android:gravity="center"
+                        android:text="Sunny"
+                        android:textColor="#FFFFFF"
+                        android:textSize="@dimen/status_text_size" />
+                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -176,19 +216,101 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/newsFrame"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:gravity="top|center"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/timeNow"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/newsTitle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="15:05"
+                    android:textSize="40sp"
+
                     android:textColor="@color/white"
-                    android:textSize="70sp" />
+                    android:gravity="center"
+                    android:text="News" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:backgroundTint="@color/new_version_black"
+                    app:cardCornerRadius="12dp">
+
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#DDDDDD" />
+
+                    </com.facebook.shimmer.ShimmerFrameLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start">
+
+                        <!-- صورة الخبر -->
+                        <ImageView
+                            android:id="@+id/news_img"
+                            android:layout_width="0dp"
+                            android:layout_height="200dp"
+                            android:scaleType="centerCrop"
+                            android:src="@mipmap/background_port"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- البلور/الخلفية تحت الهيدر (اختياري) -->
+                        <View
+                            android:id="@+id/header_background"
+                            android:layout_width="0dp"
+                            android:layout_height="80dp"
+                            android:background="#80000000"
+                            app:layout_constraintBottom_toBottomOf="@id/news_img"
+                            app:layout_constraintEnd_toEndOf="@id/news_img"
+                            app:layout_constraintStart_toStartOf="@id/news_img" />
+
+                        <TextView
+                            android:id="@+id/main_header"
+                            android:layout_width="300dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:ellipsize="end"                            android:padding="10dp"
+                            android:text="Header sample text as news"
+                            android:textColor="@color/white"
+                            android:textSize="40sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/news_img"
+                            app:layout_constraintEnd_toEndOf="@id/news_img"
+                            app:layout_constraintStart_toStartOf="@id/news_img"
+                            app:layout_constraintTop_toTopOf="@+id/header_background" />
+
+                        <TextView
+                            android:id="@+id/news_details"
+                            android:layout_width="300dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:maxLines="3"
+                            android:ellipsize="end"                            android:padding="10dp"
+                            android:text="Header sample text as news"
+                            android:textColor="@color/white"
+                            android:textSize="30sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/news_img" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
         </LinearLayout>
@@ -197,20 +319,27 @@
 
     <ImageView
         android:id="@+id/qrCodeImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_margin="10dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
         android:contentDescription="QR Code"
+        android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.95"
+        app:layout_constraintDimensionRatio="1:1"
+        />
 
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@mipmap/logo1"
-        android:layout_margin="12dp"
+        android:src="@drawable/final_logo"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -218,11 +347,18 @@
         android:id="@+id/displayText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_margin="20dp"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
         android:text="Advert is Here"
         android:textColor="@color/white"
-        android:textSize="15sp"
-        android:gravity="center"
+        android:textSize="19sp"
+        android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -238,6 +374,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/progressText"
         android:layout_width="wrap_content"
@@ -250,4 +387,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/loadBar" />
+
+    <!--  <FrameLayout
+          android:id="@+id/noAdsLayout"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="#000000">
+
+          <ImageView
+              android:id="@+id/logo_no_ads"
+              android:layout_width="100dp"
+              android:layout_height="100dp"
+              android:layout_gravity="center"
+              android:src="@mipmap/logo1" />
+      </FrameLayout>-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>

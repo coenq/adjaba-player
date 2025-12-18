@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adjaba.R;
-import com.adjaba.room.InfoDao_Impl;
+//import com.adjaba.room.InfoDao_Impl;
 import com.adjaba.room.InfoEntity;
 
 import java.util.ArrayList;

@@ -2,17 +2,16 @@ package com.adjaba.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,12 +22,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+import androidx.core.widget.NestedScrollView;
 import com.adjaba.R;
 import com.adjaba.activities.viewmodel.DataHolder;
 import com.adjaba.models.newmodels.MediaModel;
@@ -41,15 +38,10 @@ import com.adjaba.room.AdEntity;
 import com.adjaba.room.InfoEntity;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.RetrofitBuilder;
-
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,11 +51,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -72,16 +65,15 @@ public class SelectScreens extends AppCompatActivity {
 
     List<WatchingModel> adList;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private static AlertDialog downloadDialog;
-    private static ProgressBar dialogProgressBar;
+    NestedScrollView nestedScrollView;
     private ProgressBar progressBar;
-    private static TextView dialogProgressText;
     RetrofitBuilder retrofitBuilder;
     Toolbar topAppBar;
     List<MediaModel> mediaModels = new ArrayList<>();
     Context context;
     Activity ac;
-    LinearLayout bot_lay;
+    LinearLayout bot_lay,logosLayout;
+    private int waitingData=0;
     Map<String, String> screenPlayerMap, screenLocationMap, screenDeviceMap, screenLocation;
     Map<String, List<String>> screenTags;
     List<TargetHours> targetHoursList;
@@ -89,7 +81,7 @@ public class SelectScreens extends AppCompatActivity {
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
     CheckBox rememberMe, displayText, businessRules;
-    ImageView adsInfo, picture;
+    ImageView adsInfo, picture, logo, waitingLogo;
     List<String> screenOptions1;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
@@ -103,16 +95,19 @@ public class SelectScreens extends AppCompatActivity {
     String timeRefresh = "0";
     int[] loadedCount = {0};
 
-
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_screen);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         editor = prefs.edit();
         context = this;
         ac = this;
+        logosLayout=findViewById(R.id.logosLayout);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
+        waitingLogo = findViewById(R.id.waitingLogo);
         loadingBar = findViewById(R.id.loadingBar);
         logOut = findViewById(R.id.logOut);
         screenOptions = new ArrayList<>();
@@ -126,21 +121,19 @@ public class SelectScreens extends AppCompatActivity {
         screenDeviceMap = new HashMap<>();
         screenLocation = new HashMap<>();
         screenLocationMap = new HashMap<>();
-        // في onCreate أو بعد findViews()
         screenTags = new HashMap<>();
         screenOptions.add("Select Screen"); // العنصر الأول الثابت
         //screenOptions1.add("Select Screen");
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, screenOptions);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
-        String[] orientationOptions = {"Orientation", "Landscape", "Portrait","Forced Portrait"};
+        logo = findViewById(R.id.loadingLogo);
+        String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
                 orientationOptions
         );
-
-
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         int spinner1Pos = prefs.getInt("spinner1_position", 0);
         int spinner2Pos = prefs.getInt("spinner2_position", 0);
@@ -157,80 +150,43 @@ public class SelectScreens extends AppCompatActivity {
                 spinner2.setSelection(spinner2Pos);
             }
         });
-// تحميل البيانات من السيرف);
-adsInfo.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        startActivity(new Intent(context,InfoActivity.class));
-    }
-});
+        adsInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, InfoActivity.class));
+            }
+        });
+        waitingLogo.setOnClickListener(new View.OnClickListener() {
+            private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 300ms
+            long lastClickTime = 0;
+
+            @Override
+            public void onClick(View v) {
+                if (waitingData == 0) {
+                    long clickTime = System.currentTimeMillis();
+                    if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                        nestedScrollView.setVisibility(View.VISIBLE);
+                        logosLayout.setVisibility(View.VISIBLE);
+                        waitingLogo.setVisibility(View.GONE);
+                        int padding = dpToPx(16);
+                        nestedScrollView.setPadding(padding, padding, padding, padding);
+                    }
+                    lastClickTime = clickTime;
+                }
+            }
+        });
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    // عرض مؤشر تحميل على الـ UI (اختياري)
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        // example: showProgress(true);
-                        progressBar.setVisibility(view.VISIBLE);
-
-                    });
-
-                    dbExecutor.execute(() -> {
-                        try {
-                            AdDatabase adDatabase = AdDatabase.getInstance(view.getContext().getApplicationContext());
-
-                            while (adDatabase.adDao().getAll().size() > 0) {
-                                adDatabase.adDao().deleteAllAds();
-                            }
-                            adDatabase.adDao().deleteAllAds();
-
-                            // لو أردت مسح ملفات cache إضافية:
-                            // clearLocalMediaFiles();
-
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                progressBar.setVisibility(View.GONE);
-                                // إخفاء مؤشر التحميل
-                                // example: showProgress(false);
-                                //Log.d("LOGOUT_SAYED", "DataBase Size : " + adDatabase.adDao().getAll().size());
-                                // افتح LoginActivity
-                                Intent intent = new Intent(view.getContext(), LoginActivity.class);
-                                // لو عايز تمنع الرجوع للشاشة السابقة:
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                view.getContext().startActivity(intent);
-                                // لو في Activity وتريد إغلاقها:
-                                if (view.getContext() instanceof Activity) {
-                                    ((Activity) view.getContext()).finish();
-                                }
-                            });
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                // show error to user
-                                Toast.makeText(view.getContext(), "Error!", Toast.LENGTH_SHORT).show();
-                                // hideProgress if needed
-                            });
-                        }
+                Intent intent = new Intent(view.getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                view.getContext().startActivity(intent);
 
 
-                    });
-                } catch (Exception e) {
-                    Intent intent = new Intent(view.getContext(), LoginActivity.class);
-                    // لو عايز تمنع الرجوع للشاشة السابقة:
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    view.getContext().startActivity(intent);
-                }
             }
         });
         spinner1.setAdapter(adapter);
 
-// استرجاع آخر اختيار لكل Spinner
-
-
-// تعيين القيم المسترجعة
-
-
-// Spinner 1
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -252,13 +208,6 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
         spinnerID.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                //screen_id = screenOptions.get(position);
-//                Log.d("sayed_sppp", screen_id);
-                //if (position > 0 && position < screenOptions.size()) {
-                // أول عنصر (position = 0) هو "Select Screen" فلا نخزنه كـ ID
-
-                // حفظ القيمة لو Remember Me مفعّل
                 if (rememberMe.isChecked()) {
                     getSharedPreferences("SpinnerPrefs", MODE_PRIVATE)
                             .edit()
@@ -266,7 +215,6 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                             .apply();
                 }
                 screen_id = screenOptions.get(position);
-                Log.d("sayed_sppp", screen_id + " " + position);
 
 
             }
@@ -297,8 +245,7 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadingBar.setVisibility(View.VISIBLE);
-                Log.d("sayed_scre", screen_id);
+
                 if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                     DataHolder.getInstance().screenID = screen_id;
                     DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -321,24 +268,21 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                     if (!businessRules.isChecked()) {
                         DataHolder.getInstance().targetHoursFlag = 0;
                     }
+
                     Executors.newSingleThreadExecutor().execute(() -> {
                         new Handler(Looper.getMainLooper()).post(() -> {
+                            setWaitingLogo();
                             getAds(0);
                         });
                     });
                 } else {
                     Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
-                    loadingBar.setVisibility(View.GONE);
                 }
             }
 
 
         });
         rememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
-           /* SharedPreferences prefsw = getSharedPreferences("SpinnerPrefs", MODE_PRIVATE);
-            int savedPositionw = prefsw.getInt("spinner2_position", 0);*/
-
-
             if (isChecked) {
                 if (savedPositionw < screenOptions.size()) {
                     spinnerID.setSelection(savedPositionw);
@@ -376,19 +320,14 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
 
                         }
                     });
-            Log.d("sayed_finalD", adDatabase.adDao().getAll().size() + "");
 
             // 2️⃣ مسح البيانات من الذاكرة
             if (adList != null) {
                 adList.clear();
             }
             DataHolder.getInstance().advertIds.clear();
-
-            Log.d("DB_Clear", "All ads deleted from DB and memory");
-
             // 3️⃣ نكمل تحميل الإعلانات بعد المسح
             new Handler(Looper.getMainLooper()).post(() -> {
-                Log.d("API_Request", "Requesting ads for screen: " + screen_id + " with token: " + AuthManager.getToken(this));
 
                 retrofitBuilder.apiCalls()
                         .getAdsByScreen(screen_id.split("/")[0], "Bearer " + AuthManager.getToken(this))
@@ -397,10 +336,7 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                             public void onResponse(Call<List<WatchingModel>> call, Response<List<WatchingModel>> response) {
                                 if (response.code() == 200) {
                                     adList = response.body();
-                                    Log.d("sayed_ssiizz", adList.size()+"");
-
                                     if (adList == null || adList.isEmpty() || adList.size() == 0) {
-                                        Log.d("sayed_scre", screen_id);
                                         if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                                             DataHolder.getInstance().screenID = screen_id;
                                             DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -423,20 +359,11 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                                             if (!businessRules.isChecked()) {
                                                 DataHolder.getInstance().targetHoursFlag = 0;
                                             }
-                                            Executors.newSingleThreadExecutor().execute(() -> {
-                                                new Handler(Looper.getMainLooper()).post(() -> {
-                                                    loadingBar.setVisibility(View.GONE);
-                                                    startActivity(new Intent(context, AdvertWatching.class));
-                                                });
-                                            });
                                         } else {
                                             Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
                                         }
-                                    }
-                                    //Log.d("sayed_size", adList.size() + "");
-                                    else {
-
-
+                                    } else {
+                                        waitingData=1;
                                         if (executorService == null || executorService.isShutdown()) {
                                             executorService = Executors.newSingleThreadExecutor();
                                         }
@@ -471,8 +398,7 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                                         });
                                     }
                                 } else {
-                                    //Toast.makeText(context, "Error : " + response.code(), Toast.LENGTH_LONG).show();
-                                    loadingBar.setVisibility(View.GONE);
+//                                    logo.setVisibility(View.GONE);
                                     if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                                         DataHolder.getInstance().screenID = screen_id;
                                         DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -497,8 +423,15 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                                         }
                                         Executors.newSingleThreadExecutor().execute(() -> {
                                             new Handler(Looper.getMainLooper()).post(() -> {
-                                                loadingBar.setVisibility(View.GONE);
-                                                startActivity(new Intent(context, AdvertWatching.class));
+                                                //loadingBar.setVisibility(View.GONE);
+                                                //logo.setVisibility(View.GONE);
+                                              /*  if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                                                    startActivity(new Intent(context, AdvertLandWatch.class));
+
+                                                } else {
+                                                    startActivity(new Intent(context, AdvertWatching.class));
+
+                                                }*/
                                             });
                                         });
                                     } else {
@@ -509,7 +442,6 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
 
                             @Override
                             public void onFailure(Call<List<WatchingModel>> call, Throwable t) {
-                                Log.e("getAds_error", t.getMessage());
                             }
                         });
             });
@@ -520,10 +452,6 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
         if (path == null || path.isEmpty()) {
             return;
         }
-        // لو هذه هي بداية السلسلة، اعرض الـ dialog
-        // (بافتراض أن المستدعي ينادي getUrl عدة مرات ويعطي totalCount الإجمالي)
-        // new Handler(Looper.getMainLooper()).post(() -> showDownloadDialog(context, totalCount));
-
         retrofitBuilder.apiCalls().getUrl("Bearer " + AuthManager.getToken(this), path).enqueue(new Callback<VideoImageModel>() {
             @Override
             public void onResponse(Call<VideoImageModel> call, Response<VideoImageModel> response) {
@@ -538,50 +466,16 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                     } catch (Exception e) {
                         extension = "mp4";
                     }
-                    Log.d("sayed_extentaion", extension);
-
                     String fileName = UUID.randomUUID().toString() + "." + extension;
 
                     Executors.newSingleThreadExecutor().execute(() -> {
-                        // استخدم النسخة المعدلة مع callback
                         String localPath = downloadFileToInternalStorage(context, resolvedUrl, fileName);
-                        long lastReportedPercent = -1;
-
-                            /*@Override
-                            public void onProgress(long downloadedBytes, long totalBytes) {
-                                int percent;
-                                if (totalBytes > 0) {
-                                    percent = (int) ((downloadedBytes * 100) / totalBytes);
-                                } else {
-                                    percent = 0;
-                                }
-                                // لتقليل عدد الرفع على الـ UI فقط نحدث لو تغيرت النسبة
-                                *//*if (percent != lastReportedPercent) {
-                                    lastReportedPercent = percent;
-                                    new Handler(Looper.getMainLooper()).post(() -> {
-                                        updateDownloadDialogProgress(percent, loadedCount[0], totalCount);
-                                    });
-                                }*//*
-                            }*/
-
-                          /*  @Override
-                            public void onComplete(String path) {
-                                // تم تحميل الملف فعليًا — لكن هنا أيضاً سنعالج بعد خروج الـ download function
-                            }*/
-
-                           /* @Override
-                            public void onError(Exception e) {
-                                new Handler(Looper.getMainLooper()).post(() -> {
-                                    Toast.makeText(context, "Download error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                            }*/
                         if (localPath != null) {
                             if (Objects.equals(path, "") || isImage(path)) {
                                 mediaFormat = "Image";
                             } else if (isVideo(path)) {
                                 mediaFormat = "Video";
                             }
-                            Log.d("sayyyy", mediaFormat);
                             AdEntity ad = new AdEntity(
                                     advertId,
                                     mediaFormat.toUpperCase(),
@@ -595,39 +489,44 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                             AdDatabase db = AdDatabase.getInstance(context);
                             db.adDao().insertAd(ad);
 
-                            // زيادة العداد على thread الخلفي
                             loadedCount[0]++;
-
-                            // حدّث الـ dialog بعد كل ملف ليُظهر عدد الملفات المحفوظة
-                            int currentLoaded = loadedCount[0];
-                           /* new Handler(Looper.getMainLooper()).post(() -> {
-                                // نحدد نسبة عامة تقريبية بين الملفات (مثال بسيط: 100 * loaded/total)
-                                int overallPercent = (int) ((currentLoaded * 100.0f) / totalCount);
-                                //updateDownloadDialogProgress(overallPercent, currentLoaded, totalCount);
-                            });*/
                             targetHoursList.add(new TargetHours(advertId, targetHours));
                             if (loadedCount[0] == totalCount) {
-                                // تم الانتهاء من كل الملفات — اغلق الـ dialog وابدأ الـ Activity
                                 List<AdEntity> ads = db.adDao().getAllAds(screenId);
-                                /*Log.d("sayed++", ads.get(0).advertId +
-                                        " " + ads.get(1).advertId + " " +
-                                        ads.get(2).advertId + " " +
-                                        ads.get(3).advertId);*/
                                 mediaModels.clear();
                                 for (AdEntity ada : ads) {
                                     mediaModels.add(new MediaModel(contractId, currency, maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId));
 
                                 }
                                 new Handler(Looper.getMainLooper()).post(() -> {
-                                    //Log.d("in__for", mediaModels.get(0).getAdvertId() + " " + mediaModels.get(1).getAdvertId());
-
                                     DataHolder.getInstance().targetHours = targetHoursList;
-                                    //dismissDownloadDialog();
-                                    loadingBar.setVisibility(View.GONE);
-                                    Intent intent = new Intent(context, AdvertWatching.class);
-                                    DataHolder.getInstance().allAds = mediaModels;
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    context.startActivity(intent);
+                                    waitingLogo.animate()
+                                            .scaleX(2.2f)
+                                            .scaleY(2.2f)
+                                            .alpha(0f)
+                                            .setDuration(1000)
+                                            .setInterpolator(new DecelerateInterpolator())
+                                            .withEndAction(() -> {
+                                                // إعادة الشعار للوضع الطبيعي
+                                               /* waitingLogo.setAlpha(1f);
+                                                waitingLogo.setScaleX(1f);
+                                                waitingLogo.setScaleY(1f);*/
+                                                if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                                                    Intent intent = new Intent(context, AdvertLandWatch.class);
+                                                    DataHolder.getInstance().allAds = mediaModels;
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    context.startActivity(intent);
+                                                } else {
+                                                    Intent intent = new Intent(context, AdvertWatching.class);
+                                                    DataHolder.getInstance().allAds = mediaModels;
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    context.startActivity(intent);
+                                                }
+
+
+                                            })
+                                            .start();
+
                                 });
                             }
                         } else {
@@ -635,52 +534,20 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
                             loadedCount[0]++;
                             AdDatabase db = AdDatabase.getInstance(context);
                             db.infoDao().insertInfo(new InfoEntity("Failed to download media: " + path));
-                            /*new Handler(Looper.getMainLooper()).post(() -> {
-
-                                Toast.makeText(context, "Failed to download media: " + path, Toast.LENGTH_SHORT).show();
-                                // ممكن تحويّل السلوك: حاول إعادة المحاولة أو تتابع بدون الملف
-                                if (loadedCount[0] == totalCount) {
-                                    // dismissDownloadDialog();
-                                    // تعامل كما في حالة الاكتمال
-                                }
-                            });*/
                         }
                     });
                 } else {
-                    Log.e("media_error", "Failed to get media URL for path: " + path + " | Response code: " + response.code());
-                    // تعامل مع الفشل
                     loadedCount[0]++;
                 }
             }
 
             @Override
             public void onFailure(Call<VideoImageModel> call, Throwable t) {
-                Log.e("sayyed_error", t.getMessage());
                 loadedCount[0]++;
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    //Toast.makeText(context, "Request failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (loadedCount[0] == totalCount) {
-                        //dismissDownloadDialog();
-                    }
-                });
             }
         });
     }
 
-    public List<Integer> stringToList(String str) {
-        List<Integer> list = new ArrayList<>();
-        if (str == null || str.isEmpty()) return list;
-
-        String[] parts = str.split("/");
-        for (String part : parts) {
-            try {
-                list.add(Integer.parseInt(part));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
-        return list;
-    }
 
     public String listToString(List<Integer> list) {
         if (list == null || list.isEmpty()) return "";
@@ -747,110 +614,35 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
         return screenOptions;
     }
 
-    public interface ProgressCallback {
-        void onProgress(long downloadedBytes, long totalBytes);
+    public static String downloadFileToInternalStorage(Context context, String fileUrl, String fileName) {
+        OkHttpClient client = new OkHttpClient();
 
-        void onComplete(String localPath);
+        Request request = new Request.Builder()
+                .url(fileUrl)
+                .build();
 
-        void onError(Exception e);
-    }
+        try (okhttp3.Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                InputStream inputStream = response.body().byteStream();
+                File file = new File(context.getFilesDir(), fileName);
+                FileOutputStream outputStream = new FileOutputStream(file);
+                byte[] buffer = new byte[4096];
+                int bytesRead;
 
-    private String downloadFileToInternalStorage(Context context, String fileUrl, String fileName) {
-        InputStream input = null;
-        OutputStream output = null;
-        HttpURLConnection connection = null;
-        try {
-            URL url = new URL(fileUrl);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
 
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new IOException("Server returned HTTP " + connection.getResponseCode()
-                        + " " + connection.getResponseMessage());
+                outputStream.close();
+                inputStream.close();
+
+                return file.getAbsolutePath();
             }
-
-            long fileLength = 0;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                fileLength = connection.getContentLengthLong();
-            }
-
-            input = connection.getInputStream();
-            File dir = context.getFilesDir(); // أو أي مكان تفضله
-            File outFile = new File(dir, fileName);
-            output = new FileOutputStream(outFile);
-
-            byte[] data = new byte[4096];
-            long total = 0;
-            int count;
-            while ((count = input.read(data)) != -1) {
-                total += count;
-                output.write(data, 0, count);
-
-                // نبلّغ عن التقدّم
-               /* if (callback != null) {
-                    callback.onProgress(total, fileLength);
-                }*/
-            }
-
-            output.flush();
-
-           /* if (callback != null) {
-                callback.onComplete(outFile.getAbsolutePath());
-            }*/
-            return outFile.getAbsolutePath();
-
-        } catch (Exception e) {
-           /* if (callback != null) {
-                callback.onError(e);
-            }*/
+        } catch (IOException e) {
             e.printStackTrace();
-            return null;
-        } finally {
-            try {
-                if (output != null) output.close();
-                if (input != null) input.close();
-            } catch (IOException ignored) {
-            }
-            if (connection != null) connection.disconnect();
         }
-    }
-    /*public static String getFilePath() {
 
-        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "CrashReports" + File.separator);
-        if (dir.exists()) {
-        } else {
-            dir.mkdir();
-        }
-        return dir.getAbsolutePath();
-    }*/
-    static void showDownloadDialog(Context context, int totalFiles) {
-        if (downloadDialog != null && downloadDialog.isShowing()) return;
-
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_progress, null);
-        dialogProgressBar = dialogView.findViewById(R.id.dialogProgressBar);
-        dialogProgressText = dialogView.findViewById(R.id.dialogProgressText);
-
-        dialogProgressBar.setMax(100); // سنعرض نسبة مئوية
-        dialogProgressBar.setProgress(0);
-        dialogProgressText.setText("0% - 0 / " + totalFiles);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setView(dialogView);
-        builder.setCancelable(false); // منع الإغلاق أثناء التحميل
-        downloadDialog = builder.create();
-        downloadDialog.show();
-    }
-
-    static void updateDownloadDialogProgress(int percent, int loadedFiles, int totalFiles) {
-        if (downloadDialog == null || !downloadDialog.isShowing()) return;
-        dialogProgressBar.setProgress(percent);
-        dialogProgressText.setText(percent + "% - " + loadedFiles + " / " + totalFiles);
-    }
-
-    static void dismissDownloadDialog() {
-        if (downloadDialog != null && downloadDialog.isShowing()) {
-            downloadDialog.dismiss();
-        }
+        return null;
     }
 
     private void findViews() {
@@ -860,95 +652,26 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
         topAppBar = findViewById(R.id.topAppBar);
         bot_lay = findViewById(R.id.bot_lay);
         spinner1 = findViewById(R.id.spinner1);
-        adsInfo=findViewById(R.id.ads_info);
+        adsInfo = findViewById(R.id.ads_info);
         spinnerID = findViewById(R.id.spinnerID);
         progressBar = findViewById(R.id.progressSignOut);
         spinner2 = findViewById(R.id.spinner2);
-//        spinner_select_screen=findViewById( R.id.spinner_select_screen);
         play = findViewById(R.id.loginbtn);
         loginrootlayout = findViewById(R.id.loginrootlayout);
-
-        //logo = findViewById(R.id.logo);
-       /* logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (doubleBackToExitPressedOnce) {
-                    debug.setVisibility(View.VISIBLE);
-                    return;
-                }
-                doubleBackToExitPressedOnce = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        doubleBackToExitPressedOnce = false;
-                    }
-                }, 2000);
-            }
-        });
-*/
         picture = findViewById(R.id.picture);
-        /*picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if (doubleBackToExitPressedOnce) {
-
-                    Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
-
-                    return;
-                }
-                doubleBackToExitPressedOnce = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        doubleBackToExitPressedOnce = false;
-                    }
-                }, 2000);
-            }
-        });*/
-    }
-
-
-    public void clearApplicationData() {
-        File cache = getCacheDir();
-        File appDir = new File(cache.getParent());
-        if (appDir.exists()) {
-            String[] children = appDir.list();
-            for (String s : children) {
-                if (!s.equals("lib")) {
-                    deleteDir(new File(appDir, s));
-                }
-            }
-        }
-    }
-
-    public static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            int i = 0;
-            while (i < children.length) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-                i++;
-            }
-        }
-        assert dir != null;
-        return dir.delete();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        /*logo.setVisibility(View.GONE);
+        logo.clearAnimation();*/
         adList.clear();
-        DataHolder.getInstance().isData=0;
+        DataHolder.getInstance().isData = 0;
         Arrays.fill(loadedCount, 0);
-
     }
+
 
     public static String getFileExtensionFromUrl(String url) {
         if (url != null) {
@@ -978,5 +701,54 @@ adsInfo.setOnClickListener(new View.OnClickListener() {
 
     }
 
+    private void setWaitingLogo() {
+        logosLayout.setVisibility(View.GONE);
+        nestedScrollView.setVisibility(View.GONE);
+        waitingLogo.setVisibility(View.VISIBLE);
 
+        findViewById(R.id.mainSelectedScreenLayout).setPadding(0, 0, 0, 0);
+        waitingLogo.setAlpha(0f);
+        waitingLogo.setScaleX(0.6f);
+        waitingLogo.setScaleY(0.6f);
+
+        waitingLogo.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(1500)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> {
+                    animateLogoIdle();
+                })
+                .start();
+    }
+
+    // دالة الحركة البسيطة المستمرة
+    private void animateLogoIdle() {
+        waitingLogo.animate()
+                .translationYBy(-10f) // تحريك لأعلى
+                .setDuration(500)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> waitingLogo.animate()
+                        .translationYBy(10f) // العودة للوضع الطبيعي
+                        .setDuration(500)
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .withEndAction(this::animateLogoIdle) // تكرار الحركة
+                        .start())
+                .start();
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        waitingLogo.setVisibility(View.GONE);
+        int padding = dpToPx(16);
+        nestedScrollView.setPadding(padding, padding, padding, padding);
+        nestedScrollView.setVisibility(View.VISIBLE);
+        logosLayout.setVisibility(View.VISIBLE);
+    }
 }

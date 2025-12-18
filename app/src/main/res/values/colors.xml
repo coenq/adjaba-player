@@ -31,6 +31,8 @@
 <!--
 <color name="loginBack"></color>
 -->
+    <color name="new_black">#262525</color>
+    <color name="new_version_black">#282828</color>
     <color name="geolocation_permissions_prompt_background">#dddddd</color>
     <color name="textColor">#021554</color>
     <color name="strokeColor">#2344B3</color>

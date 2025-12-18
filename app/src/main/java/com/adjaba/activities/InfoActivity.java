@@ -25,7 +25,6 @@ import java.util.List;
 
 public class InfoActivity extends AppCompatActivity {
     RecyclerView infoRecyclerView;
-    InfoAdapter infoAdapter;
     Context context;
     FloatingActionButton clearData;
     private List<InfoEntity> infoEntityList;

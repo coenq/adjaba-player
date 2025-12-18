@@ -2,18 +2,35 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/mainSelectedScreenLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/background_port"
     tools:context=".activities.PreviewAds">
+    <ImageView
+        android:id="@+id/waitingLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:src="@mipmap/app_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
 
-
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="500dp"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -205,28 +222,40 @@
 
         </LinearLayout>
     </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    <ImageView
-        android:id="@+id/ads_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/baseline_info_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/logosLayout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/linearLayout3"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@mipmap/picture"
-        />
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/ads_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@drawable/baseline_info_24"
+            />
+        <ImageView
+            android:id="@+id/Logo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="Logo"
+            android:src="@mipmap/logo1" />
+
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:contentDescription="Logo"
+            android:src="@mipmap/picture" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
