@@ -50,7 +50,10 @@ dependencies {
 
     // TensorFlow
     implementation 'org.tensorflow:tensorflow-android:1.13.1'
+    //noinspection Aligned16KB
     implementation 'org.tensorflow:tensorflow-lite:2.14.0'
+    //noinspection Aligned16KB
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.14.0'
 
     // ML Kit - تحديث مكتبات Firebase القديمة
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
@@ -99,6 +102,9 @@ dependencies {
 
     //Android Chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
+
 
 }
 apply plugin: 'com.google.gms.google-services'

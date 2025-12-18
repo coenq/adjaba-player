@@ -10,9 +10,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,7 +19,6 @@ import com.rnd.R;
 import com.rnd.camera.CameraSource;
 import com.rnd.camera.CameraSourcePreview;
 import com.rnd.face_detection.FaceRecognitionProcessor;
-import com.rnd.others.DataHolder;
 import com.rnd.others.GraphicOverlay;
 import com.rnd.utilities.TinyDB;
 
@@ -47,7 +45,7 @@ public class TestCamera extends AppCompatActivity {
     public static TextView key_age, value_age;
     public static TextView key_object;
     public static TextView value_object;
-    public static TextView value_txt, mood_txt;
+    public static TextView value_txt, mood_txt,maleNum,femaleNum, neutralPeople, sadPeople, happyPeople, all_number,female_number;
     FaceRecognitionProcessor faceRecognitionProcessor;
     public static String orient;
 
@@ -56,6 +54,7 @@ public class TestCamera extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         instance = this;
         ac = this;
         tinyDb = new TinyDB(ac);
@@ -80,14 +79,15 @@ public class TestCamera extends AppCompatActivity {
 
         value_txt = findViewById(R.id.value_txt);
         mood_txt = findViewById(R.id.mood_tv);
+        sadPeople =findViewById(R.id.watchesNumbers);
+        neutralPeople =findViewById(R.id.laptopsNumber);
+        happyPeople =findViewById(R.id.phonesNumber);
+       maleNum=findViewById(R.id.maleNumber);
+       femaleNum=findViewById(R.id.femaleNumber);
+       all_number =findViewById(R.id.allNum);
         faceRecognitionProcessor = new FaceRecognitionProcessor(getAssets(), false, this);
-        if (preview == null) {
-            Log.d(TAG, "Preview is null");
-        }
         graphicOverlay = findViewById(R.id.graphics_overlay);
-        if (graphicOverlay == null) {
-            Log.d(TAG, "graphicOverlay is null");
-        }
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
@@ -103,7 +103,6 @@ public class TestCamera extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
         if (runnable != null) {
             handler.removeCallbacks(runnable);
         }
@@ -156,15 +155,9 @@ public class TestCamera extends AppCompatActivity {
     private void startCameraSource() {
         if (cameraSource != null) {
             try {
-                if (preview == null) {
-                    Log.d(TAG, "resume: Preview is null");
-                }
-                if (graphicOverlay == null) {
-                    Log.d(TAG, "resume: graphOverlay is null");
-                }
+
                 preview.start(cameraSource, graphicOverlay);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to start camera source.", e);
                 cameraSource.release();
                 cameraSource = null;
             }
@@ -240,7 +233,6 @@ public class TestCamera extends AppCompatActivity {
                 preview = null;
             }
 
-            Log.d("CameraDebug", "Camera + Processor stopped successfully.");
         } catch (Exception e) {
             e.printStackTrace();
         }

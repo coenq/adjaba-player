@@ -25,51 +25,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class APIImpression {
-    private static final String BASE_URL = "https://api.buyir.uk/";
-
-    /*public static void sendImpression(Context context, com.rnd.room.ImpressionEntity impression) {
-        RetrofitBuilder retrofitBuilder = new RetrofitBuilder();
-        new Thread(() -> {
-            Gson gson = new Gson();
-
-            Log.d("SayedAPISS", gson.toJson(impression));
-
-            retrofitBuilder.apiCalls().sendCameraData("Bearer " + AuthManager.getToken(context), impression).enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (response.isSuccessful()) {
-                        Log.d("SayedAPISS", "Impression sent successfully");
-                        AdDatabase adDatabase = AdDatabase.getInstance(context);
-                        adDatabase.impDao().clearImpressions();
-                    } else {
-                        try {
-                            Log.d("SayedAPISS", "Impression Error Code " + response.code() + " " + response.errorBody().string());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AdDatabase adDatabase = AdDatabase.getInstance(context);
-                                adDatabase.impDao().clearImpressions();
-
-                            }
-                        }).start();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    Log.d("SayedAPISS", "Impression Failed " + t.getMessage());
-                }
-            });
-        }).start();
-
-    }*/
+    private static final String BASE_URL = "https://api.adjaba.in";
     public static void sendImpression(Context context, com.rnd.room.ImpressionEntity impression) {
         new Thread(() -> {
             try {
-                URL url = new URL(BASE_URL + "create_screenview");
+                URL url = new URL(BASE_URL + "/create_screenview");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -117,7 +77,6 @@ public class APIImpression {
                     json.put("screenDevice", impression.screenDevice);
                     json.put("screenPlayer", impression.screenPlayer);
                     json.put("viewCount", impression.viewCount);
-                    Log.d("sayed_json",json+"");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -128,11 +87,9 @@ public class APIImpression {
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
-                    Log.d("SayedAPISS", "Impression sent successfully");
                     AdDatabase adDatabase=AdDatabase.getInstance(context);
                     adDatabase.impDao().deleteAdById(impression.screenViewId);
                 } else {
-                    Log.e("saAPI", "Failed to send impression: " + responseCode);
                     AdDatabase adDatabase=AdDatabase.getInstance(context);
                     adDatabase.impDao().deleteAdById(impression.screenViewId);
                 }

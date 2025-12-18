@@ -30,7 +30,6 @@ public class ReportUtils {
         data.teenCount = (int) teen;
         data.adultCount = (int) adult;
         data.seniorCount = (int) senior;
-        Log.d("sayed-report",visitors+"");
         return data;
     }
 

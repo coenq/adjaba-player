@@ -13,8 +13,8 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -83,7 +83,7 @@ public class SelectScreens extends AppCompatActivity {
     Context context;
     Activity ac;
     TinyDB tinyDb;
-
+    ImageView waitingLogo;
     Map<String, String> screenPlayerMap, screenLocationMap, screenDeviceMap, screenLocation;
     Map<String, List<String>> screenTags;
     RelativeLayout loginrootlayout;
@@ -98,7 +98,7 @@ public class SelectScreens extends AppCompatActivity {
     List<String> screenCurrency = new ArrayList<>();
 
     ArrayAdapter<String> spinnerAdapter;
-    Button play, logOut, syncData,reportBt;
+    Button play, logOut, syncData, reportBt;
     String orient, screen_id, currency = "";
     String screenDirection = "0";
 
@@ -119,11 +119,12 @@ public class SelectScreens extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
         tinyDb = new TinyDB(ac);
-        reportBt=findViewById(R.id.report_bt);
+        reportBt = findViewById(R.id.report_bt);
         prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         editor = prefs.edit();
         context = this;
         ac = this;
+        waitingLogo = findViewById(R.id.waitingLogo);
         loadingBar = findViewById(R.id.loadingBar);
         logOut = findViewById(R.id.logOut);
         screenOptions1 = new ArrayList<>();
@@ -183,7 +184,12 @@ public class SelectScreens extends AppCompatActivity {
                 spinner2.setSelection(spinner2Pos);
             }
         });
-
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 // Spinner 1
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -234,16 +240,22 @@ public class SelectScreens extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-reportBt.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        startActivity(new Intent(context, ReportDashboardActivity.class));
-    }
-});
+        reportBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context, ReportDashboardActivity.class));
+            }
+        });
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!screenDirection.equals("Direction") && !orient.equals("Orientation") && !screen_id.equals("Select Screen")) {
+                    findViewById(R.id.selectScreen).setPadding(dpToPx(0), dpToPx(0), dpToPx(0), dpToPx(0));
+                    findViewById(R.id.nestedScrollView).setVisibility(View.GONE);
+                    findViewById(R.id.logo).setVisibility(View.GONE);
+                    reportBt.setVisibility(View.GONE);
+                    syncData.setVisibility(View.GONE);
+                    waitingLogo.setVisibility(View.VISIBLE);
                     if (screenDirection.equals("Back")) {
                         tinyDb.putBoolean("BackCamera", true);
                     } else {
@@ -254,9 +266,9 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                     } else {
                         tinyDb.putInt("Orientation", 1);
                     }
-                    Log.d("sayedyy", screen_id);
                     DataHolder.getInstance().screenID = screen_id;
                     DataHolder.getInstance().currency = currency;
+
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             setPermissions(Manifest.permission.READ_MEDIA_IMAGES);
@@ -264,9 +276,19 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                             setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), TestCamera.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
+                        waitingLogo.setVisibility(View.VISIBLE);
+                        waitingLogo.animate()
+                                .scaleX(2.2f)
+                                .scaleY(2.2f)
+                                .alpha(0f)
+                                .setDuration(2000)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .withEndAction(() -> {
+                                    Intent intent = new Intent(getApplicationContext(), TestCamera.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                })
+                                .start();
 
                     }
                 } else {
@@ -295,7 +317,6 @@ reportBt.setOnClickListener(new View.OnClickListener() {
         });
 
         syncData.setOnClickListener(v -> {
-            Log.d("sayed-sync", "Clicked Sync Button");
             if (isInternetAvailable(context)) {
                 Toast.makeText(context, "Uploading...", Toast.LENGTH_LONG).show();
                 loadingBar.setVisibility(View.VISIBLE);
@@ -304,6 +325,7 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                         List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
                         for (ImpressionEntity impression1 : impressions) {
                             APIImpression.sendImpression(context, impression1);
+                            adDatabase.impDao().deleteAdById(impression1.screenViewId);
                         }
 
                         runOnUiThread(() -> {
@@ -314,7 +336,6 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                                 }
                         );
                     } catch (Exception e) {
-                        Log.e("sayed-sync", "Error: ", e);
                     }
 
                 }).start();
@@ -340,12 +361,6 @@ reportBt.setOnClickListener(new View.OnClickListener() {
             public void onResponse(Call<List<Root>> call, Response<List<Root>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     for (int screen = 0; screen < response.body().size(); screen++) {
-                        //screenOptions1.add(response.body().get(screen).screenId);
-                      /*  screenPlayerMap.put(response.body().get(screen).screenId, response.body().get(screen).screenPlayer);
-                        screenDeviceMap.put(response.body().get(screen).screenId, response.body().get(screen).screenDevice);
-                        screenTags.put(response.body().get(screen).screenId, response.body().get(screen).screenTags);
-                        screenLocation.put(response.body().get(screen).screenId, response.body().get(screen).location);
-*/
                         screenCurrency.add(response.body().get(screen).currency);
                         screenOptions.add(response.body().get(screen).getScreenId());
                     }
@@ -398,10 +413,19 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         // check if all permissions are granted
                         if (report.areAllPermissionsGranted()) {
+                            waitingLogo.animate()
+                                    .scaleX(2.2f)
+                                    .scaleY(2.2f)
+                                    .alpha(0f)
+                                    .setDuration(2000)
+                                    .setInterpolator(new DecelerateInterpolator())
+                                    .withEndAction(() -> {
+                                        Intent intent = new Intent(getApplicationContext(), TestCamera.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        startActivity(intent);
 
-                            Intent intent = new Intent(getApplicationContext(), TestCamera.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                                    })
+                                    .start();
 
                         }
 
@@ -409,7 +433,7 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                         if (report.isAnyPermissionPermanentlyDenied()) {
                             // permission is denied permenantly, navigate user to app settings
                             AlertDialog.Builder builder1 = new AlertDialog.Builder(ac);
-                            builder1.setMessage("App will not work properly, please allow all permission");
+                            builder1.setMessage("App will not work properly, please allow all permissions");
                             builder1.setCancelable(true);
 
                             builder1.setPositiveButton(
@@ -433,6 +457,10 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                 }).check();
     }
 
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -446,7 +474,19 @@ reportBt.setOnClickListener(new View.OnClickListener() {
                 } else {
                     syncData.setVisibility(View.GONE);
                 }
+                findViewById(R.id.selectScreen).setPadding(dpToPx(15), dpToPx(15), dpToPx(15), dpToPx(15));
+                findViewById(R.id.nestedScrollView).setVisibility(View.VISIBLE);
+                findViewById(R.id.logo).setVisibility(View.VISIBLE);
+                reportBt.setVisibility(View.VISIBLE);
+                //syncData.setVisibility(View.VISIBLE);
+                waitingLogo.setVisibility(View.GONE);
+                waitingLogo.setScaleX(0.6f);
+                waitingLogo.setScaleY(0.6f);
+                waitingLogo.setAlpha(1f); // لازم 1
+
             });
         }).start();
+
     }
+
 }

@@ -1,12 +1,19 @@
 package com.rnd.report;
 
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -18,29 +25,44 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.rnd.R;
 import com.rnd.room.AdDatabase;
+import com.rnd.room.ReportDataBase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ReportDashboardActivity extends AppCompatActivity {
-    LinearLayout container;
+    LinearLayout container, sentimentBar;
     PieChart genderChart;
     ProgressBar progressBar;
     HorizontalBarChart sentimentChart;
-    LinearLayout sentimentBar;
+    Spinner daySpinner;
     View happyView, neutralView, sadView, childView, teenView, adultView, seniorView;
     TextView tvTotalVisitors;
     long visitors, happy = 0, sad = 0, neutral = 0, male, child, teen, adult, senior;
+    private BarChart barChart;
+    List<String> hours = new ArrayList<>();
+    private LinearLayout.LayoutParams happyParams;
+    private LinearLayout.LayoutParams neutralParams;
+    private LinearLayout.LayoutParams sadParams;
+    List<Long> counts = new ArrayList<>();
+    int day = 0, today = 0;
+    long all = 0;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -54,75 +76,100 @@ public class ReportDashboardActivity extends AppCompatActivity {
         sadView = findViewById(R.id.sadView);
         progressBar = findViewById(R.id.loadReport_bar);
         container = findViewById(R.id.ageContainer);
+        barChart = findViewById(R.id.barChart);
+        sentimentBar = findViewById(R.id.sentimentBar);
+        daySpinner = findViewById(R.id.daySpinner);
+        day = Integer.parseInt(new SimpleDateFormat("dd", Locale.getDefault()).format(new Date()));
+        today = day;
 
-        AdDatabase adDatabase = AdDatabase.getInstance(this);
-        new Thread(new Runnable() {
+        String[] days = {
+                "day", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+                "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+                "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"
+        };
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                days
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        daySpinner.setAdapter(spinnerAdapter);
+        daySpinner.setSelection(day);
+        daySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                progressBar.setVisibility(View.VISIBLE);
+                if (position == 0) {
+                    return;
+                }
+                day = Integer.parseInt(spinnerAdapter.getItem(position));
+                setReport(day);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+    }
+
+    private void setReport(int h) {
+        ReportDataBase adDatabase = ReportDataBase.getInstance(this);
+        new
+
+                Thread(new Runnable() {
             @Override
             public void run() {
-
-                for (int i = 0; i < adDatabase.impDao().getAllImpressions().size(); i++) {
-                    happy += adDatabase.impDao().getAllImpressions().get(i).happy;
-                    sad += adDatabase.impDao().getAllImpressions().get(i).sad;
-                    neutral += adDatabase.impDao().getAllImpressions().get(i).neutral;
-                    visitors += adDatabase.impDao().getAllImpressions().get(i).viewCount;
-                    male += adDatabase.impDao().getAllImpressions().get(i).male20 +
-                            adDatabase.impDao().getAllImpressions().get(i).male32 +
-                            adDatabase.impDao().getAllImpressions().get(i).male40 +
-                            adDatabase.impDao().getAllImpressions().get(i).male50 +
-                            adDatabase.impDao().getAllImpressions().get(i).male50plus;
-                    child += adDatabase.impDao().getAllImpressions().get(i).male20 + adDatabase.impDao().getAllImpressions().get(i).female20;
-                    adult += adDatabase.impDao().getAllImpressions().get(i).male32 + adDatabase.impDao().getAllImpressions().get(i).female32;
-                    teen += adDatabase.impDao().getAllImpressions().get(i).male40 + adDatabase.impDao().getAllImpressions().get(i).female40;
-                    senior += adDatabase.impDao().getAllImpressions().get(i).male50 + adDatabase.impDao().getAllImpressions().get(i).male50plus +
-                            adDatabase.impDao().getAllImpressions().get(i).female50 + adDatabase.impDao().getAllImpressions().get(i).female50plus;
+                happy = 0;
+                sad = 0;
+                neutral = 0;
+                visitors = 0;
+                male = 0;
+                child = 0;
+                adult = 0;
+                teen = 0;
+                senior = 0;
+                for (int i = 1; i < 25; i++) {
+                    if (i < 12) {
+                        hours.add(i + " am");
+                    } else hours.add(i + " pm");
+                    counts.add(Long.parseLong("0"));
                 }
+                for (int i = 0; i < adDatabase.reportDao().getAllReports(h).size(); i++) {
+                    happy += adDatabase.reportDao().getAllReports(h).get(i).happy;
+                    sad += adDatabase.reportDao().getAllReports(h).get(i).sad;
+                    neutral += adDatabase.reportDao().getAllReports(h).get(i).neutral;
+                    visitors += adDatabase.reportDao().getAllReports(h).get(i).female20 + adDatabase.reportDao().getAllReports(h).get(i).female32 + adDatabase.reportDao().getAllReports(h).get(i).female40 + adDatabase.reportDao().getAllReports(h).get(i).female50 + adDatabase.reportDao().getAllReports(h).get(i).female50plus + adDatabase.reportDao().getAllReports(h).get(i).male20 + adDatabase.reportDao().getAllReports(h).get(i).male32 + adDatabase.reportDao().getAllReports(h).get(i).male40 + adDatabase.reportDao().getAllReports(h).get(i).male50 + adDatabase.reportDao().getAllReports(h).get(i).male50plus;
+
+                    male += adDatabase.reportDao().getAllReports(h).get(i).male20 + adDatabase.reportDao().getAllReports(h).get(i).male32 + adDatabase.reportDao().getAllReports(h).get(i).male40 + adDatabase.reportDao().getAllReports(h).get(i).male50 + adDatabase.reportDao().getAllReports(h).get(i).male50plus;
+                    ;
+                    child += adDatabase.reportDao().getAllReports(h).get(i).child;
+                    adult += adDatabase.reportDao().getAllReports(h).get(i).adult;
+                    teen += adDatabase.reportDao().getAllReports(h).get(i).middle;
+                    senior += adDatabase.reportDao().getAllReports(h).get(i).senior;
+                    all = counts.get(adDatabase.reportDao().getAllReports(h).get(i).hour) + adDatabase.reportDao().getAllReports(h).get(i).senior + adDatabase.reportDao().getAllReports(h).get(i).child + adDatabase.reportDao().getAllReports(h).get(i).adult + adDatabase.reportDao().getAllReports(h).get(i).middle;
+                    counts.set(adDatabase.reportDao().getAllReports(h).get(i).hour, all);
+                    all = 0;
+                }
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        long vis = (senior + adult + teen + child);
                         ReportData report = ReportUtils.generateReport(visitors, happy, sad, neutral, male, child, teen, adult, senior);
 
 
-                        tvTotalVisitors.setText(String.valueOf(report.totalVisitors));
+                        tvTotalVisitors.setText(vis+"");
 
                         setupGenderChart(report);
-                        updateSentimentBar((int) happy, (int) neutral, (int) sad);
                         container.setOrientation(LinearLayout.VERTICAL);
+                        showBarChart(hours, counts);
 
-                        /*float child = 5f;
-                        float teen = 30f;
-                        float adult = 50f;
-                        float senior = 15f;*/
+                        updateAgeBar(child, teen, adult, senior);
+                        updateSentimentBar((int) happy, (int) neutral, (int) sad);
 
-                        container.post(() -> {
-                            int fullWidth = container.getWidth();
 
-                            // Child
-                            View childView = new View(getApplicationContext());
-                            childView.setBackgroundColor(Color.parseColor("#4CAF50"));
-                            LinearLayout.LayoutParams childParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) child / 100)), 30);
-                            childParams.setMargins(0, 0, 0, 16);
-                            container.addView(childView, childParams);
-
-                            // Teen
-                            View teenView = new View(getApplicationContext());
-                            teenView.setBackgroundColor(Color.parseColor("#2196F3"));
-                            LinearLayout.LayoutParams teenParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) teen / 100)), 30);
-                            teenParams.setMargins(0, 0, 0, 16);
-                            container.addView(teenView, teenParams);
-
-                            // Adult
-                            View adultView = new View(getApplicationContext());
-                            adultView.setBackgroundColor(Color.parseColor("#FF9800"));
-                            LinearLayout.LayoutParams adultParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) adult / 100)), 30);
-                            adultParams.setMargins(0, 0, 0, 16);
-                            container.addView(adultView, adultParams);
-
-                            // Senior
-                            View seniorView = new View(getApplicationContext());
-                            seniorView.setBackgroundColor(Color.parseColor("#9C27B0"));
-                            LinearLayout.LayoutParams seniorParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) senior / 100)), 30);
-                            container.addView(seniorView, seniorParams);
-                        });
                         progressBar.setVisibility(View.GONE);
                     }
                 });
@@ -156,55 +203,168 @@ public class ReportDashboardActivity extends AppCompatActivity {
     }
 
     private void updateSentimentBar(int happy, int neutral, int sad) {
-        LinearLayout.LayoutParams happyParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, happy);
-        LinearLayout.LayoutParams neutralParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, neutral);
-        LinearLayout.LayoutParams sadParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, sad);
+        happyParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, happy);
+        neutralParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, neutral);
+        sadParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, sad);
 
         happyView.setLayoutParams(happyParams);
         neutralView.setLayoutParams(neutralParams);
         sadView.setLayoutParams(sadParams);
     }
 
-    private void updateAgeBar(int child, int teen, int adult, int senior) {
-        LinearLayout.LayoutParams childParams = new LinearLayout.LayoutParams(child / 100, LinearLayout.LayoutParams.MATCH_PARENT, child);
-        LinearLayout.LayoutParams teenParams = new LinearLayout.LayoutParams(teen / 100, LinearLayout.LayoutParams.MATCH_PARENT, teen);
-        LinearLayout.LayoutParams adultParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, adult);
-        LinearLayout.LayoutParams seniorParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, senior);
+    @SuppressLint("SetTextI18n")
+    private void updateAgeBar(long child, long teen, long adult, long senior) {
+        container.removeAllViews();
+        container.post(() -> {
 
-        childView.setLayoutParams(childParams);
-        teenView.setLayoutParams(teenParams);
-        adultView.setLayoutParams(adultParams);
-        seniorView.setLayoutParams(seniorParams);
+            int fullWidth = container.getWidth();
+            FrameLayout childLayout = new FrameLayout(getApplicationContext());
+            childLayout.setBackgroundColor(Color.parseColor("#4CAF50"));
 
+            FrameLayout.LayoutParams barParams =
+                    new FrameLayout.LayoutParams(
+                            (int) (fullWidth * ((float) child / 100)),
+                            50
+                    );
+            barParams.setMargins(0, 0, 0, 16);
+
+// TextView
+            TextView textView = new TextView(getApplicationContext());
+            textView.setText(child + "");
+            textView.setTextColor(Color.WHITE);
+            textView.setTextSize(10);
+            FrameLayout.LayoutParams textParams =
+                    new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            Gravity.END | Gravity.CENTER_VERTICAL
+                    );
+            textParams.setMargins(0, 0, 8, 0);
+
+            childLayout.addView(textView, textParams);
+            container.addView(childLayout, barParams);
+
+            // Teen
+            FrameLayout teenLayout = new FrameLayout(getApplicationContext());
+            teenLayout.setBackgroundColor(Color.parseColor("#2196F3"));
+
+            FrameLayout.LayoutParams teenParams =
+                    new FrameLayout.LayoutParams(
+                            (int) (fullWidth * ((float) teen / 100)),
+                            50
+                    );
+            teenParams.setMargins(0, 0, 0, 16);
+
+// TextView
+            TextView teenText = new TextView(getApplicationContext());
+            teenText.setText(teen + "");
+            teenText.setTextColor(Color.WHITE);
+            teenText.setTextSize(10);
+            FrameLayout.LayoutParams textParamsTeen =
+                    new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            Gravity.END | Gravity.CENTER_VERTICAL
+                    );
+            textParamsTeen.setMargins(0, 0, 8, 0);
+
+            teenLayout.addView(teenText, textParamsTeen);
+            container.addView(teenLayout, teenParams);
+
+
+            // Adult
+            FrameLayout adultLayout = new FrameLayout(getApplicationContext());
+            adultLayout.setBackgroundColor(Color.parseColor("#FF9800"));
+            FrameLayout.LayoutParams adultParams =
+                    new FrameLayout.LayoutParams(
+                            (int) (fullWidth * ((float) teen / 100)),
+                            50
+                    );
+            adultParams.setMargins(0, 0, 0, 16);
+            TextView adultText = new TextView(getApplicationContext());
+            adultText.setText(adult + "");
+            adultText.setTextColor(Color.WHITE);
+            adultText.setTextSize(10);
+            FrameLayout.LayoutParams textParamsAdult =
+                    new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            Gravity.END | Gravity.CENTER_VERTICAL
+                    );
+            textParamsAdult.setMargins(0, 0, 8, 0);
+
+            adultLayout.addView(adultText, textParamsAdult);
+            container.addView(adultLayout, adultParams);
+
+            // Senior
+            FrameLayout seniorLayout = new FrameLayout(getApplicationContext());
+            seniorLayout.setBackgroundColor(Color.parseColor("#9C27B0"));
+            FrameLayout.LayoutParams seniorParams =
+                    new FrameLayout.LayoutParams(
+                            (int) (fullWidth * ((float) senior / 100)),
+                            50
+                    );
+            seniorParams.setMargins(0, 0, 0, 16);
+            TextView seniorText = new TextView(getApplicationContext());
+            seniorText.setText(senior + "");
+            seniorText.setTextColor(Color.WHITE);
+            seniorText.setTextSize(10);
+            FrameLayout.LayoutParams textParamsSenior =
+                    new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            Gravity.END | Gravity.CENTER_VERTICAL
+                    );
+            textParamsSenior.setMargins(0, 0, 8, 0);
+
+            seniorLayout.addView(seniorText, textParamsSenior);
+            container.addView(seniorLayout, seniorParams);
+
+
+        });
     }
 
-    private void setupSentimentChart(ReportData report) {
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, report.happyPercent));
-        entries.add(new BarEntry(1, report.neutralPercent));
-        entries.add(new BarEntry(2, report.sadPercent));
 
-        BarDataSet dataSet = new BarDataSet(entries, "Sentiment");
-        dataSet.setColors(new int[]{
-                Color.parseColor("#00C49F"), // Happy
-                Color.parseColor("#FFBB28"), // Neutral
-                Color.parseColor("#FF8042")  // Sad
-        });
-        dataSet.setValueTextSize(14f);
+    private void showBarChart(List<String> hours, List<Long> counts) {
+        barChart.clear();
+        barChart.invalidate();
+        ArrayList<BarEntry> entries = new ArrayList<>();
+
+        for (int i = 0; i < counts.size(); i++) {
+            entries.add(new BarEntry(i, counts.get(i)));
+        }
+
+        BarDataSet dataSet = new BarDataSet(entries, "Number of people per hour");
+        dataSet.setValueTextSize(8f);
 
         BarData data = new BarData(dataSet);
-        data.setBarWidth(0.6f);
+        barChart.setData(data);
 
-        sentimentChart.setData(data);
-        sentimentChart.setFitBars(true);
-        sentimentChart.getDescription().setEnabled(false);
-        sentimentChart.getLegend().setEnabled(false);
-        sentimentChart.getAxisLeft().setAxisMinimum(0);
-        sentimentChart.getAxisRight().setEnabled(false);
-        sentimentChart.getXAxis().setEnabled(false);
+        // إعداد المحور X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(hours));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(10f);
+        xAxis.setTextColor(Color.DKGRAY);
+        xAxis.setAxisMinimum(0f); // يبدأ من صفر
+        xAxis.setAvoidFirstLastClipping(true);
 
-        sentimentChart.invalidate(); // Refresh
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setGridColor(Color.parseColor("#E0E0E0"));
+        leftAxis.setTextColor(Color.DKGRAY);
+        leftAxis.setTextSize(10f);
+        leftAxis.setAxisMinimum(0f);
+
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setEnabled(false);
+        barChart.getDescription().setEnabled(false);
+        barChart.animateY(1000);
+        barChart.invalidate();
+        counts.clear();
     }
-
-
 }
+
