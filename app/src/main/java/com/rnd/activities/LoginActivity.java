@@ -8,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -19,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 
 import com.rnd.R;
@@ -28,6 +29,8 @@ import com.rnd.utilities.ApiCalls;
 import com.rnd.utilities.AuthManager;
 import com.rnd.utilities.RetrofitBuilder;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -98,12 +101,10 @@ public class LoginActivity extends AppCompatActivity {
         if (Objects.equals(token, "null")) {
             token = AuthManager.getToken(this);
         }
-        /*if (!isInternetAvailable()) {
-            Log.d("sayed", AuthManager.getToken(this));
-        }*/
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnLogin.setVisibility(View.GONE);
                 attemptLogin(editor);
             }
         });
@@ -124,12 +125,39 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     progressBar.setVisibility(View.GONE);
                     LoginResponse data = response.body();
-                    Log.d("LOGIN_SUCCESS", "Token: " + data.loginToken);
-                    SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
-                    prefs.edit().putString("token", data.loginToken).apply();
+                    MasterKey masterKey = null;
+                    try {
+                        masterKey = new MasterKey.Builder(getApplicationContext())
+                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                                .build();
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    SharedPreferences securePrefs = null;
+                    try {
+                        securePrefs = EncryptedSharedPreferences.create(
+                                getApplicationContext(),
+                                "auth",
+                                masterKey,
+                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                        );
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    securePrefs.edit()
+                            .putString("token", data.loginToken)
+                            .apply();
                     intentToPreview();
 
                 } else {
+                    btnLogin.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Failed Data!", Toast.LENGTH_LONG).show();
                 }
@@ -137,6 +165,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                btnLogin.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(LoginActivity.this, "Connection Error!", Toast.LENGTH_LONG).show();
             }
@@ -165,6 +194,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (!isValidInput(userId, password)) {
+            btnLogin.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -198,5 +228,9 @@ public class LoginActivity extends AppCompatActivity {
 
         return true;
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        btnLogin.setVisibility(View.VISIBLE);
+    }
 }

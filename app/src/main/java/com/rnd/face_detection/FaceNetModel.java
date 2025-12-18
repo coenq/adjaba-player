@@ -3,7 +3,6 @@ package com.rnd.face_detection;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -36,7 +35,6 @@ public class FaceNetModel {
 
     public float[] getEmbedding(Bitmap bitmap) {
         if (bitmap == null) {
-            Log.e(TAG, "❌ Input bitmap is null");
             return null;
         }
 
@@ -47,7 +45,6 @@ public class FaceNetModel {
         try {
             interpreter.run(inputBuffer, output);
         } catch (Exception e) {
-            Log.e(TAG, "❌ Failed to run model inference: " + e.getMessage());
             return null;
         }
 
@@ -82,7 +79,6 @@ public class FaceNetModel {
         norm = (float) Math.sqrt(norm);
 
         if (norm == 0f) {
-            Log.w(TAG, "⚠ Embedding norm is zero. Returning raw embedding.");
             return embedding;
         }
 
@@ -93,7 +89,13 @@ public class FaceNetModel {
 
         return normalized;
     }
-
+    public float cosineSimilarity(float[] emb1, float[] emb2) {
+        float dot = 0f;
+        for (int i = 0; i < emb1.length; i++) {
+            dot += emb1[i] * emb2[i];
+        }
+        return dot; // بسبب الـ L2 normalization
+    }
     public void close() {
         interpreter.close();
     }

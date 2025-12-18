@@ -6,21 +6,21 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {ImpressionEntity.class}, version =7, exportSchema = false)
-public abstract class AdDatabase extends RoomDatabase {
+@Database(entities = {ReportEntity.class}, version =2, exportSchema = false)
+public abstract class ReportDataBase extends RoomDatabase {
 
-    private static volatile AdDatabase INSTANCE;
+    private static volatile ReportDataBase INSTANCE;
 
-    public abstract ImpressionDao impDao();
+    public abstract ReportDao reportDao();
 
-    public static AdDatabase getInstance(Context context) {
+    public static ReportDataBase getInstance(Context context) {
         if (INSTANCE == null) {
-            synchronized (AdDatabase.class) {
+            synchronized (ReportDataBase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(
                             context.getApplicationContext(),
-                            AdDatabase.class,
-                            "ad_database"
+                            ReportDataBase.class,
+                            "report_database"
                     ).fallbackToDestructiveMigration().build();
                 }
             }
@@ -28,5 +28,3 @@ public abstract class AdDatabase extends RoomDatabase {
         return INSTANCE;
     }
 }
-
-

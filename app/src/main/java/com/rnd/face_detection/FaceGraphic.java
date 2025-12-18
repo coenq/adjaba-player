@@ -18,7 +18,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Bitmap;
-import android.widget.Toast;
+
 
 import com.rnd.others.GraphicOverlay;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
@@ -47,6 +47,8 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
     private boolean frontFacingCamera;
     private final String mood;
     private DecimalFormat df;
+    private RectF cachedRect = null;
+    private String cachedText = null;
 
     FaceGraphic(GraphicOverlay overlay, FirebaseVisionFace face, Bitmap bitmap, String gender, String ageRange, boolean frontFacingCamera, String mood) {
         super(overlay);
@@ -76,28 +78,28 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
     public void draw(Canvas canvas) {
 
 
-        System.out.println("Age Range " + ageRange + " Gender:- " + gender);
-        if (face == null) {
-            throw new IllegalStateException("Attempting to draw a null face.");
-        }
+        if (face == null) return;
 
         // Draws the bounding box around the face.
-        RectF rect = new RectF(face.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
-        canvas.drawRect(rect, rectPaint);
+        if (cachedRect == null) {
+            RectF rect = new RectF(face.getBoundingBox());
+            rect.left = translateX(rect.left);
+            rect.top = translateY(rect.top);
+            rect.right = translateX(rect.right);
+            rect.bottom = translateY(rect.bottom);
+            cachedRect = rect;
+        }
+        canvas.drawRect(cachedRect, rectPaint);
 
         // For debugging
         // canvas.drawBitmap(this.bitmap, this.bitmap.getScaledWidth(canvas), this.bitmap.getScaledHeight(canvas), rectPaint);
 
 //    Toast.makeText(getApplicationContext(), "Age Range "+ageRange+" Gender:- "+gender, Toast.LENGTH_SHORT).show();
 //    System.out.println("Age Range "+ageRange+" Gender:- "+gender);
-        if (frontFacingCamera) {
-            canvas.drawText(ageRange + " " + gender+" "+mood, rect.left, rect.top, textPaint);
-        } else {
-            canvas.drawText(ageRange + " " + gender+" "+mood, rect.left, rect.top, textPaint);
+        if (cachedText == null) {
+            cachedText = ageRange + " " + gender + " " + mood;
         }
+
+        canvas.drawText(cachedText, cachedRect.left, cachedRect.top, textPaint);
     }
 }

@@ -13,13 +13,13 @@
 // limitations under the License.
 package com.rnd.face_detection;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -29,11 +29,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.util.SparseArray;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
@@ -44,7 +40,7 @@ import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
-import com.rnd.newmodels.MediaModel;
+import com.rnd.newmodels.ScreenRecord;
 import com.rnd.others.APIImpression;
 import com.rnd.others.DataHolder;
 import com.rnd.others.FrameMetadata;
@@ -58,8 +54,11 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.rnd.report.ReportAPI;
 import com.rnd.room.AdDatabase;
 import com.rnd.room.ImpressionEntity;
+import com.rnd.room.ReportDataBase;
+import com.rnd.room.ReportEntity;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -86,19 +85,28 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.tensorflow.lite.Interpreter;
 
+import static com.rnd.activities.TestCamera.ac;
 import static com.rnd.activities.TestCamera.cameraSource;
+import static com.rnd.activities.TestCamera.female_number;
+import static com.rnd.activities.TestCamera.all_number;
+import static com.rnd.activities.TestCamera.sadPeople;
 import static com.rnd.activities.TestCamera.key_age;
 import static com.rnd.activities.TestCamera.key_object;
+import static com.rnd.activities.TestCamera.maleNum;
+import static com.rnd.activities.TestCamera.femaleNum;
 import static com.rnd.activities.TestCamera.value_age;
 import static com.rnd.activities.TestCamera.value_object;
 import static com.rnd.activities.TestCamera.value_txt;
 import static com.rnd.activities.TestCamera.mood_txt;
 import static com.rnd.activities.TestCamera.orient;
-import static com.rnd.activities.TestCamera.container;
+import static com.rnd.activities.TestCamera.happyPeople;
+import static com.rnd.activities.TestCamera.neutralPeople;
 
 public class FaceRecognitionProcessor {
 
@@ -109,8 +117,11 @@ public class FaceRecognitionProcessor {
     public Runnable runnableCode;
     private float[][] outputClasses;
     public int female20 = 0;
-
-
+    public int phone = 0;
+    public int watch = 0;
+    public int laptop = 0;
+    public int people = 0;
+    public List<String> sentimentCount = new ArrayList<>();
     public int female32 = 0;
     public Set<String> detectedObjects = new HashSet<>();
     public List<String> tags = new ArrayList<>();
@@ -124,11 +135,11 @@ public class FaceRecognitionProcessor {
     public int male50 = 0;
     public int male50plus = 0;
     int maxAt = 0;
-
+    String screenViewId = "view-" + String.format("%03d", new Random().nextInt(100000));
     private float[][] outputScores;
     private float[] numDetections;
     private final List<float[]> uniqueFaces = new ArrayList<>();
-    private static final float MATCH_THRESHOLD = 1.0f;
+    private static final float MATCH_THRESHOLD = 0.91f;
 
     public static Handler handler = new Handler(Looper.getMainLooper());
     public static Runnable runnable;
@@ -137,6 +148,9 @@ public class FaceRecognitionProcessor {
     private static final String TAG = "TextRecProc";
     private long lastUploadTime = 0;
     private long lastUploadTime1 = 0;
+    int i = 0;
+    int angrySM, disgustSM, fearSM, happySM, sadSM, surpriseSM, neutralSM = 0;
+    int angrySF, disgustSF, fearSF, happySF, sadSF, surpriseSF, neutralSF = 0;
 
     private final FirebaseVisionFaceDetector detector;
     private EmotionClassifier emotionClassifier;
@@ -153,9 +167,11 @@ public class FaceRecognitionProcessor {
     private final int[] ageListMapping = {0, 0, 0, 0, 1, 2, 3, 4};
     private final List<String> AGE_LIST_2 = Arrays.asList("(0, 20)", "(20, 32)", "(32, 43)", "(43, 53)", "(53, 100)");
     private static final int EMBEDDING_SIZE = 192;
-    long lastUpdateTime = 0;
-    long lastUpdateTime1 = 0;
-
+    long lastUpdateTime = System.currentTimeMillis();
+    long lastUpdateTime1 = System.currentTimeMillis();
+    long lastUpdateTime3 = System.currentTimeMillis();
+    public Set<String> objects = new HashSet<>();
+    public int male = 0, female = 0, allPeople = 0;
     private FaceNetModel faceNetModel;
     String angryMale, angryFemale, disgustMale, disgustFemale, fearMale, fearFemale, happyMale, happyFemale, sadMale, sadFemale, surpriseMale, surpriseFemale, neutralMale, neutralFemale;
     int angryM, disgustM, fearM, happyM, sadM, surpriseM, neutralM = 0;
@@ -235,7 +251,6 @@ public class FaceRecognitionProcessor {
             detector.close();
 
         } catch (IOException e) {
-            Log.e(TAG, "Exception thrown while trying to close Text Detector: " + e);
         }
     }
 
@@ -263,11 +278,23 @@ public class FaceRecognitionProcessor {
         return detector.detectInImage(image);
     }
 
+    int frame = 0;
+    private long lastProcessedTime = 0;
+    private final long PROCESS_INTERVAL = 200;
 
+    @SuppressLint("SetTextI18n")
     protected void onSuccess(@NonNull List<FirebaseVisionFace> results, @NonNull FrameMetadata frameMetadata, @NonNull GraphicOverlay graphicOverlay, @NonNull Bitmap bitmap) {
+       /* long currentTime1 = System.currentTimeMillis();
 
+        // لو لسه الوقت ماكملش — متعالجش الفريم
+        if (currentTime1 - lastProcessedTime < PROCESS_INTERVAL) {
+            return;
+        }
+
+        // سجّل آخر وقت تمت فيه المعالجة
+        lastProcessedTime = currentTime1;*/
         graphicOverlay.clear();
-        container.setOrientation(LinearLayout.VERTICAL);
+        //container.setOrientation(LinearLayout.VERTICAL);
         try {
             key_age.setText("");
             value_age.setText("");
@@ -278,7 +305,6 @@ public class FaceRecognitionProcessor {
             ex.printStackTrace();
         }
 
-        Bitmap scaledBitmap;
 
         for (FirebaseVisionFace result : results) {
             // crop face bitmap
@@ -308,8 +334,9 @@ public class FaceRecognitionProcessor {
             }
 
             Bitmap resultBmp = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+
             // process bitmap here
-            scaledBitmap = Bitmap.createScaledBitmap(resultBmp, 64, 64, false);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(resultBmp, 64, 64, false);
 
             scaledBitmap.getPixels(intValues, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
             for (int i = 0; i < intValues.length; ++i) {
@@ -325,7 +352,6 @@ public class FaceRecognitionProcessor {
             /*** Run Gender Detection Model First ***/
             if (emotionClassifier != null) {
                 detectedMood = emotionClassifier.predictEmotion(scaledBitmap);
-                Log.d("EMOTION", "Detected Mood: " + detectedMood);
                 mood_txt.setText(detectedMood);
             }
             // Copy the input data into TensorFlow.
@@ -336,17 +362,17 @@ public class FaceRecognitionProcessor {
 
             // Copy the output Tensor back into the output array.
             genderIinferenceInterface.fetch(outputName, genderOutputs);
-
             if (genderOutputs[0] <= 0.72) {
                 detectedGender = "F";
 
             } else {
                 detectedGender = "M";
+
             }
 
             /*** Run Age Detection Model ***/
-            inputName = "Placeholder";
-            outputName = "output/output";
+            String inputName1 = "Placeholder";
+            String outputName1 = "output/output";
 
             // Rude carnie expects different input dimensions
             scaledBitmap = Bitmap.createScaledBitmap(resultBmp, CARNIE_DIM, CARNIE_DIM, false);
@@ -361,13 +387,13 @@ public class FaceRecognitionProcessor {
             }
 
             // Copy the input data into TensorFlow.
-            ageInferenceInterface.feed(inputName, floatValuesCarnie, 1, CARNIE_DIM, CARNIE_DIM, 3);
+            ageInferenceInterface.feed(inputName1, floatValuesCarnie, 1, CARNIE_DIM, CARNIE_DIM, 3);
 
             // Run the inference call.
-            ageInferenceInterface.run(new String[]{outputName});
+            ageInferenceInterface.run(new String[]{outputName1});
 
             // Copy the output Tensor back into the output array.
-            ageInferenceInterface.fetch(outputName, ageOutputs);
+            ageInferenceInterface.fetch(outputName1, ageOutputs);
 
 
             maxAt = 0;
@@ -378,7 +404,6 @@ public class FaceRecognitionProcessor {
             detectedAgeRange = AGE_LIST_2.get(ageListMapping[maxAt]);
 
 
-            Log.d("newwr", "AgeRange" + detectedAgeRange + " Gender" + detectedGender);
             try {
                 key_age.setText(detectedAgeRange);
                 value_age.setText(String.valueOf(detectedGender));
@@ -397,8 +422,6 @@ public class FaceRecognitionProcessor {
                 // filter the distinct
                 Set<String> setWithUniqueValues = new HashSet<>(viewList);
                 viewCountList = new ArrayList<>(setWithUniqueValues);
-                //Log.d("sayed_list", viewCountList.size() + "");
-//				System.out.println("Face Reco data "+MainActivity.viewCountList);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -417,217 +440,195 @@ public class FaceRecognitionProcessor {
                     e1.printStackTrace();
                 }
             }
-        }
 
-        /* * This is Text Recognition Section
-         */
 
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-        try {
-            if (!textRecognizer.isOperational()) {
-                new AlertDialog.
-                        Builder(context).
-                        setMessage("Text recognizer could not be set up on your device").show();
-                return;
-            }
 
-            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-            SparseArray<TextBlock> origTextBlocks = textRecognizer.detect(frame);
-            List<TextBlock> textBlocks = new ArrayList<>();
-            for (int i = 0; i < origTextBlocks.size(); i++) {
-                TextBlock textBlock = origTextBlocks.valueAt(i);
-                textBlocks.add(textBlock);
-            }
-            Collections.sort(textBlocks, new Comparator<TextBlock>() {
-                @Override
-                public int compare(TextBlock o1, TextBlock o2) {
-                    int diffOfTops = o1.getBoundingBox().top - o2.getBoundingBox().top;
-                    int diffOfLefts = o1.getBoundingBox().left - o2.getBoundingBox().left;
-                    if (diffOfTops != 0) {
-                        return diffOfTops;
-                    }
-                    return diffOfLefts;
-                }
-            });
-
-            StringBuilder detectedText = new StringBuilder();
-            for (TextBlock textBlock : textBlocks) {
-                if (textBlock != null && textBlock.getValue() != null) {
-                    detectedText.append(textBlock.getValue());
-                    detecteddText.add(textBlock.getValue());
-                    detectedText.append("\n");
-                }
-            }
-            textFound = detectedText.toString();
+            /* * This is Text Recognition Section
+             */
+            TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
             try {
-                value_txt.setText(String.valueOf(textFound));
-            } catch (Exception e) {
-                e.printStackTrace();
+                if (!textRecognizer.isOperational()) {
+                    new AlertDialog.
+                            Builder(context).
+                            setMessage("Text recognizer could not be set up on your device").show();
+                    return;
+                }
+
+                Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+                SparseArray<TextBlock> origTextBlocks = textRecognizer.detect(frame);
+                List<TextBlock> textBlocks = new ArrayList<>();
+                for (int i = 0; i < origTextBlocks.size(); i++) {
+                    TextBlock textBlock = origTextBlocks.valueAt(i);
+                    textBlocks.add(textBlock);
+                }
+                Collections.sort(textBlocks, new Comparator<TextBlock>() {
+                    @Override
+                    public int compare(TextBlock o1, TextBlock o2) {
+                        int diffOfTops = o1.getBoundingBox().top - o2.getBoundingBox().top;
+                        int diffOfLefts = o1.getBoundingBox().left - o2.getBoundingBox().left;
+                        if (diffOfTops != 0) {
+                            return diffOfTops;
+                        }
+                        return diffOfLefts;
+                    }
+                });
+
+                StringBuilder detectedText = new StringBuilder();
+                for (TextBlock textBlock : textBlocks) {
+                    if (textBlock != null && textBlock.getValue() != null) {
+                        detectedText.append(textBlock.getValue());
+                        detecteddText.add(textBlock.getValue());
+                        detectedText.append("\n");
+                    }
+                }
+                textFound = detectedText.toString();
+                try {
+                    value_txt.setText(String.valueOf(textFound));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                textRecognizer.release();
             }
-            Log.d(TAG, detectedText.toString());
-        } finally {
-            textRecognizer.release();
-        }
 
 
-        /*
-         * This is Object Detection Section
-         * */
+            /*
+             * This is Object Detection Section
+             * */
 
 
-        InputImage image = InputImage.fromBitmap(bitmap, 0);
+            try {
 
-        FaceDetectorOptions options = new FaceDetectorOptions.Builder()
-                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-                .enableTracking()
-                .build();
-        Log.d("sayed_geneder", detecteddText.toString());
+                Bitmap scaledFace = Bitmap.createScaledBitmap(resultBmp, 112, 112, true);
+                float[] embedding = faceNetModel.getEmbedding(scaledFace);
 
-        FaceDetector detector = FaceDetection.getClient(options);
-        detector.process(image)
-                .addOnSuccessListener(faces -> {
-                    if (faces.isEmpty()) return;
+                if (embedding != null && embedding.length == EMBEDDING_SIZE) {
 
-                    for (Face face : faces) {
-                        try {
-                            Rect box = face.getBoundingBox();
+                    if (!isSamePerson(embedding)) {
+                        i++;
+                        if (i < 1) return;
+                        i = 0;
+                        if (ageListMapping[maxAt] == 0) {
+                            child++;
+                        } else if (ageListMapping[maxAt] == 1) {
+                            adult++;
+                        } else if (ageListMapping[maxAt] == 2) {
+                            teen++;
+                        } else if (ageListMapping[maxAt] == 3 || ageListMapping[maxAt] == 4) {
+                            senior++;
+                        }
+                        if (detectedGender.equals("M")) {
+                            male++;
+                            switch (detectedMood) {
+                                case "Angry":
+                                    angryM++;
+                                    angrySM++;
+                                    break;
+                                case "Disgust":
+                                    disgustM++;
+                                    disgustSM++;
+                                    break;
+                                case "Fear":
+                                    fearM++;
+                                    fearSM++;
+                                    break;
+                                case "Happy":
+                                    happyM++;
+                                    happySM++;
+                                    break;
+                                case "Sad":
+                                    sadM++;
+                                    sadSM++;
+                                    break;
+                                case "Surprise":
+                                    surpriseM++;
+                                    surpriseSM++;
+                                    break;
+                                case "Neutral":
+                                    neutralM++;
+                                    neutralSM++;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ageListMapping[maxAt] == 0) male20++;
+                            if (ageListMapping[maxAt] == 1) male32++;
+                            if (ageListMapping[maxAt] == 2) male40++;
+                            if (ageListMapping[maxAt] == 3) male50++;
+                            if (ageListMapping[maxAt] == 4) male50plus++;
 
-                            int x = Math.max(box.left, 0);
-                            int y = Math.max(box.top, 0);
-                            int width = Math.min(box.width(), bitmap.getWidth() - x);
-                            int height = Math.min(box.height(), bitmap.getHeight() - y);
 
-                            Bitmap faceBitmap = Bitmap.createBitmap(bitmap, x, y, width, height);
-                            Bitmap scaledFace = Bitmap.createScaledBitmap(faceBitmap, 112, 112, true);
-                            float[] embedding = faceNetModel.getEmbedding(scaledFace);
+                        } else {
+                            female++;
+                            switch (detectedMood) {
+                                case "Angry":
+                                    angryF++;
+                                    angrySF++;
+                                    break;
+                                case "Disgust":
+                                    disgustF++;
+                                    disgustSF++;
+                                    break;
+                                case "Fear":
+                                    fearF++;
+                                    fearSF++;
+                                    break;
+                                case "Happy":
+                                    happyF++;
+                                    happySF++;
+                                    break;
+                                case "Sad":
+                                    sadF++;
+                                    sadSF++;
+                                    break;
+                                case "Surprise":
+                                    surpriseF++;
+                                    surpriseSF++;
+                                    break;
+                                case "Neutral":
+                                    neutralF++;
+                                    neutralSF++;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ageListMapping[maxAt] == 0) female20++;
+                            if (ageListMapping[maxAt] == 1) female32++;
+                            if (ageListMapping[maxAt] == 2) female40++;
+                            if (ageListMapping[maxAt] == 3) female50++;
+                            if (ageListMapping[maxAt] == 4) female50plus++;
 
-                            if (embedding != null && embedding.length == EMBEDDING_SIZE) {
-                                Log.d("sayd", ageListMapping[maxAt] + " " + detectedAgeRange + " " + detectedGender);
+                        }
+                        uniqueFaces.add(embedding);
+                        ac.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (happyF + happyM > 0)
+                                    happyPeople.setText(happyF + happyM + "");
+                                if (sadF + sadM > 0)
+                                    sadPeople.setText(sadF + sadM + "");
+                                if (neutralF + neutralM > 0)
+                                    neutralPeople.setText(neutralF + neutralM + "");
 
-                                if (!isSamePerson(embedding)) {
-                                    if (ageListMapping[maxAt] == 0) {
-                                        child++;
-                                    } else if (ageListMapping[maxAt] == 1) {
-                                        adult++;
-                                    } else if (ageListMapping[maxAt] == 2) {
-                                        teen++;
-                                    } else if (ageListMapping[maxAt] == 3 || ageListMapping[maxAt] == 4) {
-                                        senior++;
-                                    }
-                                    container.post(() -> {
-                                        container.removeAllViews();
-                                        int fullWidth = container.getWidth();
+                                if ((male + female) > 0) {
+                                    all_number.setText(uniqueFaces.size() + "");
+                                    maleNum.setText((int) Math.ceil((male * 100) / (male + female)) + "% Male");
+                                    femaleNum.setText(100 - Integer.parseInt(maleNum.getText().toString().replace("% Male", "")) + "% Female");
 
-                                        // Child
-                                        View childView = new View(context);
-                                        childView.setBackgroundColor(Color.parseColor("#4CAF50"));
-                                        LinearLayout.LayoutParams childParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) child / 100)), 30);
-                                        childParams.setMargins(0, 0, 0, 16);
-                                        container.addView(childView, childParams);
-
-                                        // Teen
-                                        View teenView = new View(context);
-                                        teenView.setBackgroundColor(Color.parseColor("#2196F3"));
-                                        LinearLayout.LayoutParams teenParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) teen / 100)), 30);
-                                        teenParams.setMargins(0, 0, 0, 16);
-                                        container.addView(teenView, teenParams);
-
-                                        // Adult
-                                        View adultView = new View(context);
-                                        adultView.setBackgroundColor(Color.parseColor("#FF9800"));
-                                        LinearLayout.LayoutParams adultParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) adult / 100)), 30);
-                                        adultParams.setMargins(0, 0, 0, 16);
-                                        container.addView(adultView, adultParams);
-
-                                        // Senior
-                                        View seniorView = new View(context);
-                                        seniorView.setBackgroundColor(Color.parseColor("#9C27B0"));
-                                        LinearLayout.LayoutParams seniorParams = new LinearLayout.LayoutParams((int) (fullWidth * ((float) senior / 100)), 30);
-                                        container.addView(seniorView, seniorParams);
-                                    });
-                                    if (detectedGender.equals("M")) {
-                                        Log.d("sayd", ageListMapping[maxAt] + " " + orient);
-                                        switch (detectedMood) {
-                                            case "Angry":
-                                                angryM++;
-                                                break;
-                                            case "Disgust":
-                                                disgustM++;
-                                                break;
-                                            case "Fear":
-                                                fearM++;
-                                                break;
-                                            case "Happy":
-                                                happyM++;
-                                                break;
-                                            case "Sad":
-                                                sadM++;
-                                                break;
-                                            case "Surprise":
-                                                surpriseM++;
-                                                break;
-                                            case "Neutral":
-                                                neutralM++;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                        if (ageListMapping[maxAt] == 0) male20++;
-                                        if (ageListMapping[maxAt] == 1) male32++;
-                                        if (ageListMapping[maxAt] == 2) male40++;
-                                        if (ageListMapping[maxAt] == 3) male50++;
-                                        if (ageListMapping[maxAt] == 4) male50plus++;
-
-                                    } else {
-                                        switch (detectedMood) {
-                                            case "Angry":
-                                                angryF++;
-                                                break;
-                                            case "Disgust":
-                                                disgustF++;
-                                                break;
-                                            case "Fear":
-                                                fearF++;
-                                                break;
-                                            case "Happy":
-                                                happyF++;
-                                                break;
-                                            case "Sad":
-                                                sadF++;
-                                                break;
-                                            case "Surprise":
-                                                surpriseF++;
-                                                break;
-                                            case "Neutral":
-                                                neutralF++;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                        if (ageListMapping[maxAt] == 0) female20++;
-                                        if (ageListMapping[maxAt] == 1) female32++;
-                                        if (ageListMapping[maxAt] == 2) female40++;
-                                        if (ageListMapping[maxAt] == 3) female50++;
-                                        if (ageListMapping[maxAt] == 4) female50plus++;
-                                    }
-
-                                    uniqueFaces.add(embedding);
-                                    Log.d("sayed_emb", "✅ New person detected. Total unique: " + uniqueFaces.size());
-                                } else {
-                                    Log.d("sayed_emb", "ℹ Same person (ignored)");
                                 }
                             }
-                        } catch (Exception e) {
+                        });
 
-                            Log.e("FACE_PROCESSING", "Error processing face: ", e);
-                        }
+
                     }
-                })
-                .addOnFailureListener(Throwable::printStackTrace);
-        Log.d("sayed_males", "male32" + "");
+                }
+            } catch (Exception e) {
 
-        scaledBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, false);
-        scaledBitmap.getPixels(intValuesDetection, 0, scaledBitmap.getWidth(), 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight());
+            }
+
+        }
+        Bitmap scaledBitmap3 = Bitmap.createScaledBitmap(bitmap, 300, 300, false);
+        scaledBitmap3.getPixels(intValuesDetection, 0, scaledBitmap3.getWidth(), 0, 0, scaledBitmap3.getWidth(), scaledBitmap3.getHeight());
 
         imgData.rewind();
         for (int i = 0; i < 300; ++i) {
@@ -695,8 +696,8 @@ public class FaceRecognitionProcessor {
             String key = entry.getKey();
             Integer count = entry.getValue();
             detectedObjects.add(key);
-            Log.d(TAG, key + " : " + count);
-//				Toast.makeText(ac, key + " : " + count, Toast.LENGTH_SHORT).show();
+            objects.add(key);
+
             try {
                 key_object.setText(key);
                 value_object.setText(String.valueOf(count));
@@ -704,111 +705,165 @@ public class FaceRecognitionProcessor {
                 e.printStackTrace();
             }
         }
-        detector.process(image)
-                .addOnSuccessListener(faces -> {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastUpdateTime < 10000) {
-                        return;
-                    }
-                    lastUpdateTime = currentTime;
-                    saveAndSendImpression(context);
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-                });
+        FaceDetectorOptions options = new FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+                .enableTracking()
+                .build();
+        FaceDetector detector = FaceDetection.getClient(options);
         detector.process(image)
                 .addOnSuccessListener(faces -> {
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastUpdateTime1 < 600000) {
-                        return;
+                    if (currentTime - lastUpdateTime >= 10000) {
+                        lastUpdateTime = currentTime;
+                        saveAndSendImpression(context);
                     }
-                    lastUpdateTime1 = currentTime;
-                    if (isInternetAvailable(context)) {
-                        Toast.makeText(context, "Uploading...", Toast.LENGTH_LONG).show();
-                        AdDatabase adDatabase = AdDatabase.getInstance(context);
-                        new Thread(() -> {
-                            try {
-                                List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
-                                for (ImpressionEntity impression1 : impressions) {
-                                    APIImpression.sendImpression(context, impression1);
-                                }
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(context, "Successfully Uploaded", Toast.LENGTH_LONG).show();
+
+                    if (currentTime - lastUpdateTime1 >= 600000) {
+                        lastUpdateTime1 = currentTime;
+                        if (isInternetAvailable(context)) {
+                            Toast.makeText(context, "Uploading...", Toast.LENGTH_SHORT).show();
+                            ReportDataBase adReportDataBase = ReportDataBase.getInstance(context);
+                            AdDatabase adDatabase = AdDatabase.getInstance(context);
+                            new Thread(() -> {
+                                try {
+                                    List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
+                                    int nMale20 = 0, nMale32 = 0, nMale40 = 0, nMale50 = 0, nMale50Plus = 0, nFemale20 = 0, nFemale32 = 0, nFemale40 = 0, nFemale50 = 0, nFemale50Plus = 0;
+                                    List<ReportEntity> newReport = adReportDataBase.reportDao().getAllReportsByHour(Integer.parseInt(new SimpleDateFormat("HH", Locale.getDefault()).format(new Date())), Integer.parseInt(new SimpleDateFormat("dd", Locale.getDefault()).format(new Date())));
+
+                                    for (int i = 0; i < newReport.size(); i++) {
+                                        nMale20 += newReport.get(i).male20;
+                                        nMale32 += newReport.get(i).male32;
+                                        nMale40 += newReport.get(i).male40;
+                                        nMale50 += newReport.get(i).male50;
+                                        nMale50Plus += newReport.get(i).male50plus;
+                                        nFemale20 += newReport.get(i).female20;
+                                        nFemale32 += newReport.get(i).female32;
+                                        nFemale40 += newReport.get(i).female40;
+                                        nFemale50 += newReport.get(i).female50;
+                                        nFemale50Plus += newReport.get(i).female50plus;
+
                                     }
-                                });
+                                    String angryMaleS, angryFemaleS, disgustMaleS, disgustFemaleS, fearMaleS, fearFemaleS, happyMaleS, happyFemaleS, sadMaleS, sadFemaleS, surpriseMaleS, surpriseFemaleS, neutralMaleS, neutralFemaleS;
+
+                                    angryMaleS = "M" + "/" + angrySM + "/" + "Angry";
+                                    angryFemaleS = "F" + "/" + angrySF + "/" + "Angry";
+                                    happyMaleS = "M" + "/" + happySM + "/" + "Happy";
+                                    happyFemaleS = "F" + "/" + happySF + "/" + "Happy";
+                                    disgustMaleS = "M" + "/" + disgustSM + "/" + "Disgust";
+                                    disgustFemaleS = "F" + "/" + disgustSF + "/" + "Disgust";
+                                    fearMaleS = "M" + "/" + fearSM + "/" + "Fear";
+                                    fearFemaleS = "F" + "/" + fearSF + "/" + "Fear";
+                                    sadMaleS = "M" + "/" + sadSM + "/" + "Sad";
+                                    sadFemaleS = "F" + "/" + sadSF + "/" + "Sad";
+                                    surpriseMaleS = "M" + "/" + surpriseSM + "/" + "Surprise";
+                                    surpriseFemaleS = "F" + "/" + surpriseSF + "/" + "Surprise";
+                                    neutralMaleS = "M" + "/" + neutralSM + "/" + "Neutral";
+                                    neutralFemaleS = "F" + "/" + neutralSF + "/" + "Neutral";
+                                    sentimentCount.add(happyMaleS);
+                                    sentimentCount.add(happyFemaleS);
+                                    sentimentCount.add(sadMaleS);
+                                    sentimentCount.add(sadFemaleS);
+                                    sentimentCount.add(disgustMaleS);
+                                    sentimentCount.add(disgustFemaleS);
+                                    sentimentCount.add(angryMaleS);
+                                    sentimentCount.add(angryFemaleS);
+                                    sentimentCount.add(fearMaleS);
+                                    sentimentCount.add(fearFemaleS);
+                                    sentimentCount.add(surpriseMaleS);
+                                    sentimentCount.add(surpriseFemaleS);
+                                    sentimentCount.add(neutralMaleS);
+                                    sentimentCount.add(neutralFemaleS);
+
+                                    int count = nMale20 + nMale32 + nMale40 + nMale50 + nMale50Plus + nFemale20 + nFemale32 + nFemale40 + nFemale50 + nFemale50Plus;
+                                    ScreenRecord screenRecord = new ScreenRecord();
+                                    screenRecord.setScreenViewId(screenViewId);
+                                    screenRecord.setScreenId(DataHolder.getInstance().screenID);
+                                    screenRecord.setAmountSettled(true);
+                                    screenRecord.setCurrency("USD");
+                                    screenRecord.setFormat("HD");
+                                    screenRecord.setTextDetected(null);
+                                    screenRecord.setDayHour(Integer.parseInt(new SimpleDateFormat("HH", Locale.getDefault()).format(new Date())));
+                                    screenRecord.setLocationType(DataHolder.getInstance().locationTypes);
+                                    screenRecord.setFemale20(nFemale20);
+                                    screenRecord.setFemale32(nFemale32);
+                                    screenRecord.setFemale40(nFemale40);
+                                    screenRecord.setFemale50(nFemale50);
+                                    screenRecord.setFemale50plus(nFemale50Plus);
+                                    screenRecord.setMale20(nMale20);
+                                    screenRecord.setMale32(nMale32);
+                                    screenRecord.setMale40(nMale40);
+                                    screenRecord.setMale50(nMale50);
+                                    screenRecord.setMale50plus(nMale50Plus);
+                                    screenRecord.setPlaySec(45);
+                                    screenRecord.setImpressionCost(0);
+                                    screenRecord.setOrientation(orient);
+                                    screenRecord.setViewCount(count);
+                                    screenRecord.setObjectDetected(new ArrayList<>(objects));
+                                    screenRecord.setRecordDate(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+                                    screenRecord.setRecordTime(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date()));
+                                    screenRecord.setScreenPlayer("DD");
+                                    screenRecord.setSentiemtCount(sentimentCount);
+                                    screenRecord.setScreenDevice("Saa");
+                                    // uploadReport(screenRecord, context);
+                                    angrySM = 0;
+                                    disgustSM = 0;
+                                    fearSM = 0;
+                                    happySM = 0;
+                                    sadSM = 0;
+                                    surpriseSM = 0;
+                                    neutralSM = 0;
+                                    angrySF = 0;
+                                    disgustSF = 0;
+                                    fearSF = 0;
+                                    happySF = 0;
+                                    sadSF = 0;
+                                    surpriseSF = 0;
+                                    neutralF = 0;
+                                    uniqueFaces.clear();
+                                    objects.clear();
+                                    for (ImpressionEntity impression1 : impressions) {
+
+                                        APIImpression.sendImpression(context, impression1);
+                                    }
+                                    ReportAPI.sendImpression(context, screenRecord);
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(context, "Successfully Uploaded", Toast.LENGTH_SHORT).show();
+                                            sentimentCount.clear();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                }
+
+                            }).start();
 
 
-                            } catch (Exception e) {
-                                Log.e("sayed-sync", "Error: ", e);
-                            }
+                        } else {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "Check Internet !", Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                        }).start();
-                    } else {
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context, "Check Internet !", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
+                        }
                     }
-
                 });
-        /*
-			Till Here
 
-			key_age, value_age;
-    static TextView key_object, value_object;
-    static TextView key_txt, value_txt
-
-			 */
-        /*runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (isInternetAvailable(context)) {
-                    saveAndSendImpression();
-                }
-                handler.postDelayed(this, 10 * 60 * 1000);
-
-            }
-        };
-
-        handler.post(runnable);*/
-        /*Log.d("sayed_yy", new ArrayList<>(detecteddText) + "");
-        startScheduler(context);*/
-
-        //Log.d("saFyed_yy", "555");
-
-       /* runnableCode = new Runnable() {
-            @Override
-            public void run() {
-
-                Log.d("saFyed_yy", "شس");
-
-                handler.postDelayed(this, 6 * 1000);
-            }
-        };
-
-        handler.post(runnableCode);*/
-    }
-
-    public void stopRepeatingTask() {
-        if (runnableCode != null) {
-            handler.removeCallbacks(runnableCode);
-
-        }
     }
 
     protected void onFailure(@NonNull Exception e) {
-        Log.w(TAG, "Face detection failed." + e);
     }
 
     private void detectInVisionImage(FirebaseVisionImage image, final FrameMetadata metadata, final GraphicOverlay graphicOverlay, final ByteBuffer data) {
         viewList.clear();
 
         final Bitmap bm = image.getBitmap();
-        detectInImage(image)
-                .addOnSuccessListener(
+        detectInImage(image).addOnSuccessListener(
                         new OnSuccessListener<List<FirebaseVisionFace>>() {
                             @Override
                             public void onSuccess(List<FirebaseVisionFace> results) {
@@ -954,9 +1009,9 @@ public class FaceRecognitionProcessor {
         tags.add(neutralMale);
         tags.add(neutralFemale);
 
+        ReportEntity reportEntity = new ReportEntity();
         ImpressionEntity impression = new ImpressionEntity();
-        Log.d("sayed_jj", DataHolder.getInstance().screenID);
-        impression.screenViewId = "view-" + String.format("%03d", new Random().nextInt(100000));
+        impression.screenViewId = screenViewId;
         impression.amountSettled = true;
         impression.currency = "USD";
         impression.dayHour = Long.parseLong(new SimpleDateFormat("HH", Locale.getDefault()).format(new Date()));
@@ -986,10 +1041,33 @@ public class FaceRecognitionProcessor {
         impression.textDetected = new ArrayList<>(detecteddText);
         impression.objectDetected = new ArrayList<>(detectedObjects);
         impression.impressionCost = 0;
+
+        //
+        reportEntity.hour = Integer.parseInt(new SimpleDateFormat("HH", Locale.getDefault()).format(new Date()));
+        reportEntity.day = Integer.parseInt(new SimpleDateFormat("dd", Locale.getDefault()).format(new Date()));
+        reportEntity.female20 = female20;
+        reportEntity.female32 = female32;
+        reportEntity.female40 = female40;
+        reportEntity.female50 = female50;
+        reportEntity.female50plus = female50plus;
+        reportEntity.male20 = male20;
+        reportEntity.male32 = male20;
+        reportEntity.male40 = male40;
+        reportEntity.male50 = male50;
+        reportEntity.male50plus = male50plus;
+        reportEntity.sad = (sadF + sadM);
+        reportEntity.happy = happyF + happyM;
+        reportEntity.neutral = neutralF + neutralM;
+        reportEntity.adult = male32 + male32;
+        reportEntity.child = male20 + female20;
+        reportEntity.middle = male40 + female40;
+        reportEntity.senior = male50 + male50plus + female50plus + female50;
+        ReportDataBase reportDataBase = ReportDataBase.getInstance(context);
         AdDatabase db = AdDatabase.getInstance(context);
         new Thread(() -> {
+            reportDataBase.reportDao().insertReport(reportEntity);
             db.impDao().insertImpression(impression);
-            Log.d("data_size--", db.impDao().getAllImpressions().size() + "");
+
             tags.clear();
             male20 = 0;
             male32 = 0;
@@ -1001,7 +1079,7 @@ public class FaceRecognitionProcessor {
             female40 = 0;
             female50 = 0;
             female50plus = 0;
-            uniqueFaces.clear();
+            //uniqueFaces.clear();
             detecteddText.clear();
             detectedObjects.clear();
             angryM = 0;
@@ -1033,23 +1111,15 @@ public class FaceRecognitionProcessor {
     }
 
 
-    public void startScheduler(Context context) {
-
-        long now1 = System.currentTimeMillis();
-        // هنا بيتخزن ويتبعت
-        saveAndSendImpression(context);
-
-        // أول تشغيل على طول
-
-    }
-
-
+    @SuppressLint("SetTextI18n")
     private boolean isSamePerson(float[] newEmbedding) {
         for (float[] saved : uniqueFaces) {
             float distance = calculateDistance(newEmbedding, saved);
-            if (distance < MATCH_THRESHOLD) {
+            float distance1 = faceNetModel.cosineSimilarity(newEmbedding, saved);
+            if (distance1 > 0.6) {
                 return true; // نفس الشخص
             }
+
         }
         return false;
     }
@@ -1061,5 +1131,15 @@ public class FaceRecognitionProcessor {
             sum += diff * diff;
         }
         return (float) Math.sqrt(sum);
+    }
+
+    public void uploadReport(ScreenRecord media, Context context) {
+
+        new Thread(() -> {
+            if (isInternetAvailable(context)) {
+                ReportAPI.sendImpression(context, media);
+
+            }
+        }).start();
     }
 }
