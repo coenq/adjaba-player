@@ -28,6 +28,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.adjaba.mqtt.MqttPlayerManager;
+import com.adjaba.mqtt.ResponseModel;
 import com.adjaba.news.NewsHandler;
 import com.adjaba.news.RssItem;
 import com.adjaba.news.Utils;
@@ -43,6 +45,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -80,6 +83,12 @@ import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.Config;
 import com.adjaba.utilities.RetrofitBuilder;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -121,12 +130,15 @@ public class AdvertWatching extends AppCompatActivity {
     private ExoPlayer exoPlayer;
     float dx = 6f; // سرعة الاتجاه الأفقي
     float dy = 6f; // سرعة الاتجاه الرأسي
+    private MqttPlayerManager mqttManager;
+
     private Handler handler1 = new Handler(Looper.getMainLooper());
     private Player.Listener playerListener = null;
     private Handler handler = new Handler();
     ImageView logoImage;
     Map<String, List<Integer>> advertHoursMap; // المفتاح advertId، والقيمة الساعات اللي يتعرض فيها الإعلان
     RotateAnimation rotate;
+    ResponseModel responseModel;
     ShimmerFrameLayout shimmer;
     private RetrofitBuilder retrofitBuilder = new RetrofitBuilder();
     private ImageView adImageView, noAdsLogo;
@@ -145,10 +157,11 @@ public class AdvertWatching extends AppCompatActivity {
     String location;
     int newTime = 2;
     private Handler timeHandler = new Handler();
+    MediaModel updatedMedia;
     private Runnable timeRunnable;
     int qrImageDimension;
     ImageView qrImage;
-    List<RssItem> getNews,getBackupNews;
+    List<RssItem> getNews, getBackupNews;
     private Runnable refreshRunnable;
     String mediaFormat = "";
     TextView displayText, newsHeader, newsDesc, newsTitle;
@@ -165,7 +178,7 @@ public class AdvertWatching extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         boolean isDataLoaded = prefs.getBoolean("data_loaded", false);
         getNews = new ArrayList<>();
-        getBackupNews=new ArrayList<>();
+        getBackupNews = new ArrayList<>();
         orient = DataHolder.getInstance().orient.toLowerCase();
         qrImage = findViewById(R.id.qrCodeImage);
         logoImage = findViewById(R.id.logoImage);
@@ -212,6 +225,11 @@ public class AdvertWatching extends AppCompatActivity {
         screenId = DataHolder.getInstance().screenID;
         location = DataHolder.getInstance().location;
         qrImageDimension = qrCodeImageDimension();
+        mqttManager = new MqttPlayerManager(this);
+
+        //mqttManager.connect(screenId);
+        Log.d("sayed_MQTT", "json");
+
         logoImage.setOnClickListener(new View.OnClickListener() {
             private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 300ms
             long lastClickTime = 0;
@@ -226,15 +244,14 @@ public class AdvertWatching extends AppCompatActivity {
             }
         });
         shimmer.startShimmer();
-// جلب مقاسات الشاشة
         View qr = findViewById(R.id.qrCodeImage);
 
         boolean isTV = getPackageManager().hasSystemFeature("android.software.leanback");
-        int percent=0;
+        int percent = 0;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             percent = 12;
-        }else{
-            percent = isTV?12:20;
+        } else {
+            percent = isTV ? 12 : 20;
         }
         ConstraintLayout.LayoutParams params =
                 (ConstraintLayout.LayoutParams) qr.getLayoutParams();
@@ -294,7 +311,7 @@ public class AdvertWatching extends AppCompatActivity {
                     newsIndex = 1;
                 }
                 getNews = rss;
-                getBackupNews=rss;
+                getBackupNews = rss;
                 return Unit.INSTANCE;
             }, bar -> {
                 if (bar == 1) shimmer.stopShimmer();
@@ -302,9 +319,11 @@ public class AdvertWatching extends AppCompatActivity {
                 return Unit.INSTANCE;
             });
             if (DataHolder.getInstance().isData == 5) {
+                Log.d("sayed-99", "next");
                 weatherLayout.setVisibility(View.VISIBLE);
                 getWeather(location, context);
             } else {
+                Log.d("sayed-99", "next11");
                 getWeather(location, context);
                 startMediaRotation(insertWeatherEveryThreeAds(DataHolder.getInstance().allAds), context);
 
@@ -338,7 +357,7 @@ public class AdvertWatching extends AppCompatActivity {
 
                         targetHours = new TargetHours(response.body().get(i).adContractData.advertId, response.body().get(i).adContractData.targetHours);
                         targetHoursList.add(targetHours);
-                        getUrl(response.body().get(i).contractId, response.body().get(i).currency, response.body().get(i).maxBid, i, listToString(response.body().get(i).adContractData.targetHours),
+                        getUrl(response.body().get(i).contractId, response.body().get(i).adContractData.targetGender, response.body().get(i).adContractData.targetAgeGroup, response.body().get(i).currency, response.body().get(i).maxBid, i, listToString(response.body().get(i).adContractData.targetHours),
                                 response.body().get(i).adContractData.textTop,
                                 response.body().get(i).adContractData.textRight,
                                 response.body().get(i).adContractData.textLeft,
@@ -385,7 +404,7 @@ public class AdvertWatching extends AppCompatActivity {
         });
     }
 
-    private void getUrl(String contractId, String currency, int maxBid, int serverOrder, String targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, Runnable onComplete) {
+    private void getUrl(String contractId, List<String> genderGroup, List<String> ageGroup, String currency, int maxBid, int serverOrder, String targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, Runnable onComplete) {
         if (path == null || path.isEmpty()) {
             return;
         }
@@ -420,7 +439,7 @@ public class AdvertWatching extends AppCompatActivity {
                                 }
                                 // يمكنك تعديل القيم حسب ما هو متوفر
                                 AdEntity ad = new AdEntity(
-                                        advertId, // أو advertId لو عندك
+                                        advertId, genderGroup, ageGroup,
                                         mediaFormat.toUpperCase(), // format
                                         localPath,
                                         txtTop, // textTop
@@ -593,6 +612,12 @@ public class AdvertWatching extends AppCompatActivity {
         mediaSwitcher = new Runnable() {
             @Override
             public void run() {
+                MediaModel nn = updateAppropriateAds();
+                if (nn != null) {
+                    Log.d("sayed-99", nn.getAdvertId());
+
+                }
+
                 if (mediaList == null || mediaList.isEmpty()) return;
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
                 adImageView.setVisibility(View.GONE);
@@ -602,13 +627,20 @@ public class AdvertWatching extends AppCompatActivity {
                 Animation inAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.enter_from_right);
                 Animation outAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.exit_to_left);
                 //int currentHour = Integer.parseInt(getCurrentHourFormatted());
-                MediaModel media = mediaList.get(currentIndex);
+                MediaModel media;
+                if (nn != null) {
+                    updatedMedia=null;
+                    media = nn;
+
+                } else {
+                    media = mediaList.get(currentIndex);
+                }
+
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
                     if (!stringToList(media.getTargetHours()).contains(currentHour) && !media.getType().equals("weather")) {
 
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
-                        return;
                     }
                 }
                 long durationMs = media.getDurationInMillis();
@@ -674,8 +706,8 @@ public class AdvertWatching extends AppCompatActivity {
                                 //progressBar.setVisibility(View.GONE);
                                 return Unit.INSTANCE;
                             });
-                        }catch (Exception e){
-                            getNews=getBackupNews;
+                        } catch (Exception e) {
+                            getNews = getBackupNews;
                         }
                     }
                     if (Utils.INSTANCE.getNewsList().size() > 0) {
@@ -707,23 +739,22 @@ public class AdvertWatching extends AppCompatActivity {
                     weatherLayout.setVisibility(View.VISIBLE);
                     crossfade(weatherLayout, adImageView, 1000);
 
+
                     // الاستمرار في الدوران بعد المدة
                     handler.postDelayed(this, durationMs);
                 }
 
                 currentIndex = (currentIndex + 1) % mediaList.size();
             }
-        }
+        };
 
-        ;
+
         handler.removeCallbacks(mediaSwitcher);
         handler.post(mediaSwitcher);
 
         handler.removeCallbacks(refreshRunnable);
 
-        if (
-
-                isInternetAvailable()) {
+        if (isInternetAvailable()) {
             if (newTime <= 60) {
                 handler.postDelayed(refreshRunnable, (long) newTime * 60 * 1000);
 
@@ -742,6 +773,67 @@ public class AdvertWatching extends AppCompatActivity {
                             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR));
         }
         return false;
+    }
+
+    private MediaModel updateAppropriateAds() {
+
+        mqttManager.setMessageListener(new MqttPlayerManager.MessageListener() {
+            @Override
+            public void onMessageReceived(String topic, String message) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String fixedMessage = message;
+                            if (fixedMessage.startsWith("\"")) {
+                                fixedMessage = fixedMessage.substring(1, fixedMessage.length() - 1);
+                                fixedMessage = fixedMessage.replace("\\\"", "\"");
+                            }
+                            JSONObject jsonObject = new JSONObject(fixedMessage);
+
+                            responseModel = new ResponseModel(
+                                    jsonObject.getString("storeId"),
+                                    jsonObject.getString("timestamp"),
+                                    jsonObject.getString("customerCount"),
+                                    jsonObject.getString("ageRange"),
+                                    jsonObject.getString("gender")
+                            );
+                            Log.d("fgh", responseModel.getGender());
+                            AdDatabase adDatabase = AdDatabase.getInstance(context);
+                            AdEntity ad = adDatabase.adDao().getAdByGender(responseModel.getGender());
+                            if (ad == null) return;
+                            updatedMedia = new MediaModel(ad.contractId, ad.currency
+                                    , ad.maxBid, ad.format,
+                                    ad.localPath, ad.duration, ad.textBottom
+                                    , ad.textTop, "", ad.targetHours, ad.advertId);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        Log.d("sayed_MQTT", "Topic: " + topic + ", Message: " + message);
+
+
+                    }
+                }).start();
+            }
+        });
+        mqttManager.setConnectionListener(new MqttPlayerManager.ConnectionListener() {
+            @Override
+            public void onConnectionStatus(boolean isConnected) {
+                Log.d("sayed_MQTT", "MQTT Connected: " + isConnected);
+            }
+        });
+        if (!mqttManager.isConnected()) {
+            String clientId = "android-client-" + System.currentTimeMillis();
+            mqttManager.connect(clientId);
+        }
+        return updatedMedia;
     }
 
     /*
@@ -853,7 +945,7 @@ public class AdvertWatching extends AppCompatActivity {
     public void saveAndSendImpression(MediaModel media, long durationMs, Context context) {
         ImpressionEntity impression = new ImpressionEntity();
 
-        // توليد impressionId: screenId + advertId + رقم عشوائي 3 خانات
+
         impression.impressionId = DataHolder.getInstance().screenID + media.getAdvertId() + String.format("%03d", new Random().nextInt(1000));
 
         impression.advertId = media.getAdvertId();
@@ -876,18 +968,18 @@ public class AdvertWatching extends AppCompatActivity {
 
         // حفظ في Room (تأكد من ان ImpressionDatabase معرف بشكل صحيح)
         AdDatabase db = AdDatabase.getInstance(context);
+
         new Thread(() -> {
             db.impDao().insertImpression(impression);
 
-            // رفع البيانات لو فيه إنترنت
             if (isInternetAvailable(context)) {
-                APIImpression.sendImpression(context, impression);
-             /*   AdDatabase adDatabase = AdDatabase.getInstance(context);
-                List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();*/
-                //for (ImpressionEntity impression1 : impressions) {
 
+                List<ImpressionEntity> impressions = db.impDao().getAllImpressions();
+                for (ImpressionEntity impression1 : impressions) {
+                    APIImpression.sendImpression(context, impression1);
+                    db.impDao().deleteAdById(impression1.impressionId);
 
-                //}
+                }
             }
         }).start();
     }
@@ -994,6 +1086,7 @@ public class AdvertWatching extends AppCompatActivity {
                 noAdsLogo.setY(y);
 
                 handlerLogo.postDelayed(this, 16); // ~60 FPS
+                return;
             }
         };
         noAdsLogo.post(() -> handlerLogo.post(runnableLogo));
@@ -1019,6 +1112,9 @@ public class AdvertWatching extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mqttManager != null) {
+            mqttManager.disconnect();
+        }
         handler.removeCallbacks(mediaSwitcher);
         releaseExoPlayer();
         if (executorService != null) {

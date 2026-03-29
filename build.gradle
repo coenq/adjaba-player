@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.9.0'
+    ext.kotlin_version = '2.1.0'
     ext {
         agp_version = '8.10.1'
     }
     repositories {
         google()
-        jcenter()
-        maven { url 'https://jitpack.io'}
+        mavenCentral() // استبدل jcenter بـ mavenCentral لأن jcenter قديم
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
@@ -17,15 +17,7 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-        mavenCentral()
-    }
-}
-
+// امسح بلوك allprojects من هنا
 
 task clean(type: Delete) {
     delete rootProject.buildDir

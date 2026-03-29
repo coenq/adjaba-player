@@ -3,8 +3,12 @@ package com.adjaba.room;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
+import androidx.room.TypeConverters;
+
+import java.util.List;
 
 @Entity(tableName = "ads")
+@TypeConverters(TagsConverter.class)
 public class AdEntity {
     @PrimaryKey
     @NonNull
@@ -24,8 +28,12 @@ public class AdEntity {
     public  String currency;
     public int maxBid;
     public int insertedAt;
+    //@TypeConverters(TagsConverter.class)
+    public List<String> targetAge;;
+    public List<String> targetGender;
 
-    public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,
+
+    public AdEntity(@NonNull String advertId,List<String>targetGender,List<String>targetAge, String format, String localPath, String textTop,
                     String textBottom, String textLeft, String textRight, int duration,
                     String orientation, String screenId, String contractId,String targetHours, int insertedAt,String currency,int maxBid) {
         this.advertId = advertId;
@@ -43,6 +51,8 @@ public class AdEntity {
         this.insertedAt=insertedAt;
         this.currency=currency;
         this.maxBid=maxBid;
+        this.targetAge=targetAge;
+        this.targetGender=targetGender;
     }
 
 

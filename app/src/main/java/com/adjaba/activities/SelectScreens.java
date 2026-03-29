@@ -23,9 +23,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
+
 import com.adjaba.R;
 import com.adjaba.activities.viewmodel.DataHolder;
 import com.adjaba.models.newmodels.MediaModel;
@@ -38,6 +40,7 @@ import com.adjaba.room.AdEntity;
 import com.adjaba.room.InfoEntity;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.RetrofitBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,6 +54,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -72,8 +76,8 @@ public class SelectScreens extends AppCompatActivity {
     List<MediaModel> mediaModels = new ArrayList<>();
     Context context;
     Activity ac;
-    LinearLayout bot_lay,logosLayout;
-    private int waitingData=0;
+    LinearLayout bot_lay, logosLayout;
+    private int waitingData = 0;
     Map<String, String> screenPlayerMap, screenLocationMap, screenDeviceMap, screenLocation;
     Map<String, List<String>> screenTags;
     List<TargetHours> targetHoursList;
@@ -105,7 +109,7 @@ public class SelectScreens extends AppCompatActivity {
         editor = prefs.edit();
         context = this;
         ac = this;
-        logosLayout=findViewById(R.id.logosLayout);
+        logosLayout = findViewById(R.id.logosLayout);
         nestedScrollView = findViewById(R.id.nestedScrollView);
         waitingLogo = findViewById(R.id.waitingLogo);
         loadingBar = findViewById(R.id.loadingBar);
@@ -363,7 +367,7 @@ public class SelectScreens extends AppCompatActivity {
                                             Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
                                         }
                                     } else {
-                                        waitingData=1;
+                                        waitingData = 1;
                                         if (executorService == null || executorService.isShutdown()) {
                                             executorService = Executors.newSingleThreadExecutor();
                                         }
@@ -374,7 +378,7 @@ public class SelectScreens extends AppCompatActivity {
                                                 String videoUrl = adList.get(i).adContractData.videoUrl;
                                                 int duration = adList.get(i).duration;
 
-                                                getUrl(
+                                                getUrl(adList.get(i).adContractData.targetGender, adList.get(i).adContractData.targetAgeGroup,
                                                         adList.get(i).contractId,
                                                         adList.get(i).currency,
                                                         adList.get(i).maxBid,
@@ -448,7 +452,7 @@ public class SelectScreens extends AppCompatActivity {
         }).start();
     }
 
-    private void getUrl(String currency, String contractId, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder) {
+    private void getUrl(List<String> targetGender, ArrayList<String> targetAge, String currency, String contractId, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder) {
         if (path == null || path.isEmpty()) {
             return;
         }
@@ -478,6 +482,8 @@ public class SelectScreens extends AppCompatActivity {
                             }
                             AdEntity ad = new AdEntity(
                                     advertId,
+                                    targetGender,
+                                    targetAge,
                                     mediaFormat.toUpperCase(),
                                     localPath,
                                     txtTop, info, txtLeft, txtRight,

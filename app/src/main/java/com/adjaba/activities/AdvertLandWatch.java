@@ -339,7 +339,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                         //SelectScreens.showDownloadDialog(context, adList.size());
                         targetHours = new TargetHours(response.body().get(i).adContractData.advertId, response.body().get(i).adContractData.targetHours);
                         targetHoursList.add(targetHours);
-                        getUrl(response.body().get(i).contractId, response.body().get(i).currency, response.body().get(i).maxBid, i, listToString(response.body().get(i).adContractData.targetHours),
+                        getUrl(response.body().get(i).contractId,response.body().get(i).adContractData.targetGender, response.body().get(i).adContractData.targetAgeGroup, response.body().get(i).currency, response.body().get(i).maxBid, i, listToString(response.body().get(i).adContractData.targetHours),
                                 response.body().get(i).adContractData.textTop,
                                 response.body().get(i).adContractData.textRight,
                                 response.body().get(i).adContractData.textLeft,
@@ -392,7 +392,7 @@ public class AdvertLandWatch extends AppCompatActivity {
         });
     }
 
-    private void getUrl(String contractId, String currency, int maxBid, int serverOrder, String targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, Runnable onComplete) {
+    private void getUrl(String contractId,List<String>genderGroup, List<String> ageGroup, String currency, int maxBid, int serverOrder, String targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, Runnable onComplete) {
         if (path == null || path.isEmpty()) {
             return;
         }
@@ -428,7 +428,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                                 }
                                 // يمكنك تعديل القيم حسب ما هو متوفر
                                 AdEntity ad = new AdEntity(
-                                        advertId, // أو advertId لو عندك
+                                        advertId, genderGroup,ageGroup,
                                         mediaFormat.toUpperCase(), // format
                                         localPath,
                                         txtTop, // textTop
@@ -601,7 +601,7 @@ public class AdvertLandWatch extends AppCompatActivity {
         mediaSwitcher = new Runnable() {
             @Override
             public void run() {
-                if (mediaList == null || mediaList.isEmpty()) return;
+                if (mediaList == null || mediaList.isEmpty()) return ;
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
                 adImageView.setVisibility(View.GONE);
                 adPlayerView.setVisibility(View.GONE);
@@ -616,7 +616,6 @@ public class AdvertLandWatch extends AppCompatActivity {
 
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
-                        return;
                     }
                 }
                 long durationMs = media.getDurationInMillis();
@@ -890,14 +889,14 @@ public class AdvertLandWatch extends AppCompatActivity {
         new Thread(() -> {
             db.impDao().insertImpression(impression);
 
-            // رفع البيانات لو فيه إنترنت
             if (isInternetAvailable(context)) {
-                APIImpression.sendImpression(context, impression);
-               /* AdDatabase adDatabase = AdDatabase.getInstance(context);
-                List<ImpressionEntity> impressions = adDatabase.impDao().getAllImpressions();
-                for (ImpressionEntity impression1 : impressions) {
 
-                }*/
+                List<ImpressionEntity> impressions = db.impDao().getAllImpressions();
+                for (ImpressionEntity impression1 : impressions) {
+                    APIImpression.sendImpression(context, impression1);
+                    db.impDao().deleteAdById(impression1.impressionId);
+
+                }
             }
         }).start();
     }

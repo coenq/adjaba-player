@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -112,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
+                    Log.d("sayed_perer",response.body().getLoginToken());
                     if (checkBox.isChecked()) {
                         editor.putString("email", etEmail.getText().toString());
                         editor.putString("password", etPassword.getText().toString());
@@ -153,6 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     btnLogin.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
+                    Log.d("sayed_loginResponse",response.code()+"");
                     Toast.makeText(LoginActivity.this, "Failed Data!", Toast.LENGTH_LONG).show();
                 }
             }

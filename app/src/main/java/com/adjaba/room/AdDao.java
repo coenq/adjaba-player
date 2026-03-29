@@ -19,8 +19,8 @@ public interface AdDao {
     @Query("SELECT * FROM ads WHERE screenId = :id ORDER BY insertedAt ASC")
     List<AdEntity> getAllAds(String id);
 
-    @Query("SELECT * FROM ads WHERE advertId = :id LIMIT 1")
-    AdEntity getAdById(String id);
+    @Query("SELECT * FROM ads WHERE targetGender LIKE '%' || :gender || '%' LIMIT 1")
+    AdEntity getAdByGender(String gender);
 
     @Query("DELETE FROM ads")
     Completable deleteAllAds();
