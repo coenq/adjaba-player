@@ -72,7 +72,7 @@
 
         <LinearLayout android:id="@+id/temp_block"
             android:layout_width="0dp" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center"
+            android:orientation="horizontal" android:gravity="center_vertical"
             android:layout_marginStart="8dp" android:layout_marginEnd="@dimen/slide_padding"
             app:layout_constraintStart_toEndOf="@id/v_center" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/h_metrics">
@@ -167,7 +167,9 @@
                 <View android:id="@+id/header_background"
                     android:layout_width="match_parent" android:layout_height="match_parent"
                     android:layout_gravity="bottom"
-                    android:background="@drawable/gradient_news_overlay" />
+                    android:background="@drawable/gradient_news_overlay"
+                    android:scaleY="0.4"
+                    android:translationY="60dp" />
                 <TextView android:id="@+id/newsTitle"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_gravity="top|start" android:layout_margin="16dp"

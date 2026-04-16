@@ -500,6 +500,8 @@ public class SelectScreens extends AppCompatActivity {
                                 }
                                 new Handler(Looper.getMainLooper()).post(() -> {
                                     DataHolder.getInstance().targetHours = targetHoursList;
+                                    DataHolder.getInstance().allAds = mediaModels;
+                                    
                                     waitingLogo.animate()
                                             .scaleX(2.2f)
                                             .scaleY(2.2f)
@@ -507,18 +509,12 @@ public class SelectScreens extends AppCompatActivity {
                                             .setDuration(1000)
                                             .setInterpolator(new DecelerateInterpolator())
                                             .withEndAction(() -> {
-                                                // إعادة الشعار للوضع الطبيعي
-                                               /* waitingLogo.setAlpha(1f);
-                                                waitingLogo.setScaleX(1f);
-                                                waitingLogo.setScaleY(1f);*/
                                                 if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
                                                     Intent intent = new Intent(context, AdvertLandWatch.class);
-                                                    DataHolder.getInstance().allAds = mediaModels;
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                     context.startActivity(intent);
                                                 } else {
                                                     Intent intent = new Intent(context, AdvertWatching.class);
-                                                    DataHolder.getInstance().allAds = mediaModels;
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                     context.startActivity(intent);
                                                 }
