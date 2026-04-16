@@ -115,7 +115,7 @@ public class AdvertWatching extends AppCompatActivity {
     private List<WatchingModel> adList = new ArrayList<>();
     List<MediaModel> mediaList = new ArrayList<>();
     int[] loadedCount = {0};
-    LinearLayout weatherLayout;
+    ConstraintLayout weatherLayout;
     FrameLayout newsLayout;
     ImageView waitingLogo, newsImg;
     int weatherCurrent;
