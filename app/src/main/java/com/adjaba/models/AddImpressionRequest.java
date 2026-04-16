@@ -1,12 +1,9 @@
-
 package com.adjaba.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.realm.RealmObject;
-
-public class AddImpressionRequest extends RealmObject {
+public class AddImpressionRequest {
 
     @SerializedName("impressionId")
     @Expose

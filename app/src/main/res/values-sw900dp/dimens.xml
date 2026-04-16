@@ -1,0 +1,26 @@
+<resources>
+    <!-- ── Slide layout (large tablet / 70" TV) ── -->
+    <dimen name="slide_padding">48dp</dimen>
+
+    <!-- ── Weather text ── -->
+    <dimen name="text_time">130sp</dimen>
+    <dimen name="text_temp">130sp</dimen>
+    <dimen name="text_location">28sp</dimen>
+    <dimen name="text_condition">24sp</dimen>
+    <dimen name="text_metrics">30sp</dimen>
+    <dimen name="text_label">20sp</dimen>
+
+    <!-- ── News text ── -->
+    <dimen name="text_news_label">26sp</dimen>
+    <dimen name="text_news_headline">56sp</dimen>
+    <dimen name="text_news_desc">36sp</dimen>
+
+    <!-- ── Spacing ── -->
+    <dimen name="news_header_padding">16dp</dimen>
+    <dimen name="news_text_padding">28dp</dimen>
+    <dimen name="metric_divider_height">80dp</dimen>
+
+    <!-- ── Icons ── -->
+    <dimen name="weather_icon_size">160dp</dimen>
+    <dimen name="weather_metric_icon_size">52dp</dimen>
+</resources>
