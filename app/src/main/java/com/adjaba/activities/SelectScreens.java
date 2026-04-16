@@ -345,6 +345,7 @@ public class SelectScreens extends AppCompatActivity {
                                             DataHolder.getInstance().location = screenLocation.get(screen_id);
                                             DataHolder.getInstance().tags = screenTags.get(screen_id);
                                             DataHolder.getInstance().isData = 5;
+                                            DataHolder.getInstance().allAds = new ArrayList<>();
                                             DataHolder.getInstance().orient = orient;
                                             DataHolder.getInstance().time = timeRefresh;
                                             if (displayText.isChecked()) {
@@ -359,6 +360,20 @@ public class SelectScreens extends AppCompatActivity {
                                             if (!businessRules.isChecked()) {
                                                 DataHolder.getInstance().targetHoursFlag = 0;
                                             }
+                                            // No ads — launch player to show weather + news only
+                                            new Handler(Looper.getMainLooper()).post(() -> {
+                                                waitingLogo.animate()
+                                                        .scaleX(2.2f).scaleY(2.2f).alpha(0f)
+                                                        .setDuration(1000)
+                                                        .setInterpolator(new DecelerateInterpolator())
+                                                        .withEndAction(() -> {
+                                                            if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                                                                startActivity(new Intent(context, AdvertLandWatch.class));
+                                                            } else {
+                                                                startActivity(new Intent(context, AdvertWatching.class));
+                                                            }
+                                                        }).start();
+                                            });
                                         } else {
                                             Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
                                         }
@@ -398,7 +413,6 @@ public class SelectScreens extends AppCompatActivity {
                                         });
                                     }
                                 } else {
-//                                    logo.setVisibility(View.GONE);
                                     if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                                         DataHolder.getInstance().screenID = screen_id;
                                         DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -407,32 +421,26 @@ public class SelectScreens extends AppCompatActivity {
                                         DataHolder.getInstance().location = screenLocation.get(screen_id);
                                         DataHolder.getInstance().tags = screenTags.get(screen_id);
                                         DataHolder.getInstance().isData = 5;
+                                        DataHolder.getInstance().allAds = new ArrayList<>();
                                         DataHolder.getInstance().orient = orient;
                                         DataHolder.getInstance().time = timeRefresh;
-                                        if (displayText.isChecked()) {
-                                            DataHolder.getInstance().displayFlag = 1;
-                                        }
-                                        if (!displayText.isChecked()) {
-                                            DataHolder.getInstance().displayFlag = 0;
-                                        }
-                                        if (businessRules.isChecked()) {
-                                            DataHolder.getInstance().targetHoursFlag = 1;
-                                        }
-                                        if (!businessRules.isChecked()) {
-                                            DataHolder.getInstance().targetHoursFlag = 0;
-                                        }
-                                        Executors.newSingleThreadExecutor().execute(() -> {
-                                            new Handler(Looper.getMainLooper()).post(() -> {
-                                                //loadingBar.setVisibility(View.GONE);
-                                                //logo.setVisibility(View.GONE);
-                                              /*  if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
-                                                    startActivity(new Intent(context, AdvertLandWatch.class));
-
-                                                } else {
-                                                    startActivity(new Intent(context, AdvertWatching.class));
-
-                                                }*/
-                                            });
+                                        if (displayText.isChecked()) { DataHolder.getInstance().displayFlag = 1; }
+                                        if (!displayText.isChecked()) { DataHolder.getInstance().displayFlag = 0; }
+                                        if (businessRules.isChecked()) { DataHolder.getInstance().targetHoursFlag = 1; }
+                                        if (!businessRules.isChecked()) { DataHolder.getInstance().targetHoursFlag = 0; }
+                                        // API error — still show weather + news
+                                        new Handler(Looper.getMainLooper()).post(() -> {
+                                            waitingLogo.animate()
+                                                    .scaleX(2.2f).scaleY(2.2f).alpha(0f)
+                                                    .setDuration(1000)
+                                                    .setInterpolator(new DecelerateInterpolator())
+                                                    .withEndAction(() -> {
+                                                        if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                                                            startActivity(new Intent(context, AdvertLandWatch.class));
+                                                        } else {
+                                                            startActivity(new Intent(context, AdvertWatching.class));
+                                                        }
+                                                    }).start();
                                         });
                                     } else {
                                         Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
