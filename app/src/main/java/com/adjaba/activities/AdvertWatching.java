@@ -48,8 +48,10 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.webkit.MimeTypeMap;
@@ -114,6 +116,7 @@ public class AdvertWatching extends AppCompatActivity {
     List<MediaModel> mediaList = new ArrayList<>();
     int[] loadedCount = {0};
     LinearLayout weatherLayout;
+    FrameLayout newsLayout;
     ImageView waitingLogo, newsImg;
     int weatherCurrent;
     Runnable runnableLogo;
@@ -150,6 +153,14 @@ public class AdvertWatching extends AppCompatActivity {
     ImageView qrImage;
     List<RssItem> getNews,getBackupNews;
     private Runnable refreshRunnable;
+    // ── 15-minute silent refresh ──────────────────────────────────────────────
+    private static final long WEATHER_REFRESH_INTERVAL_MS = 15 * 60 * 1000L; // 15 min
+    private static final long NEWS_REFRESH_INTERVAL_MS    = 15 * 60 * 1000L; // 15 min
+    private final Handler weatherRefreshHandler = new Handler(Looper.getMainLooper());
+    private final Handler newsRefreshHandler    = new Handler(Looper.getMainLooper());
+    private Runnable weatherRefreshRunnable;
+    private Runnable newsRefreshRunnable;
+    // ─────────────────────────────────────────────────────────────────────────
     String mediaFormat = "";
     TextView displayText, newsHeader, newsDesc, newsTitle;
     String orient;
@@ -179,14 +190,7 @@ public class AdvertWatching extends AppCompatActivity {
         waitingLogo = findViewById(R.id.waitingLogo);
         tvTemp = findViewById(R.id.weatherTemp);
         newsDesc = findViewById(R.id.news_details);
-        if (getResources().getConfiguration().smallestScreenWidthDp < 600) {
-            newsHeader.setTextSize(20);
-            newsDesc.setTextSize(18);
-            newsTitle.setTextSize(30);
-            timeNow.setTextSize(50);
-            tvTemp.setTextSize(25);
-            tvStatus.setTextSize(15);
-        }
+        newsLayout = findViewById(R.id.newsLayout);
         if ("landscape".equalsIgnoreCase(orient)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             prefs.edit().remove("data_loaded").apply();
@@ -302,17 +306,64 @@ public class AdvertWatching extends AppCompatActivity {
                 return Unit.INSTANCE;
             });
             if (DataHolder.getInstance().isData == 5) {
-                weatherLayout.setVisibility(View.VISIBLE);
                 getWeather(location, context);
+                // No ads — cycle weather and news slides
+                List<MediaModel> infoSlides = new ArrayList<>();
+                infoSlides.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
+                infoSlides.add(new MediaModel("", "", 0, "news", "", 10000, "", "", "", "", ""));
+                startMediaRotation(infoSlides, context);
             } else {
                 getWeather(location, context);
                 startMediaRotation(insertWeatherEveryThreeAds(DataHolder.getInstance().allAds), context);
-
             }
 
 
             prefs.edit().putBoolean("data_loaded", true).apply();
+            startWeatherAutoRefresh();
+            startNewsAutoRefresh();
         }
+    }
+
+    /**
+     * Silently refreshes weather data every 15 minutes.
+     * Updates text/image views in-place — no slide transition, no flicker.
+     */
+    private void startWeatherAutoRefresh() {
+        weatherRefreshRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing() && !isDestroyed()) {
+                    getWeather(location, context);
+                }
+                weatherRefreshHandler.postDelayed(this, WEATHER_REFRESH_INTERVAL_MS);
+            }
+        };
+        weatherRefreshHandler.postDelayed(weatherRefreshRunnable, WEATHER_REFRESH_INTERVAL_MS);
+    }
+
+    /**
+     * Silently refreshes news RSS every 15 minutes.
+     * Replaces the in-memory list; the next time the news slide shows, it uses the fresh data.
+     */
+    private void startNewsAutoRefresh() {
+        newsRefreshRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing() && !isDestroyed()) {
+                    newsHandler = new NewsHandler(0);
+                    newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                        newsIndex = 0;
+                        getNews = rss;
+                        getBackupNews = rss;
+                        Utils.INSTANCE.getNewsList().clear();
+                        Utils.INSTANCE.getNewsList().addAll(rss);
+                        return Unit.INSTANCE;
+                    }, bar -> Unit.INSTANCE);
+                }
+                newsRefreshHandler.postDelayed(this, NEWS_REFRESH_INTERVAL_MS);
+            }
+        };
+        newsRefreshHandler.postDelayed(newsRefreshRunnable, NEWS_REFRESH_INTERVAL_MS);
     }
 
     void getAds(int flag) {
@@ -472,19 +523,20 @@ public class AdvertWatching extends AppCompatActivity {
 
     private List<MediaModel> insertWeatherEveryThreeAds(List<MediaModel> originalList) {
         List<MediaModel> newList = new ArrayList<>();
+        if (originalList == null || originalList.isEmpty()) {
+            progressBar.setVisibility(View.GONE);
+            return newList;
+        }
         int count = 0;
         for (MediaModel media : originalList) {
             newList.add(media);
             count++;
-            if (originalList.size() > 1) {
-                if (count == originalList.size()) {
-                    MediaModel weather = new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", "");
-                    newList.add(weather);
-                    count = 0;
-                }
-            } else {
-                MediaModel weather = new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", "");
-                newList.add(weather);
+            boolean cycleComplete = (originalList.size() == 1) || (count == originalList.size());
+            if (cycleComplete) {
+                // After each full ad cycle: weather slide then news slide
+                newList.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
+                newList.add(new MediaModel("", "", 0, "news",    "", 10000, "", "", "", "", ""));
+                count = 0;
             }
         }
         progressBar.setVisibility(View.GONE);
@@ -595,17 +647,25 @@ public class AdvertWatching extends AppCompatActivity {
             public void run() {
                 if (mediaList == null || mediaList.isEmpty()) return;
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
+
+                // Determine the view currently visible so we can slide it out
+                View currentVisible = null;
+                if (adImageView.getVisibility() == View.VISIBLE) currentVisible = adImageView;
+                else if (adPlayerView.getVisibility() == View.VISIBLE) currentVisible = adPlayerView;
+                else if (weatherLayout.getVisibility() == View.VISIBLE) currentVisible = weatherLayout;
+                else if (newsLayout.getVisibility() == View.VISIBLE) currentVisible = newsLayout;
+
                 adImageView.setVisibility(View.GONE);
                 adPlayerView.setVisibility(View.GONE);
                 weatherLayout.setVisibility(View.GONE);
+                newsLayout.setVisibility(View.GONE);
                 releaseExoPlayer();
-                Animation inAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.enter_from_right);
-                Animation outAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.exit_to_left);
-                //int currentHour = Integer.parseInt(getCurrentHourFormatted());
+
                 MediaModel media = mediaList.get(currentIndex);
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
-                    if (!stringToList(media.getTargetHours()).contains(currentHour) && !media.getType().equals("weather")) {
-
+                    String type = media.getType();
+                    if (!stringToList(media.getTargetHours()).contains(currentHour)
+                            && !type.equals("weather") && !type.equals("news")) {
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
                         return;
@@ -613,28 +673,23 @@ public class AdvertWatching extends AppCompatActivity {
                 }
                 long durationMs = media.getDurationInMillis();
 
-
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
                     waitingLogo.setVisibility(View.GONE);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
                     QRCodeMaker(media.getInfo());
                     displayText.setText(media.getDisplayText());
-                    adPlayerView.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.GONE);
                     qrImage.setVisibility(View.VISIBLE);
                     logoImage.setVisibility(View.VISIBLE);
-                    adImageView.setVisibility(View.VISIBLE);
-
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
-                    crossfade(adImageView, adPlayerView, 1000);
+                    slideTransition(adImageView, currentVisible);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
+
                 } else if (media.getType().equals("VIDEO")) {
                     waitingLogo.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.GONE);
                     displayText.setText(media.getDisplayText());
                     adPlayerView.setVisibility(View.INVISIBLE);
                     logoImage.setVisibility(View.VISIBLE);
@@ -644,16 +699,29 @@ public class AdvertWatching extends AppCompatActivity {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
-                    setupExoPlayer(media.getUrl(), inAnim, outAnim);
-                    crossfade(adPlayerView, adImageView, 1000);
+                    setupExoPlayer(media.getUrl(), null, null);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
+
                 } else if (media.getType().equals("weather")) {
-                    findViewById(R.id.newsFrame).setVisibility(View.VISIBLE);
                     waitingLogo.setVisibility(View.GONE);
-                    if (getNews.size() - 1 == newsIndex) {
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+                    slideTransition(weatherLayout, currentVisible);
+                    handler.postDelayed(this, durationMs);
+
+                } else if (media.getType().equals("news")) {
+                    waitingLogo.setVisibility(View.GONE);
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+
+                    // Refresh news list when exhausted
+                    if (getNews.size() > 0 && newsIndex >= getNews.size()) {
                         Utils.INSTANCE.getNewsList().clear();
                         getNews.clear();
+                        newsIndex = 0;
                     }
                     if (Utils.INSTANCE.getNewsList().size() == 0) {
                         shimmer.startShimmer();
@@ -661,53 +729,43 @@ public class AdvertWatching extends AppCompatActivity {
                         newsHandler = new NewsHandler(newsIndex);
                         try {
                             newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
-                                if (i != 1) {
-                                    newsIndex = 1;
-                                }
+                                if (i != 1) newsIndex = 0;
                                 getNews = rss;
+                                getBackupNews = rss;
                                 shimmer.stopShimmer();
                                 shimmer.setVisibility(View.GONE);
                                 return Unit.INSTANCE;
                             }, bar -> {
                                 if (bar == 1) shimmer.stopShimmer();
                                 shimmer.setVisibility(View.GONE);
-                                //progressBar.setVisibility(View.GONE);
                                 return Unit.INSTANCE;
                             });
-                        }catch (Exception e){
-                            getNews=getBackupNews;
+                        } catch (Exception e) {
+                            getNews = getBackupNews;
+                            shimmer.stopShimmer();
+                            shimmer.setVisibility(View.GONE);
                         }
                     }
-                    if (Utils.INSTANCE.getNewsList().size() > 0) {
 
+                    if (Utils.INSTANCE.getNewsList().size() > 0 && newsIndex < getNews.size()) {
                         if (getNews.get(newsIndex).getThumbnailUrl().endsWith(".gif")) {
-                            Glide.with(context)
-                                    .asGif()
+                            Glide.with(context).asGif()
                                     .load(getNews.get(newsIndex).getThumbnailUrl())
                                     .into(newsImg);
-
                         } else {
-
-                            Glide.with(getApplicationContext()).load(getNews.get(newsIndex).getThumbnailUrl()).into(newsImg);
+                            Glide.with(getApplicationContext())
+                                    .load(getNews.get(newsIndex).getThumbnailUrl())
+                                    .into(newsImg);
                         }
                         newsHeader.setText(getNews.get(newsIndex).getTitle());
                         newsDesc.setText(getNews.get(newsIndex).getDescription());
                         newsIndex++;
-                    } else {
-                        findViewById(R.id.newsFrame).setVisibility(View.GONE);
                     }
+
                     newsHeader.setVisibility(View.VISIBLE);
                     newsDesc.setVisibility(View.VISIBLE);
                     newsImg.setVisibility(View.VISIBLE);
-                    adImageView.setVisibility(View.GONE);
-                    adPlayerView.setVisibility(View.GONE);
-                    logoImage.setVisibility(View.GONE);
-                    qrImage.setVisibility(View.GONE);
-                    displayText.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.VISIBLE);
-                    crossfade(weatherLayout, adImageView, 1000);
-
-                    // الاستمرار في الدوران بعد المدة
+                    slideTransition(newsLayout, currentVisible);
                     handler.postDelayed(this, durationMs);
                 }
 
@@ -999,15 +1057,47 @@ public class AdvertWatching extends AppCompatActivity {
         noAdsLogo.post(() -> handlerLogo.post(runnableLogo));
     }
 
-    private void crossfade(final View showView, final View hideView, long duration) {
-        // hideView يختفي تدريجيًا
-        hideView.animate()
-                .alpha(0f)
-                .setDuration(duration)
-                .withEndAction(() -> hideView.setVisibility(View.GONE))
-                .start();
+    /**
+     * Slide the new view in from the right while fading out the old view to the left.
+     * Works at any screen size — offset is proportional to display density.
+     */
+    private void slideTransition(final View showView, final View hideView) {
+        float offsetPx = getResources().getDisplayMetrics().density * 60; // 60dp in px
 
-        // showView يظهر تدريجيًا
+        if (hideView != null && hideView.getVisibility() == View.VISIBLE) {
+            hideView.animate()
+                    .alpha(0f)
+                    .translationXBy(-offsetPx)
+                    .setDuration(450)
+                    .setInterpolator(new AccelerateInterpolator())
+                    .withEndAction(() -> {
+                        hideView.setVisibility(View.GONE);
+                        hideView.setTranslationX(0f);
+                        hideView.setAlpha(1f);
+                    })
+                    .start();
+        }
+
+        showView.setAlpha(0f);
+        showView.setTranslationX(offsetPx);
+        showView.setVisibility(View.VISIBLE);
+        showView.animate()
+                .alpha(1f)
+                .translationX(0f)
+                .setDuration(450)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
+    /** Simple crossfade kept for video player internal transitions. */
+    private void crossfade(final View showView, final View hideView, long duration) {
+        if (hideView != null) {
+            hideView.animate()
+                    .alpha(0f)
+                    .setDuration(duration)
+                    .withEndAction(() -> hideView.setVisibility(View.GONE))
+                    .start();
+        }
         showView.setAlpha(0f);
         showView.setVisibility(View.VISIBLE);
         showView.animate()
@@ -1025,8 +1115,8 @@ public class AdvertWatching extends AppCompatActivity {
             executorService.shutdownNow();
         }
         handler.removeCallbacks(refreshRunnable);
+        if (weatherRefreshRunnable != null) weatherRefreshHandler.removeCallbacks(weatherRefreshRunnable);
+        if (newsRefreshRunnable != null) newsRefreshHandler.removeCallbacks(newsRefreshRunnable);
         stopLiveClock();
-
     }
-
 }

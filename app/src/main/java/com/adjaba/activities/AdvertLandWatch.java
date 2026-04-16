@@ -20,8 +20,10 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -98,7 +100,7 @@ public class AdvertLandWatch extends AppCompatActivity {
     private List<WatchingModel> adList = new ArrayList<>();
     List<MediaModel> mediaList = new ArrayList<>();
     int[] loadedCount = {0};
-    LinearLayout weatherLayout;
+    LinearLayout weatherLayout, newsLayout;
     int weatherCurrent;
     private int currentIndex = 0;
     private ExoPlayer exoPlayer;
@@ -127,6 +129,14 @@ public class AdvertLandWatch extends AppCompatActivity {
     int qrImageDimension;
     ImageView qrImage;
     private Runnable refreshRunnable;
+    // ── 15-minute silent refresh ──────────────────────────────────────────────
+    private static final long WEATHER_REFRESH_INTERVAL_MS = 15 * 60 * 1000L;
+    private static final long NEWS_REFRESH_INTERVAL_MS    = 15 * 60 * 1000L;
+    private final Handler weatherRefreshHandler = new Handler(Looper.getMainLooper());
+    private final Handler newsRefreshHandler    = new Handler(Looper.getMainLooper());
+    private Runnable weatherRefreshRunnable;
+    private Runnable newsRefreshRunnable;
+    // ─────────────────────────────────────────────────────────────────────────
     String mediaFormat = "";
     TextView displayText, newsTitle;
     String orient;
@@ -158,12 +168,7 @@ public class AdvertLandWatch extends AppCompatActivity {
         newsDesc = findViewById(R.id.news_detailsF);
         adImageView = findViewById(R.id.adImageView);
         shimmer = findViewById(R.id.shimmer);
-        if (getResources().getConfiguration().smallestScreenWidthDp < 600) {
-            newsHeader.setTextSize(18);
-            newsDesc.setTextSize(14);
-            newsTitle.setTextSize(25);
-            timeNow.setTextSize(40);
-        }
+        newsLayout = findViewById(R.id.newsLayout);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 
@@ -280,41 +285,56 @@ public class AdvertLandWatch extends AppCompatActivity {
             });
 
             if (DataHolder.getInstance().isData == 5) {
-              /*  shimmer.startShimmer();
-                shimmer.setVisibility(View.VISIBLE);
-                //progressBar.setVisibility(View.VISIBLE);
-                newsIndex++;
-                newsHandler = new NewsHandler(newsIndex);
-                newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
-                    if (i != 1) {
-                        newsIndex = 1;
-                    }
-                    shimmer.stopShimmer();
-                    shimmer.setVisibility(View.GONE);
-                    newsHeader.setVisibility(View.VISIBLE);
-                    newsHeader.setText(rss.getTitle());
-                    newsDesc.setVisibility(View.VISIBLE);
-                    newsDesc.setText(rss.getDescription());
-                    return Unit.INSTANCE;
-                }, bar -> {
-                    if (bar == 1) shimmer.stopShimmer();
-                    shimmer.setVisibility(View.GONE);
-                    //progressBar.setVisibility(View.GONE);
-                    return Unit.INSTANCE;
-                });*/
                 getWeather(location, context);
-                weatherLayout.setVisibility(View.VISIBLE);
+                // No ads — cycle weather and news slides
+                List<MediaModel> infoSlides = new ArrayList<>();
+                infoSlides.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
+                infoSlides.add(new MediaModel("", "", 0, "news",    "", 10000, "", "", "", "", ""));
+                startMediaRotation(infoSlides, context);
             } else {
                 getWeather(location, context);
                 startMediaRotation(insertWeatherEveryThreeAds(DataHolder.getInstance().allAds), context);
-
             }
 
 
             prefs.edit().putBoolean("data_loaded", true).apply();
+            startWeatherAutoRefresh();
+            startNewsAutoRefresh();
         }
     }
 
+    private void startWeatherAutoRefresh() {
+        weatherRefreshRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing() && !isDestroyed()) {
+                    getWeather(location, context);
+                }
+                weatherRefreshHandler.postDelayed(this, WEATHER_REFRESH_INTERVAL_MS);
+            }
+        };
+        weatherRefreshHandler.postDelayed(weatherRefreshRunnable, WEATHER_REFRESH_INTERVAL_MS);
+    }
+
+    private void startNewsAutoRefresh() {
+        newsRefreshRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing() && !isDestroyed()) {
+                    newsHandler = new NewsHandler(0);
+                    newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                        newsIndex = 0;
+                        getNews = rss;
+                        Utils.INSTANCE.getNewsList().clear();
+                        Utils.INSTANCE.getNewsList().addAll(rss);
+                        return Unit.INSTANCE;
+                    }, bar -> Unit.INSTANCE);
+                }
+                newsRefreshHandler.postDelayed(this, NEWS_REFRESH_INTERVAL_MS);
+            }
+        };
+        newsRefreshHandler.postDelayed(newsRefreshRunnable, NEWS_REFRESH_INTERVAL_MS);
+    }
 
     void getAds(int flag) {
         retrofitBuilder.apiCalls().getAdsByScreen(screenId, "Bearer " + AuthManager.getToken(this)).enqueue(new Callback<List<WatchingModel>>() {
@@ -481,19 +501,19 @@ public class AdvertLandWatch extends AppCompatActivity {
 
     private List<MediaModel> insertWeatherEveryThreeAds(List<MediaModel> originalList) {
         List<MediaModel> newList = new ArrayList<>();
+        if (originalList == null || originalList.isEmpty()) {
+            progressBar.setVisibility(View.GONE);
+            return newList;
+        }
         int count = 0;
         for (MediaModel media : originalList) {
             newList.add(media);
             count++;
-            if (originalList.size() > 1) {
-                if (count == originalList.size()) {
-                    MediaModel weather = new MediaModel("", "", 0, "weather", "", 8000, "", "", "", "", "");
-                    newList.add(weather);
-                    count = 0;
-                }
-            } else {
-                MediaModel weather = new MediaModel("", "", 0, "weather", "", 8000, "", "", "", "", "");
-                newList.add(weather);
+            boolean cycleComplete = (originalList.size() == 1) || (count == originalList.size());
+            if (cycleComplete) {
+                newList.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
+                newList.add(new MediaModel("", "", 0, "news",    "", 10000, "", "", "", "", ""));
+                count = 0;
             }
         }
         progressBar.setVisibility(View.GONE);
@@ -603,17 +623,24 @@ public class AdvertLandWatch extends AppCompatActivity {
             public void run() {
                 if (mediaList == null || mediaList.isEmpty()) return;
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
+
+                View currentVisible = null;
+                if (adImageView.getVisibility() == View.VISIBLE)     currentVisible = adImageView;
+                else if (adPlayerView.getVisibility() == View.VISIBLE) currentVisible = adPlayerView;
+                else if (weatherLayout.getVisibility() == View.VISIBLE) currentVisible = weatherLayout;
+                else if (newsLayout.getVisibility() == View.VISIBLE)  currentVisible = newsLayout;
+
                 adImageView.setVisibility(View.GONE);
                 adPlayerView.setVisibility(View.GONE);
                 weatherLayout.setVisibility(View.GONE);
+                newsLayout.setVisibility(View.GONE);
                 releaseExoPlayer();
-                Animation inAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.enter_from_right);
-                Animation outAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.exit_to_left);
-                //int currentHour = Integer.parseInt(getCurrentHourFormatted());
+
                 MediaModel media = mediaList.get(currentIndex);
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
-                    if (!stringToList(media.getTargetHours()).contains(currentHour) && !media.getType().equals("weather")) {
-
+                    String type = media.getType();
+                    if (!stringToList(media.getTargetHours()).contains(currentHour)
+                            && !type.equals("weather") && !type.equals("news")) {
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
                         return;
@@ -621,28 +648,23 @@ public class AdvertLandWatch extends AppCompatActivity {
                 }
                 long durationMs = media.getDurationInMillis();
 
-
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
                     waitingLogo.setVisibility(View.GONE);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
                     QRCodeMaker(media.getInfo());
                     displayText.setText(media.getDisplayText());
-                    adPlayerView.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.GONE);
                     qrImage.setVisibility(View.VISIBLE);
                     logoImage.setVisibility(View.VISIBLE);
-                    adImageView.setVisibility(View.VISIBLE);
-
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
-                    crossfade(adImageView, adPlayerView, 1000);
+                    slideTransition(adImageView, currentVisible);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
+
                 } else if (media.getType().equals("VIDEO")) {
                     waitingLogo.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.GONE);
                     displayText.setText(media.getDisplayText());
                     adPlayerView.setVisibility(View.INVISIBLE);
                     logoImage.setVisibility(View.VISIBLE);
@@ -652,68 +674,70 @@ public class AdvertLandWatch extends AppCompatActivity {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
-                    setupExoPlayer(media.getUrl(), inAnim, outAnim);
-                    crossfade(adPlayerView, adImageView, 1000);
+                    setupExoPlayer(media.getUrl(), null, null);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
+
                 } else if (media.getType().equals("weather")) {
-                    findViewById(R.id.newsFrame).setVisibility(View.VISIBLE);
                     waitingLogo.setVisibility(View.GONE);
-                    if (getNews.size() - 1 == newsIndex) {
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+                    slideTransition(weatherLayout, currentVisible);
+                    handler.postDelayed(this, durationMs);
+
+                } else if (media.getType().equals("news")) {
+                    waitingLogo.setVisibility(View.GONE);
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+
+                    if (getNews.size() > 0 && newsIndex >= getNews.size()) {
                         Utils.INSTANCE.getNewsList().clear();
                         getNews.clear();
+                        newsIndex = 0;
                     }
                     if (Utils.INSTANCE.getNewsList().size() == 0) {
                         shimmer.startShimmer();
                         shimmer.setVisibility(View.VISIBLE);
                         newsHandler = new NewsHandler(newsIndex);
-                        newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
-                            if (i != 1) {
-                                newsIndex = 1;
-                            }
-                            getNews = rss;
+                        try {
+                            newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                                if (i != 1) newsIndex = 0;
+                                getNews = rss;
+                                shimmer.stopShimmer();
+                                shimmer.setVisibility(View.GONE);
+                                return Unit.INSTANCE;
+                            }, bar -> {
+                                if (bar == 1) shimmer.stopShimmer();
+                                shimmer.setVisibility(View.GONE);
+                                return Unit.INSTANCE;
+                            });
+                        } catch (Exception e) {
                             shimmer.stopShimmer();
                             shimmer.setVisibility(View.GONE);
-                            return Unit.INSTANCE;
-                        }, bar -> {
-                            if (bar == 1) shimmer.stopShimmer();
-                            shimmer.setVisibility(View.GONE);
-                            //progressBar.setVisibility(View.GONE);
-                            return Unit.INSTANCE;
-                        });
+                        }
+                    }
+
+                    if (Utils.INSTANCE.getNewsList().size() > 0 && newsIndex < getNews.size()) {
+                        if (getNews.get(newsIndex).getThumbnailUrl().endsWith(".gif")) {
+                            Glide.with(context).asGif()
+                                    .load(getNews.get(newsIndex).getThumbnailUrl())
+                                    .into(newsImg);
+                        } else {
+                            Glide.with(getApplicationContext())
+                                    .load(getNews.get(newsIndex).getThumbnailUrl())
+                                    .into(newsImg);
+                        }
+                        newsHeader.setText(getNews.get(newsIndex).getTitle());
+                        newsDesc.setText(getNews.get(newsIndex).getDescription());
+                        newsIndex++;
                     }
 
                     newsHeader.setVisibility(View.VISIBLE);
                     newsDesc.setVisibility(View.VISIBLE);
                     newsImg.setVisibility(View.VISIBLE);
-                    if (Utils.INSTANCE.getNewsList().size() > 0) {
-
-                        if (getNews.get(newsIndex).getThumbnailUrl().endsWith(".gif")) {
-                            Glide.with(context)
-                                    .asGif()
-                                    .load(getNews.get(newsIndex).getThumbnailUrl())
-                                    .into(newsImg);
-
-                        } else {
-
-                            Glide.with(getApplicationContext()).load(getNews.get(newsIndex).getThumbnailUrl()).into(newsImg);
-                        }
-                        newsHeader.setText(getNews.get(newsIndex).getTitle());
-                        newsDesc.setText(getNews.get(newsIndex).getDescription());
-                        newsIndex++;
-                    } else {
-                        findViewById(R.id.newsFrame);
-                    }
-
-                    adImageView.setVisibility(View.GONE);
-                    adPlayerView.setVisibility(View.GONE);
-                    qrImage.setVisibility(View.GONE);
-                    logoImage.setVisibility(View.GONE);
-                    displayText.setVisibility(View.GONE);
-                    weatherLayout.setVisibility(View.VISIBLE);
-                    crossfade(weatherLayout, adImageView, 1000);
-
-                    // الاستمرار في الدوران بعد المدة
+                    slideTransition(newsLayout, currentVisible);
                     handler.postDelayed(this, durationMs);
                 }
 
@@ -979,15 +1003,42 @@ public class AdvertLandWatch extends AppCompatActivity {
                 ext.equalsIgnoreCase("mov"));
     }
 
-    private void crossfade(final View showView, final View hideView, long duration) {
-        // hideView يختفي تدريجيًا
-        hideView.animate()
-                .alpha(0f)
-                .setDuration(duration)
-                .withEndAction(() -> hideView.setVisibility(View.GONE))
-                .start();
+    private void slideTransition(final View showView, final View hideView) {
+        float offsetPx = getResources().getDisplayMetrics().density * 60;
 
-        // showView يظهر تدريجيًا
+        if (hideView != null && hideView.getVisibility() == View.VISIBLE) {
+            hideView.animate()
+                    .alpha(0f)
+                    .translationXBy(-offsetPx)
+                    .setDuration(450)
+                    .setInterpolator(new AccelerateInterpolator())
+                    .withEndAction(() -> {
+                        hideView.setVisibility(View.GONE);
+                        hideView.setTranslationX(0f);
+                        hideView.setAlpha(1f);
+                    })
+                    .start();
+        }
+
+        showView.setAlpha(0f);
+        showView.setTranslationX(offsetPx);
+        showView.setVisibility(View.VISIBLE);
+        showView.animate()
+                .alpha(1f)
+                .translationX(0f)
+                .setDuration(450)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
+    private void crossfade(final View showView, final View hideView, long duration) {
+        if (hideView != null) {
+            hideView.animate()
+                    .alpha(0f)
+                    .setDuration(duration)
+                    .withEndAction(() -> hideView.setVisibility(View.GONE))
+                    .start();
+        }
         showView.setAlpha(0f);
         showView.setVisibility(View.VISIBLE);
         showView.animate()
@@ -1005,6 +1056,8 @@ public class AdvertLandWatch extends AppCompatActivity {
             executorService.shutdownNow();
         }
         handler.removeCallbacks(refreshRunnable);
+        if (weatherRefreshRunnable != null) weatherRefreshHandler.removeCallbacks(weatherRefreshRunnable);
+        if (newsRefreshRunnable != null) newsRefreshHandler.removeCallbacks(newsRefreshRunnable);
         stopLiveClock();
 
     }
