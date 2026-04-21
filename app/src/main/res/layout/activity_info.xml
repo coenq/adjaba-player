@@ -1,34 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.InfoActivity">
+    android:background="@color/tvBg">
+
+    <!-- Header bar -->
+    <LinearLayout
+        android:id="@+id/infoHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/tvSurface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:text="System Logs"
+            android:textColor="@color/tvTextPrimary"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.06"
+            android:text="TAP   TO CLEAR"
+            android:textAllCaps="true"
+            android:textColor="@color/tvTextSecondary"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/headerDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/tvDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoHeader" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/infoRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="6dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="96dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/info_custom" />
+        app:layout_constraintTop_toBottomOf="@id/headerDivider" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/clearInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/colorRed"
-        android:contentDescription="delete"
-        app:layout_anchorGravity="bottom|end"
+        android:layout_margin="28dp"
+        android:backgroundTint="@color/tvAccent"
+        android:contentDescription="Clear logs"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_delete"
         app:tint="@android:color/white" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

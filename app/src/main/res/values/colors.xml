@@ -37,4 +37,18 @@
     <color name="textColor">#021554</color>
     <color name="strokeColor">#2344B3</color>
 
+    <!-- TV Dark Theme -->
+    <color name="tvBg">#0A0A0A</color>
+    <color name="tvSurface">#141414</color>
+    <color name="tvCard">#1E1E1E</color>
+    <color name="tvInput">#262626</color>
+    <color name="tvDivider">#2A2A2A</color>
+    <color name="tvTextPrimary">#FFFFFF</color>
+    <color name="tvTextSecondary">#B3B3B3</color>
+    <color name="tvTextHint">#666666</color>
+    <color name="tvAccent">#E50914</color>
+    <color name="tvAccentPressed">#B20710</color>
+    <color name="tvBorder">#333333</color>
+    <color name="tvBorderFocused">#E50914</color>
+
 </resources>

@@ -1,261 +1,339 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainSelectedScreenLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/background_port"
-    tools:context=".activities.PreviewAds">
+    android:background="@color/tvBg">
+
+    <!-- Waiting overlay: fullscreen, shown while loading ads -->
     <ImageView
         android:id="@+id/waitingLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:src="@mipmap/app_icon"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="match_parent"
 
-        android:layout_height="wrap_content"
+    <ProgressBar
+        android:id="@+id/loadingBar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/tvAccent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="500dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/logo_lay"
-            android:elevation="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Choose Screen Orientation"
-                android:textColor="@color/black" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/list_bg"
-                android:padding="1dp">
-
-                <Spinner
-                    android:id="@+id/spinner1"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:entries="@array/screen_arrays"
-                    android:prompt="@string/screen_prompt" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Choose Screen ID"
-                android:textColor="@color/black" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/list_bg"
-                android:padding="1dp">
-
-                <Spinner
-                    android:id="@+id/spinnerID"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:entries="@array/screen_arrays"
-                    android:prompt="@string/screen_prompt" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/rememberMeCh"
-                    android:layout_weight="1"
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:textSize="15sp"
-                    app:buttonTint="@color/black"
-                    android:textColor="@color/black"
-                    android:text="Remember Me" />
-                <CheckBox
-                    android:id="@+id/text_display"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="15sp"
-
-                    android:text="Display Text"
-                    android:textColor="@color/black"
-                    app:buttonTint="@color/black" />
-
-                <CheckBox
-                    android:id="@+id/business_rule"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="15sp"
-
-                    android:text="Business Rules"
-                    android:textColor="@color/black"
-                    app:buttonTint="@color/black" />
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select interval for new data"
-                android:textColor="@color/black" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@drawable/list_bg"
-                android:padding="1dp">
-
-                <Spinner
-                    android:id="@+id/spinner2"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:entries="@array/interval_arrays"
-                    android:prompt="@string/interval_prompt" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/bot_lay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <Button
-                android:id="@+id/loginbtn"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/btn_login_selector"
-                android:elevation="10dp"
-                android:gravity="center"
-                android:text="@string/login"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/edit_screen"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/btn_login_selector"
-                android:elevation="10dp"
-                android:gravity="center"
-                android:text="Edit"
-                android:textAllCaps="false"
-                android:textAppearance="@android:style/TextAppearance.Medium"
-                android:textColor="@color/white"
-                android:visibility="gone" />
-
-
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/bot_lay2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ProgressBar
-                android:id="@+id/progressSignOut"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                />
-            <Button
-                android:layout_marginTop="8dp"
-                android:id="@+id/logOut"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@drawable/btn_login_selector"
-                android:elevation="10dp"
-                android:gravity="center"
-                android:text="Sign out"
-                android:textSize="16sp"
-                android:textAllCaps="false"
-                android:textColor="@color/white" />
-
-            <ProgressBar
-                android:id="@+id/loadingBar"
-                android:layout_width="wrap_content"
-                android:visibility="gone"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-
-        </LinearLayout>
-    </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-
-    <LinearLayout
-        android:id="@+id/logosLayout"
+    <!-- Zero-size placeholder: Java holds reference but never renders -->
+    <ImageView
+        android:id="@+id/loadingLogo"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="24dp"
+        android:layout_height="0dp"
+        android:src="@mipmap/logo1"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Two-panel wrapper -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:id="@+id/ads_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:background="@drawable/baseline_info_24"
-            />
-        <ImageView
-            android:id="@+id/Logo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:contentDescription="Logo"
-            android:src="@mipmap/logo1" />
 
-        <ImageView
-            android:id="@+id/imgLogo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:contentDescription="Logo"
-            android:src="@mipmap/picture" />
+        <!-- Left: scrollable config form -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
+
+            <RelativeLayout
+                android:id="@+id/loginrootlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Required by Java findViews(), kept at zero size -->
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/topAppBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@null" />
+
+                <ImageView
+                    android:id="@+id/picture"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:src="@mipmap/picture"
+                    android:visibility="gone" />
+
+                <!-- Form content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="48dp"
+                    android:paddingEnd="40dp"
+                    android:paddingTop="36dp"
+                    android:paddingBottom="40dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="28dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Screen Configuration"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="28sp" />
+
+                    <!-- Orientation -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="sans-serif-light"
+                        android:letterSpacing="0.06"
+                        android:text="SCREEN ORIENTATION"
+                        android:textAllCaps="true"
+                        android:textColor="@color/tvTextSecondary"
+                        android:textSize="11sp" />
+
+                    <Spinner
+                        android:id="@+id/spinner1"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="24dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:entries="@array/screen_arrays"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:prompt="@string/screen_prompt"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
+                    <!-- Screen ID -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="sans-serif-light"
+                        android:letterSpacing="0.06"
+                        android:text="SCREEN ID"
+                        android:textAllCaps="true"
+                        android:textColor="@color/tvTextSecondary"
+                        android:textSize="11sp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerID"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="24dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:prompt="@string/screen_prompt"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
+                    <!-- Options -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
+                        android:background="@drawable/bg_tv_card"
+                        android:orientation="horizontal"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
+
+                        <CheckBox
+                            android:id="@+id/rememberMeCh"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Remember Me"
+                            android:textColor="@color/tvTextPrimary"
+                            android:textSize="14sp"
+                            app:buttonTint="@color/tvAccent" />
+
+                        <CheckBox
+                            android:id="@+id/text_display"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Display Text"
+                            android:textColor="@color/tvTextPrimary"
+                            android:textSize="14sp"
+                            app:buttonTint="@color/tvAccent" />
+
+                        <CheckBox
+                            android:id="@+id/business_rule"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Business Rules"
+                            android:textColor="@color/tvTextPrimary"
+                            android:textSize="14sp"
+                            app:buttonTint="@color/tvAccent" />
+
+                    </LinearLayout>
+
+                    <!-- Refresh Interval -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="sans-serif-light"
+                        android:letterSpacing="0.06"
+                        android:text="DATA REFRESH INTERVAL"
+                        android:textAllCaps="true"
+                        android:textColor="@color/tvTextSecondary"
+                        android:textSize="11sp" />
+
+                    <Spinner
+                        android:id="@+id/spinner2"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:entries="@array/interval_arrays"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:prompt="@string/interval_prompt"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
+                    <!-- Primary action -->
+                    <LinearLayout
+                        android:id="@+id/bot_lay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <Button
+                            android:id="@+id/loginbtn"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:background="@drawable/bg_tv_button"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.08"
+                            android:text="PLAY"
+                            android:textAllCaps="true"
+                            android:textColor="@color/tvTextPrimary"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/edit_screen"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_tv_button_secondary"
+                            android:text="Edit"
+                            android:textAllCaps="false"
+                            android:textColor="@color/tvTextPrimary"
+                            android:textSize="15sp"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <!-- Secondary action -->
+                    <LinearLayout
+                        android:id="@+id/bot_lay2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ProgressBar
+                            android:id="@+id/progressSignOut"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:indeterminateTint="@color/tvAccent"
+                            android:visibility="gone" />
+
+                        <Button
+                            android:id="@+id/logOut"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_tv_button_secondary"
+                            android:fontFamily="sans-serif-light"
+                            android:letterSpacing="0.06"
+                            android:text="SIGN OUT"
+                            android:textAllCaps="true"
+                            android:textColor="@color/tvTextSecondary"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/tvDivider" />
+
+        <!-- Right: branding panel -->
+        <LinearLayout
+            android:id="@+id/logosLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@color/tvSurface"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="40dp">
+
+            <ImageView
+                android:id="@+id/ads_info"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/baseline_info_24"
+                android:scaleType="fitCenter" />
+
+            <ImageView
+                android:id="@+id/Logo"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:contentDescription="Logo"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/logo1" />
+
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginTop="24dp"
+                android:contentDescription="Logo"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/picture" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-light"
+                android:letterSpacing="0.12"
+                android:text="DIGITAL SIGNAGE"
+                android:textAllCaps="true"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
