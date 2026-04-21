@@ -27,8 +27,8 @@
             android:paddingBottom="48dp">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_marginBottom="8dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/logo1" />

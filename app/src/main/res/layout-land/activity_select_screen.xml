@@ -56,7 +56,7 @@
             android:id="@+id/nestedScrollView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3">
+            android:layout_weight="1">
 
             <RelativeLayout
                 android:id="@+id/loginrootlayout"
@@ -289,7 +289,7 @@
             android:id="@+id/logosLayout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:background="@color/tvSurface"
             android:gravity="center"
             android:orientation="vertical"
@@ -306,16 +306,16 @@
 
             <ImageView
                 android:id="@+id/Logo"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:contentDescription="Logo"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/logo1" />
 
             <ImageView
                 android:id="@+id/imgLogo"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="260dp"
+                android:layout_height="260dp"
                 android:layout_marginTop="24dp"
                 android:contentDescription="Logo"
                 android:scaleType="fitCenter"
