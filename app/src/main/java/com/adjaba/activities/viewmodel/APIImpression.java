@@ -31,7 +31,7 @@ public class APIImpression {
                 json.put("impressionId", impression.impressionId);
                 json.put("advertId", impression.advertId);
                 json.put("amountSettled", impression.amountSettled);
-                json.put("contractId", impression.currency);
+                json.put("contractId", impression.contractId);
                 json.put("duration", 5);
                 json.put("currency", "USD");
                 json.put("dayHour", impression.dayHour);
