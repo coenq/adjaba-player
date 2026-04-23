@@ -49,131 +49,118 @@
         android:id="@+id/weatherLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/tvBg"
+        android:background="@drawable/bg_weather_slide"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Metrics strip starts at 78% from top -->
+        <!-- Metrics strip starts at 82% from top -->
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/h_metrics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.78" />
+            app:layout_constraintGuide_percent="0.82" />
 
-        <!-- Location row -->
-        <LinearLayout
-            android:id="@+id/location_row"
+        <!-- Location row: pin + city -->
+        <ImageView
+            android:id="@+id/loc_pin_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/baseline_location_pin_24"
+            android:tint="@color/tvAccent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/weatherLoc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_marginStart="@dimen/slide_padding"
-            android:layout_marginEnd="@dimen/slide_padding"
-            android:layout_marginTop="@dimen/slide_padding"
-            android:orientation="horizontal"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="20dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="London"
+            android:textColor="@color/tvTextSecondary"
+            android:textSize="@dimen/text_location"
+            app:layout_constraintBottom_toBottomOf="@id/loc_pin_icon"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toEndOf="@id/loc_pin_icon"
+            app:layout_constraintTop_toTopOf="@id/loc_pin_icon" />
 
-            <ImageView
-                android:layout_width="@dimen/weather_metric_icon_size"
-                android:layout_height="@dimen/weather_metric_icon_size"
-                android:src="@drawable/baseline_location_pin_24"
-                android:tint="@color/tvAccent" />
-
-            <TextView
-                android:id="@+id/weatherLoc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:letterSpacing="0.04"
-                android:maxLines="1"
-                android:text="London"
-                android:textColor="@color/tvTextSecondary"
-                android:textSize="@dimen/text_location" />
-        </LinearLayout>
-
-        <!-- Giant clock — centered between location row and temp block -->
+        <!-- Content chain: clock → icon → temp → condition -->
         <TextView
             android:id="@+id/timeNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:includeFontPadding="false"
             android:letterSpacing="-0.02"
             android:text="15:05"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_time"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/temp_block"
+            app:layout_constraintBottom_toTopOf="@id/currentWeatherImg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/location_row"
-            app:layout_constraintVertical_bias="0.45"
+            app:layout_constraintTop_toBottomOf="@id/loc_pin_icon"
+            app:layout_constraintVertical_bias="0.4"
             app:layout_constraintVertical_chainStyle="packed" />
 
-        <!-- Weather icon + temperature + condition -->
-        <LinearLayout
-            android:id="@+id/temp_block"
+        <ImageView
+            android:id="@+id/currentWeatherImg"
+            android:layout_width="@dimen/weather_icon_size"
+            android:layout_height="@dimen/weather_icon_size"
+            android:layout_marginTop="4dp"
+            app:layout_constraintBottom_toTopOf="@id/weatherTemp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/timeNow" />
+
+        <TextView
+            android:id="@+id/weatherTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.03"
+            android:text="24°C"
+            android:textColor="@color/tvTextPrimary"
+            android:textSize="@dimen/text_temp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/currentStatus"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/currentWeatherImg" />
+
+        <TextView
+            android:id="@+id/currentStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:letterSpacing="0.10"
+            android:text="PARTLY CLOUDY"
+            android:textAllCaps="true"
+            android:textColor="@color/tvTextSecondary"
+            android:textSize="@dimen/text_condition"
             app:layout_constraintBottom_toTopOf="@id/h_divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timeNow">
+            app:layout_constraintTop_toBottomOf="@id/weatherTemp" />
 
-            <ImageView
-                android:id="@+id/currentWeatherImg"
-                android:layout_width="@dimen/weather_icon_size"
-                android:layout_height="@dimen/weather_icon_size"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/weatherTemp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="-0.02"
-                    android:text="24°C"
-                    android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_temp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/currentStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:letterSpacing="0.04"
-                    android:text="Partly Cloudy"
-                    android:textColor="@color/tvTextSecondary"
-                    android:textSize="@dimen/text_condition" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Red accent divider above metrics -->
+        <!-- Thin divider above metrics -->
         <View
             android:id="@+id/h_divider"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:background="@color/tvAccent"
+            android:layout_height="1dp"
+            android:background="@color/tvBorder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/h_metrics" />
 
-        <!-- Metrics strip: Wind | Humidity | Rain -->
+        <!-- Metrics strip: Wind | Humidity | Feels Like -->
         <LinearLayout
             android:id="@+id/metrics_bar"
             android:layout_width="0dp"
@@ -196,8 +183,9 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.7"
-                    android:src="@drawable/wind" />
+                    android:alpha="0.75"
+                    android:src="@drawable/wind"
+                    android:tint="@color/tvTextSecondary" />
 
                 <TextView
                     android:id="@+id/windW"
@@ -222,7 +210,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="@dimen/metric_divider_height"
-                android:background="@color/tvDivider" />
+                android:background="@color/tvBorder" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -234,15 +222,16 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.7"
-                    android:src="@drawable/humidity" />
+                    android:alpha="0.75"
+                    android:src="@drawable/humidity"
+                    android:tint="@color/tvTextSecondary" />
 
                 <TextView
                     android:id="@+id/hamudity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="60"
+                    android:text="60%"
                     android:textColor="@color/tvTextPrimary"
                     android:textSize="@dimen/text_metrics"
                     android:textStyle="bold" />
@@ -260,7 +249,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="@dimen/metric_divider_height"
-                android:background="@color/tvDivider" />
+                android:background="@color/tvBorder" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -272,15 +261,16 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.7"
-                    android:src="@drawable/umbrella" />
+                    android:alpha="0.75"
+                    android:src="@drawable/ic_thermostat"
+                    android:tint="@color/tvTextSecondary" />
 
                 <TextView
                     android:id="@+id/rain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="5"
+                    android:text="22°"
                     android:textColor="@color/tvTextPrimary"
                     android:textSize="@dimen/text_metrics"
                     android:textStyle="bold" />
@@ -290,7 +280,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:letterSpacing="0.08"
-                    android:text="mm rain"
+                    android:text="feels like"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_label" />
             </LinearLayout>

@@ -3,11 +3,11 @@
     <dimen name="slide_padding">20dp</dimen>
 
     <!-- ── Weather text (phone default) ── -->
-    <dimen name="text_time">72sp</dimen>
-    <dimen name="text_temp">72sp</dimen>
+    <dimen name="text_time">80sp</dimen>
+    <dimen name="text_temp">96sp</dimen>
     <dimen name="text_location">18sp</dimen>
-    <dimen name="text_condition">16sp</dimen>
-    <dimen name="text_metrics">20sp</dimen>
+    <dimen name="text_condition">15sp</dimen>
+    <dimen name="text_metrics">22sp</dimen>
     <dimen name="text_label">13sp</dimen>
 
     <!-- ── News text (phone default) ── -->
@@ -21,8 +21,8 @@
     <dimen name="metric_divider_height">44dp</dimen>
 
     <!-- ── Icons ── -->
-    <dimen name="weather_icon_size">72dp</dimen>
-    <dimen name="weather_metric_icon_size">26dp</dimen>
+    <dimen name="weather_icon_size">120dp</dimen>
+    <dimen name="weather_metric_icon_size">28dp</dimen>
 
     <!-- ── Legacy (kept for compatibility) ── -->
     <dimen name="weather_margin">16dp</dimen>

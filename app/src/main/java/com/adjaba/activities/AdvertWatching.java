@@ -550,8 +550,9 @@ public class AdvertWatching extends AppCompatActivity {
             public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
                 if (response.isSuccessful()) {
                     if (!isFinishing() && !isDestroyed()) {
-                        Glide.with(AdvertWatching.this).load("https:" + response.body().current.condition.icon).into(weatherImg);
-
+                        String iconUrl = "https:" + response.body().current.condition.icon
+                                .replace("/64x64/", "/128x128/");
+                        Glide.with(AdvertWatching.this).load(iconUrl).into(weatherImg);
                     }
                     List<Hour> nextThreeHours = new ArrayList<>();
                     List<String> nextTimes = new ArrayList<>();
@@ -579,8 +580,9 @@ public class AdvertWatching extends AppCompatActivity {
 
                         if (nextThreeHours.size() == 3) break;
                     }
-                    humadity.setText(response.body().current.humidity + "");
-                    wind.setText(response.body().current.wind_kph + "");
+                    humadity.setText(response.body().current.humidity + "%");
+                    wind.setText(Math.round(response.body().current.wind_kph) + "");
+                    rain.setText(Math.round(response.body().current.feelslike_c) + "°");
                     tvLoc.setText(DataHolder.getInstance().location);
                     tvTemp.setText(Math.round(response.body().current.temp_c) + "°C");
                     tvStatus.setText(response.body().current.condition.text);

@@ -57,15 +57,15 @@
     <!-- ═══════════════════════════════════════════════════════
          WEATHER SLIDE — forced portrait
          LinearLayout required by Java (AdvertLandWatch casts it).
-         Two halves: left = clock panel (→ top of portrait TV)
-                     right = temp + metrics (→ bottom of portrait TV)
-         Each half's content rotated -90° to read upright on portrait TV.
+         Left half  → top panel on portrait TV  (location + clock)
+         Right half → bottom panel on portrait TV (icon + temp + condition + metrics)
+         Each half rotated -90° to read upright on portrait-mounted TV.
          ═══════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/weatherLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/tvBg"
+        android:background="@drawable/bg_weather_slide"
         android:orientation="horizontal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -73,7 +73,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- LEFT HALF → top panel on portrait TV -->
+        <!-- LEFT HALF → top panel: location + giant clock -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -82,17 +82,16 @@
             android:orientation="vertical"
             android:rotation="-90">
 
-            <!-- Location row -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingBottom="12dp">
+                android:paddingBottom="16dp">
 
                 <ImageView
-                    android:layout_width="@dimen/weather_metric_icon_size"
-                    android:layout_height="@dimen/weather_metric_icon_size"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/baseline_location_pin_24"
                     android:tint="@color/tvAccent" />
 
@@ -105,11 +104,9 @@
                     android:maxLines="1"
                     android:text="London"
                     android:textColor="@color/tvTextSecondary"
-                    android:textSize="@dimen/text_location"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_location" />
             </LinearLayout>
 
-            <!-- Giant clock -->
             <TextView
                 android:id="@+id/timeNow"
                 android:layout_width="wrap_content"
@@ -121,20 +118,9 @@
                 android:textColor="@color/tvTextPrimary"
                 android:textSize="@dimen/text_time"
                 android:textStyle="bold" />
-
-            <!-- Condition text -->
-            <TextView
-                android:id="@+id/currentStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:letterSpacing="0.04"
-                android:text="Partly Cloudy"
-                android:textColor="@color/tvTextSecondary"
-                android:textSize="@dimen/text_condition" />
         </LinearLayout>
 
-        <!-- RIGHT HALF → bottom panel on portrait TV -->
+        <!-- RIGHT HALF → bottom panel: icon + temp + condition + metrics -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -144,48 +130,52 @@
             android:orientation="vertical"
             android:rotation="-90">
 
-            <!-- Icon + temperature row -->
-            <LinearLayout
+            <!-- Icon + temperature stacked -->
+            <ImageView
+                android:id="@+id/currentWeatherImg"
+                android:layout_width="@dimen/weather_icon_size"
+                android:layout_height="@dimen/weather_icon_size" />
+
+            <TextView
+                android:id="@+id/weatherTemp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginTop="4dp"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:text="24°C"
+                android:textColor="@color/tvTextPrimary"
+                android:textSize="@dimen/text_temp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/currentWeatherImg"
-                    android:layout_width="@dimen/weather_icon_size"
-                    android:layout_height="@dimen/weather_icon_size"
-                    android:layout_marginEnd="12dp" />
+            <TextView
+                android:id="@+id/currentStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:letterSpacing="0.10"
+                android:text="PARTLY CLOUDY"
+                android:textAllCaps="true"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="@dimen/text_condition" />
 
-                <TextView
-                    android:id="@+id/weatherTemp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="24°C"
-                    android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_temp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Red accent divider -->
+            <!-- Thin divider -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
-                android:background="@color/tvAccent" />
+                android:background="@color/tvBorder" />
 
-            <!-- Metrics row: Wind | Humidity | Rain -->
+            <!-- Metrics row: Wind | Humidity | Feels Like -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <!-- Wind -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -196,8 +186,8 @@
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.7"
-                        android:src="@drawable/storm"
+                        android:alpha="0.75"
+                        android:src="@drawable/wind"
                         android:tint="@color/tvTextSecondary" />
 
                     <TextView
@@ -221,9 +211,8 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="@dimen/metric_divider_height"
-                    android:background="@color/tvDivider" />
+                    android:background="@color/tvBorder" />
 
-                <!-- Humidity -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -234,7 +223,7 @@
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.7"
+                        android:alpha="0.75"
                         android:src="@drawable/humidity"
                         android:tint="@color/tvTextSecondary" />
 
@@ -243,7 +232,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="60"
+                        android:text="60%"
                         android:textColor="@color/tvTextPrimary"
                         android:textSize="@dimen/text_metrics"
                         android:textStyle="bold" />
@@ -251,7 +240,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="%"
+                        android:text="humidity"
                         android:textColor="@color/tvTextSecondary"
                         android:textSize="@dimen/text_label" />
                 </LinearLayout>
@@ -259,9 +248,8 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="@dimen/metric_divider_height"
-                    android:background="@color/tvDivider" />
+                    android:background="@color/tvBorder" />
 
-                <!-- Rain -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -272,8 +260,8 @@
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.7"
-                        android:src="@drawable/rainy"
+                        android:alpha="0.75"
+                        android:src="@drawable/ic_thermostat"
                         android:tint="@color/tvTextSecondary" />
 
                     <TextView
@@ -281,7 +269,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="5"
+                        android:text="22°"
                         android:textColor="@color/tvTextPrimary"
                         android:textSize="@dimen/text_metrics"
                         android:textStyle="bold" />
@@ -289,7 +277,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="mm"
+                        android:text="feels like"
                         android:textColor="@color/tvTextSecondary"
                         android:textSize="@dimen/text_label" />
                 </LinearLayout>
