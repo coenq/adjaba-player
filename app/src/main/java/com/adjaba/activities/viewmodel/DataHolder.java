@@ -1,7 +1,5 @@
 package com.adjaba.activities.viewmodel;
 
-import androidx.lifecycle.ViewModel;
-
 import com.adjaba.models.newmodels.MediaModel;
 import com.adjaba.others.TargetHours;
 
@@ -20,7 +18,6 @@ public class DataHolder {
     public String screenDevice;
     public List<String> tags;
     public List<String> advertIds = new ArrayList<>();
-    public int isData;
 
     private DataHolder() {
     }

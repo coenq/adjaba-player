@@ -284,7 +284,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                 return Unit.INSTANCE;
             });
 
-            if (DataHolder.getInstance().isData == 5) {
+            if (DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
                 getWeather(location, context);
                 // No ads — cycle weather and news slides
                 List<MediaModel> infoSlides = new ArrayList<>();

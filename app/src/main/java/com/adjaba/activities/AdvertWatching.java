@@ -298,7 +298,6 @@ public class AdvertWatching extends AppCompatActivity {
         if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape") || orient.equals("forced portrait")) {
             android.util.Log.i("AdvertWatching", "🎬 onCreate() - Initializing playback");
             android.util.Log.i("AdvertWatching", "   isDataLoaded: " + isDataLoaded);
-            android.util.Log.i("AdvertWatching", "   DataHolder.isData: " + DataHolder.getInstance().isData);
             android.util.Log.i("AdvertWatching", "   DataHolder.allAds: " + (DataHolder.getInstance().allAds == null ? "NULL" : DataHolder.getInstance().allAds.size() + " ads"));
 
             newsHandler = new NewsHandler(newsIndex);
@@ -317,9 +316,9 @@ public class AdvertWatching extends AppCompatActivity {
                 return Unit.INSTANCE;
             });
 
-            if (DataHolder.getInstance().isData == 5 || DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
+            if (DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
                 android.util.Log.w("AdvertWatching", "⚠️ NO ADS AVAILABLE - Showing weather and news only");
-                android.util.Log.i("AdvertWatching", "   Reason: isData=" + DataHolder.getInstance().isData + ", allAds=" + (DataHolder.getInstance().allAds == null ? "NULL" : (DataHolder.getInstance().allAds.isEmpty() ? "EMPTY" : DataHolder.getInstance().allAds.size() + " ads")));
+                android.util.Log.i("AdvertWatching", "   Reason: allAds=" + (DataHolder.getInstance().allAds == null ? "NULL" : "EMPTY"));
                 updateDebugText("NO ADS - Weather/News only mode");
                 getWeather(location, context);
                 // No ads — cycle weather and news slides

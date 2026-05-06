@@ -357,7 +357,6 @@ public class SelectScreens extends AppCompatActivity {
                                             DataHolder.getInstance().locationTypes = screenLocationMap.get(screen_id);
                                             DataHolder.getInstance().location = screenLocation.get(screen_id);
                                             DataHolder.getInstance().tags = screenTags.get(screen_id);
-                                            DataHolder.getInstance().isData = 5; // Signal: Weather-only mode (no ads available)
                                             DataHolder.getInstance().allAds = new ArrayList<>();
                                             DataHolder.getInstance().orient = orient;
                                             DataHolder.getInstance().time = timeRefresh;
@@ -437,7 +436,6 @@ public class SelectScreens extends AppCompatActivity {
                                         DataHolder.getInstance().locationTypes = screenLocationMap.get(screen_id);
                                         DataHolder.getInstance().location = screenLocation.get(screen_id);
                                         DataHolder.getInstance().tags = screenTags.get(screen_id);
-                                        DataHolder.getInstance().isData = 5; // Signal: Weather-only mode (API error)
                                         DataHolder.getInstance().allAds = new ArrayList<>();
                                         DataHolder.getInstance().orient = orient;
                                         DataHolder.getInstance().time = timeRefresh;
@@ -833,7 +831,6 @@ public class SelectScreens extends AppCompatActivity {
         /*logo.setVisibility(View.GONE);
         logo.clearAnimation();*/
         adList.clear();
-        DataHolder.getInstance().isData = 0;
         Arrays.fill(loadedCount, 0);
     }
 
