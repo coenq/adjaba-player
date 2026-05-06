@@ -163,6 +163,7 @@ public class AdvertWatching extends AppCompatActivity {
     // ─────────────────────────────────────────────────────────────────────────
     String mediaFormat = "";
     TextView displayText, newsHeader, newsDesc, newsTitle;
+    TextView debugOverlay; // Debug overlay for playback status
     String orient;
     NewsHandler newsHandler;
 
@@ -201,6 +202,16 @@ public class AdvertWatching extends AppCompatActivity {
 
         }
         displayText = findViewById(R.id.displayText);
+        debugOverlay = findViewById(R.id.debugOverlay);
+        android.util.Log.e("AdvertWatching", "🐛 DEBUG: debugOverlay = " + (debugOverlay == null ? "NULL" : "FOUND"));
+        if (debugOverlay != null) {
+            debugOverlay.setVisibility(View.VISIBLE); // Show debug info
+            debugOverlay.setBackgroundColor(0xCC000000); // Semi-transparent black
+            debugOverlay.setTextColor(0xFF00FF00); // Bright green
+            android.util.Log.e("AdvertWatching", "🐛 DEBUG: debugOverlay visibility set to VISIBLE");
+        } else {
+            android.util.Log.e("AdvertWatching", "🐛 WARNING: debugOverlay view not found in layout!");
+        }
         context = this;
         advertHoursMap = new HashMap<>();
         rain = findViewById(R.id.rain);
@@ -261,17 +272,10 @@ public class AdvertWatching extends AppCompatActivity {
         refreshRunnable = new Runnable() {
             @Override
             public void run() {
-
-                Executors.newSingleThreadExecutor().execute(() -> {
-                    AdDatabase db = AdDatabase.getInstance(getApplicationContext());
-                    db.adDao().deleteAllAds(); // مسح الإعلانات القديمة
-
-                    // بعد ما تخلص المسح وتأكدت، نرجع للـ UI thread لتحديث الداتا
-                    handler.post(() -> {
-                        getAds(0);
-                    });
-                });
-
+                // FIXED: Don't delete ads or re-fetch from API
+                // Ads come from SelectScreens and are managed locally
+                // Only refresh weather data periodically
+                getWeather(location, context);
                 handler.postDelayed(this, (long) newTime * 60 * 1000);
             }
         };
@@ -292,6 +296,11 @@ public class AdvertWatching extends AppCompatActivity {
         List<MediaModel> mediaModels = new ArrayList<>();
         screenLoc = location;
         if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape") || orient.equals("forced portrait")) {
+            android.util.Log.i("AdvertWatching", "🎬 onCreate() - Initializing playback");
+            android.util.Log.i("AdvertWatching", "   isDataLoaded: " + isDataLoaded);
+            android.util.Log.i("AdvertWatching", "   DataHolder.isData: " + DataHolder.getInstance().isData);
+            android.util.Log.i("AdvertWatching", "   DataHolder.allAds: " + (DataHolder.getInstance().allAds == null ? "NULL" : DataHolder.getInstance().allAds.size() + " ads"));
+
             newsHandler = new NewsHandler(newsIndex);
             newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
                 if (i != 1) {
@@ -299,22 +308,35 @@ public class AdvertWatching extends AppCompatActivity {
                 }
                 getNews = rss;
                 getBackupNews=rss;
+                android.util.Log.d("AdvertWatching", "   📰 News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
+                updateDebugText("News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
                 return Unit.INSTANCE;
             }, bar -> {
                 if (bar == 1) shimmer.stopShimmer();
                 shimmer.setVisibility(View.GONE);
                 return Unit.INSTANCE;
             });
+
             if (DataHolder.getInstance().isData == 5 || DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
+                android.util.Log.w("AdvertWatching", "⚠️ NO ADS AVAILABLE - Showing weather and news only");
+                android.util.Log.i("AdvertWatching", "   Reason: isData=" + DataHolder.getInstance().isData + ", allAds=" + (DataHolder.getInstance().allAds == null ? "NULL" : (DataHolder.getInstance().allAds.isEmpty() ? "EMPTY" : DataHolder.getInstance().allAds.size() + " ads")));
+                updateDebugText("NO ADS - Weather/News only mode");
                 getWeather(location, context);
                 // No ads — cycle weather and news slides
                 List<MediaModel> infoSlides = new ArrayList<>();
                 infoSlides.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
                 infoSlides.add(new MediaModel("", "", 0, "news", "", 10000, "", "", "", "", ""));
+                android.util.Log.e("AdvertWatching", "🔴 STARTING WEATHER+NEWS ROTATION (no ads)");
                 startMediaRotation(infoSlides, context);
             } else {
+                android.util.Log.i("AdvertWatching", "✨ Starting playback with " + DataHolder.getInstance().allAds.size() + " ads");
+                updateDebugText("Playing " + DataHolder.getInstance().allAds.size() + " ads");
                 getWeather(location, context);
-                startMediaRotation(insertWeatherEveryThreeAds(DataHolder.getInstance().allAds), context);
+                List<MediaModel> rotationList = insertWeatherEveryThreeAds(DataHolder.getInstance().allAds);
+                android.util.Log.i("AdvertWatching", "   Total items in rotation: " + (rotationList == null ? "0" : rotationList.size()) + " (ads + weather + news)");
+                updateDebugText("Rotation: " + (rotationList == null ? "0" : rotationList.size()) + " items (ads+weather+news)");
+                android.util.Log.e("AdvertWatching", "🔴 STARTING AD+WEATHER+NEWS ROTATION with " + (rotationList == null ? 0 : rotationList.size()) + " items");
+                startMediaRotation(rotationList, context);
             }
 
 
@@ -594,7 +616,15 @@ public class AdvertWatching extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<WeatherModel> call, Throwable t) {
-
+                android.util.Log.e("AdvertWatching", "❌ Weather API failed: " + (t != null ? t.getMessage() : "unknown error"));
+                // Set default/fallback weather values
+                tvTemp.setText("N/A");
+                tvStatus.setText("Weather unavailable");
+                tvLoc.setText(DataHolder.getInstance().location != null ? DataHolder.getInstance().location : "Unknown");
+                humadity.setText("--");
+                wind.setText("--");
+                rain.setText("--");
+                android.util.Log.i("AdvertWatching", "✅ Set fallback weather values");
             }
         });
     }
@@ -641,14 +671,30 @@ public class AdvertWatching extends AppCompatActivity {
         this.mediaList = mediaList;
         this.currentIndex = 0;
 
+        android.util.Log.e("AdvertWatching", "🔴🔴🔴 startMediaRotation() CALLED - Total items: " + (mediaList == null ? "0" : mediaList.size()));
+
         if (mediaSwitcher != null) {
             handler.removeCallbacks(mediaSwitcher);
         }
         mediaSwitcher = new Runnable() {
             @Override
             public void run() {
-                if (mediaList == null || mediaList.isEmpty()) return;
+                if (mediaList == null || mediaList.isEmpty()) {
+                    android.util.Log.e("AdvertWatching", "🔴 Media list is empty or null");
+                    return;
+                }
+                android.util.Log.e("AdvertWatching", "🔴 mediaSwitcher.run() - currentIndex=" + currentIndex + ", total=" + mediaList.size());
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
+
+                // ...existing mediaSwitcher logic...
+                android.util.Log.d("AdvertWatching", "▶️  Playing item " + (currentIndex + 1) + "/" + mediaList.size() + " (Hour: " + currentHour + ")");
+                if (currentIndex < mediaList.size()) {
+                    MediaModel media = mediaList.get(currentIndex);
+                    android.util.Log.d("AdvertWatching", "   Type: " + media.getType() + ", Duration: " + (media.getDurationInMillis() / 1000) + "s");
+                    if (media.getAdvertId() != null && !media.getAdvertId().isEmpty()) {
+                        android.util.Log.d("AdvertWatching", "   Ad ID: " + media.getAdvertId());
+                    }
+                }
 
                 // Determine the view currently visible so we can slide it out
                 View currentVisible = null;
@@ -668,6 +714,7 @@ public class AdvertWatching extends AppCompatActivity {
                     String type = media.getType();
                     if (!stringToList(media.getTargetHours()).contains(currentHour)
                             && !type.equals("weather") && !type.equals("news")) {
+                        android.util.Log.d("AdvertWatching", "   ⏭️  Skipping - target hours don't match current hour");
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
                         return;
@@ -676,12 +723,14 @@ public class AdvertWatching extends AppCompatActivity {
                 long durationMs = media.getDurationInMillis();
 
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
+                    android.util.Log.d("AdvertWatching", "   🖼️  Displaying IMAGE");
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | IMAGE | " + (durationMs/1000) + "s");
                     waitingLogo.setVisibility(View.GONE);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
                     QRCodeMaker(media.getInfo());
                     displayText.setText(media.getDisplayText());
                     qrImage.setVisibility(View.VISIBLE);
-                    logoImage.setVisibility(View.VISIBLE);
+                    logoImage.setVisibility(View.GONE); // Temporarily hide for testing
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
@@ -691,10 +740,12 @@ public class AdvertWatching extends AppCompatActivity {
                     saveAndSendImpression(media, durationMs, context);
 
                 } else if (media.getType().equals("VIDEO")) {
+                    android.util.Log.d("AdvertWatching", "   🎬 Playing VIDEO");
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | VIDEO | " + (durationMs/1000) + "s");
                     waitingLogo.setVisibility(View.GONE);
                     displayText.setText(media.getDisplayText());
                     adPlayerView.setVisibility(View.INVISIBLE);
-                    logoImage.setVisibility(View.VISIBLE);
+                    logoImage.setVisibility(View.GONE); // Temporarily hide for testing
                     QRCodeMaker(media.getInfo());
                     qrImage.setVisibility(View.VISIBLE);
                     if (DataHolder.getInstance().displayFlag == 1) {
@@ -706,6 +757,8 @@ public class AdvertWatching extends AppCompatActivity {
                     saveAndSendImpression(media, durationMs, context);
 
                 } else if (media.getType().equals("weather")) {
+                    android.util.Log.d("AdvertWatching", "   🌤️  Showing WEATHER");
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | WEATHER | 10s");
                     waitingLogo.setVisibility(View.GONE);
                     logoImage.setVisibility(View.GONE);
                     qrImage.setVisibility(View.GONE);
@@ -714,6 +767,8 @@ public class AdvertWatching extends AppCompatActivity {
                     handler.postDelayed(this, durationMs);
 
                 } else if (media.getType().equals("news")) {
+                    android.util.Log.d("AdvertWatching", "   📰 Showing NEWS");
+                    updateDebugText("NEWS Slide " + (newsIndex + 1) + " | 10s");
                     waitingLogo.setVisibility(View.GONE);
                     logoImage.setVisibility(View.GONE);
                     qrImage.setVisibility(View.GONE);
@@ -777,13 +832,13 @@ public class AdvertWatching extends AppCompatActivity {
 
         ;
         handler.removeCallbacks(mediaSwitcher);
+        android.util.Log.e("AdvertWatching", "🔴 About to post mediaSwitcher to handler");
         handler.post(mediaSwitcher);
+        android.util.Log.e("AdvertWatching", "🔴 mediaSwitcher posted to handler");
 
         handler.removeCallbacks(refreshRunnable);
 
-        if (
-
-                isInternetAvailable()) {
+        if (isInternetAvailable()) {
             if (newTime <= 60) {
                 handler.postDelayed(refreshRunnable, (long) newTime * 60 * 1000);
 
@@ -1106,6 +1161,33 @@ public class AdvertWatching extends AppCompatActivity {
                 .alpha(1f)
                 .setDuration(duration)
                 .start();
+    }
+
+    /**
+     * Updates debug overlay with current playback status.
+     * Shows: current media type, index, ads loaded, etc.
+     * TODO: Remove this before production release
+     */
+    private void updateDebugText(String message) {
+        String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        String fullMsg = timestamp + " | " + message;
+
+        // Always log to logcat
+        android.util.Log.e("AdvertWatching", "🐛 " + fullMsg);
+
+        // Also try to update overlay if it exists
+        if (debugOverlay != null) {
+            runOnUiThread(() -> {
+                try {
+                    debugOverlay.setText(fullMsg);
+                    android.util.Log.e("AdvertWatching", "🐛 Overlay updated: " + fullMsg);
+                } catch (Exception e) {
+                    android.util.Log.e("AdvertWatching", "🐛 ERROR updating overlay: " + e.getMessage());
+                }
+            });
+        } else {
+            android.util.Log.e("AdvertWatching", "🐛 WARNING: debugOverlay is NULL, can't update UI");
+        }
     }
 
     @Override

@@ -570,7 +570,15 @@ public class AdvertLandWatch extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<WeatherModel> call, Throwable t) {
-
+                android.util.Log.e("AdvertLandWatch", "❌ Weather API failed: " + (t != null ? t.getMessage() : "unknown error"));
+                // Set default/fallback weather values
+                tvTemp.setText("N/A");
+                tvStatus.setText("Weather unavailable");
+                tvLoc.setText(DataHolder.getInstance().location != null ? DataHolder.getInstance().location : "Unknown");
+                humadity.setText("--");
+                wind.setText("--");
+                rain.setText("--");
+                android.util.Log.i("AdvertLandWatch", "✅ Set fallback weather values");
             }
         });
     }
@@ -689,6 +697,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                     handler.postDelayed(this, durationMs);
 
                 } else if (media.getType().equals("news")) {
+                    updateDebugText("NEWS " + (newsIndex + 1) + " | 10s");
                     waitingLogo.setVisibility(View.GONE);
                     logoImage.setVisibility(View.GONE);
                     qrImage.setVisibility(View.GONE);
@@ -1047,6 +1056,16 @@ public class AdvertLandWatch extends AppCompatActivity {
                 .alpha(1f)
                 .setDuration(duration)
                 .start();
+    }
+
+    /**
+     * Updates debug overlay to show current playback status.
+     * TODO: Remove before production release
+     */
+    private void updateDebugText(String message) {
+        // Debug text would go here if debugOverlay was available
+        // For now, just log it
+        android.util.Log.d("AdvertLandWatch", "🐛 DEBUG: " + message);
     }
 
     @Override

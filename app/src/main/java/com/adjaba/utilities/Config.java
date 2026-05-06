@@ -14,7 +14,7 @@ public class Config {
 
     //  newer    https://api.adjaba.in/
     public static final String BASE_URL = "https://api.adjaba.in";
-    public static final String MEDIA_URL = "https://buyir.uk:3100/";
+    public static final String MEDIA_URL = "https://api.adjaba.in/";
 
 
 //    public static final String BASE_URL = "http://116.203.216.248:3200/";

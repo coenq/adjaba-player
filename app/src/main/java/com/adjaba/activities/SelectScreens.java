@@ -37,6 +37,7 @@ import com.adjaba.room.AdDatabase;
 import com.adjaba.room.AdEntity;
 import com.adjaba.room.InfoEntity;
 import com.adjaba.utilities.AuthManager;
+import com.adjaba.utilities.Config;
 import com.adjaba.utilities.RetrofitBuilder;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -91,7 +92,7 @@ public class SelectScreens extends AppCompatActivity {
     ArrayAdapter<String> spinnerAdapter;
     Button play, logOut;
     String mediaFormat = "";
-    String orient, screen_id = "";
+    String orient = "Orientation", screen_id = "Select Screen";
     String timeRefresh = "0";
     int[] loadedCount = {0};
 
@@ -300,6 +301,9 @@ public class SelectScreens extends AppCompatActivity {
     void getAds(int flag) {
         AdDatabase adDatabase = AdDatabase.getInstance(context);
 
+        // 📌 LOG: Starting ad fetching process
+        android.util.Log.i("SelectScreens", "🎬 getAds() started - screenID: " + screen_id);
+
         // نشتغل على Background Thread
         new Thread(() -> {
             // 1️⃣ مسح قاعدة البيانات
@@ -312,12 +316,12 @@ public class SelectScreens extends AppCompatActivity {
 
                         @Override
                         public void onComplete() {
-
+                            android.util.Log.i("SelectScreens", "✅ Database cleared - All old ads deleted");
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
+                            android.util.Log.e("SelectScreens", "❌ Error clearing database: " + e.getMessage());
                         }
                     });
 
@@ -329,14 +333,23 @@ public class SelectScreens extends AppCompatActivity {
             // 3️⃣ نكمل تحميل الإعلانات بعد المسح
             new Handler(Looper.getMainLooper()).post(() -> {
 
+                // 📌 LOG: API call details
+                String screenIdForApi = screen_id.contains("/") ? screen_id.split("/")[0] : screen_id;
+                android.util.Log.i("SelectScreens", "🔗 API call - endpoint: get_screen_playlists/" + screenIdForApi);
+
                 retrofitBuilder.apiCalls()
-                        .getAdsByScreen(screen_id.split("/")[0], "Bearer " + AuthManager.getToken(this))
+                        .getAdsByScreen(screenIdForApi, "Bearer " + AuthManager.getToken(this))
                         .enqueue(new Callback<List<WatchingModel>>() {
                             @Override
                             public void onResponse(Call<List<WatchingModel>> call, Response<List<WatchingModel>> response) {
+                                // 📌 LOG: API response received
+                                android.util.Log.i("SelectScreens", "📨 API response code: " + response.code());
+
                                 if (response.code() == 200) {
                                     adList = response.body();
+                                    android.util.Log.i("SelectScreens", "📦 Ads received from API: " + (adList == null ? "NULL" : adList.size() + " ads"));
                                     if (adList == null || adList.isEmpty() || adList.size() == 0) {
+                                        android.util.Log.w("SelectScreens", "⚠️ No ads returned from API for screenID: " + screen_id);
                                         if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                                             DataHolder.getInstance().screenID = screen_id;
                                             DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -344,7 +357,7 @@ public class SelectScreens extends AppCompatActivity {
                                             DataHolder.getInstance().locationTypes = screenLocationMap.get(screen_id);
                                             DataHolder.getInstance().location = screenLocation.get(screen_id);
                                             DataHolder.getInstance().tags = screenTags.get(screen_id);
-                                            DataHolder.getInstance().isData = 5;
+                                            DataHolder.getInstance().isData = 5; // Signal: Weather-only mode (no ads available)
                                             DataHolder.getInstance().allAds = new ArrayList<>();
                                             DataHolder.getInstance().orient = orient;
                                             DataHolder.getInstance().time = timeRefresh;
@@ -367,6 +380,7 @@ public class SelectScreens extends AppCompatActivity {
                                                         .setDuration(1000)
                                                         .setInterpolator(new DecelerateInterpolator())
                                                         .withEndAction(() -> {
+                                                            android.util.Log.i("SelectScreens", "🚀 Launching AdvertWatching (NO ADS) - orientation: " + orient);
                                                             if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
                                                                 startActivity(new Intent(context, AdvertLandWatch.class));
                                                             } else {
@@ -378,12 +392,14 @@ public class SelectScreens extends AppCompatActivity {
                                             Toast.makeText(context, "Please select orientation and screen id", Toast.LENGTH_LONG).show();
                                         }
                                     } else {
+                                        android.util.Log.i("SelectScreens", "✨ Starting to download " + adList.size() + " ads");
                                         waitingData=1;
                                         if (executorService == null || executorService.isShutdown()) {
                                             executorService = Executors.newSingleThreadExecutor();
                                         }
                                         executorService.execute(() -> {
                                             for (int i = 0; i < adList.size(); i++) {
+                                                android.util.Log.d("SelectScreens", "  📥 Ad " + (i+1) + "/" + adList.size() + " - ID: " + adList.get(i).adContractData.advertId);
                                                 DataHolder.getInstance().advertIds.add(adList.get(i).adContractData.advertId);
                                                 String format = adList.get(i).adContractData.format.toLowerCase();
                                                 String videoUrl = adList.get(i).adContractData.videoUrl;
@@ -413,6 +429,7 @@ public class SelectScreens extends AppCompatActivity {
                                         });
                                     }
                                 } else {
+                                    android.util.Log.e("SelectScreens", "❌ API error - response code: " + response.code());
                                     if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
                                         DataHolder.getInstance().screenID = screen_id;
                                         DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -420,7 +437,7 @@ public class SelectScreens extends AppCompatActivity {
                                         DataHolder.getInstance().locationTypes = screenLocationMap.get(screen_id);
                                         DataHolder.getInstance().location = screenLocation.get(screen_id);
                                         DataHolder.getInstance().tags = screenTags.get(screen_id);
-                                        DataHolder.getInstance().isData = 5;
+                                        DataHolder.getInstance().isData = 5; // Signal: Weather-only mode (API error)
                                         DataHolder.getInstance().allAds = new ArrayList<>();
                                         DataHolder.getInstance().orient = orient;
                                         DataHolder.getInstance().time = timeRefresh;
@@ -435,6 +452,7 @@ public class SelectScreens extends AppCompatActivity {
                                                     .setDuration(1000)
                                                     .setInterpolator(new DecelerateInterpolator())
                                                     .withEndAction(() -> {
+                                                        android.util.Log.i("SelectScreens", "🚀 Launching AdvertWatching (API ERROR) - showing weather/news only");
                                                         if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
                                                             startActivity(new Intent(context, AdvertLandWatch.class));
                                                         } else {
@@ -450,6 +468,24 @@ public class SelectScreens extends AppCompatActivity {
 
                             @Override
                             public void onFailure(Call<List<WatchingModel>> call, Throwable t) {
+                                String errorMsg = t != null ? t.getMessage() : "Unknown error";
+                                android.util.Log.e("SelectScreens", "❌ Network error in getAds: " + errorMsg);
+                                android.util.Log.e("SelectScreens", "🔥 FULL ERROR: ", t);
+                                Toast.makeText(context, "Failed to load ads: " + errorMsg, Toast.LENGTH_LONG).show();
+
+                                // Show waiting logo error state
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    waitingLogo.animate()
+                                            .scaleX(2.2f).scaleY(2.2f).alpha(0f)
+                                            .setDuration(1000)
+                                            .setInterpolator(new DecelerateInterpolator())
+                                            .withEndAction(() -> {
+                                                nestedScrollView.setVisibility(View.VISIBLE);
+                                                logosLayout.setVisibility(View.VISIBLE);
+                                                waitingLogo.setVisibility(View.GONE);
+                                                Toast.makeText(context, "Error: " + errorMsg + " - Going back to screen selection", Toast.LENGTH_LONG).show();
+                                            }).start();
+                                });
                             }
                         });
             });
@@ -458,14 +494,20 @@ public class SelectScreens extends AppCompatActivity {
 
     private void getUrl(String currency, String contractId, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder) {
         if (path == null || path.isEmpty()) {
+            android.util.Log.w("SelectScreens", "⚠️ Ad " + advertId + " has empty path - skipping");
             return;
         }
+
+        android.util.Log.d("SelectScreens", "🌐 Calling /media/{path} API for ad " + advertId);
+        android.util.Log.d("SelectScreens", "   Path: " + path);
+
         retrofitBuilder.apiCalls().getUrl("Bearer " + AuthManager.getToken(this), path).enqueue(new Callback<VideoImageModel>() {
             @Override
             public void onResponse(Call<VideoImageModel> call, Response<VideoImageModel> response) {
                 if (response.isSuccessful() && response.body() != null) {
-
                     String resolvedUrl = response.body().url;
+                    android.util.Log.d("SelectScreens", "  ✅ Got URL from API: " + resolvedUrl.substring(0, Math.min(100, resolvedUrl.length())));
+
                     String extension;
                     try {
                         int start = resolvedUrl.lastIndexOf('.') + 1;
@@ -479,6 +521,7 @@ public class SelectScreens extends AppCompatActivity {
                     Executors.newSingleThreadExecutor().execute(() -> {
                         String localPath = downloadFileToInternalStorage(context, resolvedUrl, fileName);
                         if (localPath != null) {
+                            android.util.Log.d("SelectScreens", "  💾 Saved ad " + advertId + " locally: " + fileName);
                             if (Objects.equals(path, "") || isImage(path)) {
                                 mediaFormat = "Image";
                             } else if (isVideo(path)) {
@@ -496,20 +539,31 @@ public class SelectScreens extends AppCompatActivity {
                             );
                             AdDatabase db = AdDatabase.getInstance(context);
                             db.adDao().insertAd(ad);
+                            android.util.Log.d("SelectScreens", "  📊 Inserted ad " + advertId + " to Room DB");
 
                             loadedCount[0]++;
                             targetHoursList.add(new TargetHours(advertId, targetHours));
-                            if (loadedCount[0] == totalCount) {
-                                List<AdEntity> ads = db.adDao().getAllAds(screenId);
-                                mediaModels.clear();
-                                for (AdEntity ada : ads) {
-                                    mediaModels.add(new MediaModel(contractId, currency, maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId));
+                            android.util.Log.i("SelectScreens", "📈 Progress: " + loadedCount[0] + "/" + totalCount + " ads loaded");
 
+                            if (loadedCount[0] == totalCount) {
+                                android.util.Log.i("SelectScreens", "🎉 ALL ADS DOWNLOADED! Preparing to launch AdvertWatching...");
+                                List<AdEntity> ads = db.adDao().getAllAds(screenId);
+                                android.util.Log.i("SelectScreens", "   Retrieved " + (ads == null ? "0" : ads.size()) + " ads from DB for screenId: " + screenId);
+                                mediaModels.clear();
+                                if (ads != null && !ads.isEmpty()) {
+                                    for (AdEntity ada : ads) {
+                                        if (ada != null && ada.localPath != null) {
+                                            mediaModels.add(new MediaModel(contractId, currency, maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId));
+                                        }
+                                    }
                                 }
+                                android.util.Log.i("SelectScreens", "   Created MediaModel list with " + mediaModels.size() + " items");
+
                                 new Handler(Looper.getMainLooper()).post(() -> {
                                     DataHolder.getInstance().targetHours = targetHoursList;
                                     DataHolder.getInstance().allAds = mediaModels;
-                                    
+                                    android.util.Log.i("SelectScreens", "   ✅ Updated DataHolder.allAds with " + mediaModels.size() + " MediaModels");
+
                                     waitingLogo.animate()
                                             .scaleX(2.2f)
                                             .scaleY(2.2f)
@@ -517,6 +571,7 @@ public class SelectScreens extends AppCompatActivity {
                                             .setDuration(1000)
                                             .setInterpolator(new DecelerateInterpolator())
                                             .withEndAction(() -> {
+                                                android.util.Log.i("SelectScreens", "🚀 Launching AdvertWatching with " + mediaModels.size() + " ads");
                                                 if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
                                                     Intent intent = new Intent(context, AdvertLandWatch.class);
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -526,30 +581,116 @@ public class SelectScreens extends AppCompatActivity {
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                     context.startActivity(intent);
                                                 }
-
-
                                             })
                                             .start();
-
                                 });
                             }
                         } else {
-                            // فشل التحميل
+                            android.util.Log.e("SelectScreens", "❌ Failed to download ad " + advertId + " from resolved URL");
                             loadedCount[0]++;
+                            updateDownloadProgress(loadedCount[0], totalCount);
                             AdDatabase db = AdDatabase.getInstance(context);
                             db.infoDao().insertInfo(new InfoEntity("Failed to download media: " + path));
+                            // ✅ Check if ALL ads processed (success or failure) and launch if done
+                            checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
                         }
                     });
                 } else {
+                    android.util.Log.e("SelectScreens", "❌ API /media/{path} returned error code: " + response.code());
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            android.util.Log.e("SelectScreens", "   Error body: " + errorBody.substring(0, Math.min(200, errorBody.length())));
+                        } catch (Exception e) {
+                            android.util.Log.e("SelectScreens", "   Could not read error: " + e.getMessage());
+                        }
+                    }
                     loadedCount[0]++;
+                    updateDownloadProgress(loadedCount[0], totalCount);
+                    // ✅ Check if ALL ads processed and launch if done
+                    checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
                 }
             }
 
             @Override
             public void onFailure(Call<VideoImageModel> call, Throwable t) {
+                String errorMsg = t != null ? t.getMessage() : "unknown";
+                android.util.Log.e("SelectScreens", "❌ Network error calling /media/{path} API for ad " + advertId);
+                android.util.Log.e("SelectScreens", "   Error: " + (t != null ? t.getClass().getSimpleName() : "null") + " - " + errorMsg);
+                if (t != null) {
+                    android.util.Log.e("SelectScreens", "   Stack: ", t);
+                }
                 loadedCount[0]++;
+                updateDownloadProgress(loadedCount[0], totalCount);
+                // ✅ Check if ALL ads processed and launch if done
+                checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
             }
         });
+    }
+    
+    /**
+     * Updates the download progress bar on UI thread
+     */
+    private void updateDownloadProgress(int loaded, int total) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (loadingBar != null) {
+                loadingBar.setProgress(loaded);
+                android.util.Log.d("SelectScreens", "🔄 UI Progress: " + loaded + "/" + total);
+            }
+        });
+    }
+
+    /**
+     * Checks if all ads have been downloaded/processed and launches AdvertWatching if so
+     */
+    private void checkAndLaunchAdvertWatchingIfAllProcessed(int loadedCount, int totalCount, String screenId, String contractId, int maxBid, String orient, Context context) {
+        if (loadedCount >= totalCount) {
+            android.util.Log.i("SelectScreens", "✅ ALL ADS PROCESSED (loaded: " + loadedCount + "/" + totalCount + ")");
+
+            // Execute database access on background thread to avoid crash
+            dbExecutor.execute(() -> {
+                AdDatabase db = AdDatabase.getInstance(context);
+                List<AdEntity> ads = db.adDao().getAllAds(screenId);
+                android.util.Log.i("SelectScreens", "   Retrieved " + (ads == null ? "0" : ads.size()) + " ads from DB for screenId: " + screenId);
+
+                mediaModels.clear();
+                if (ads != null && !ads.isEmpty()) {
+                    for (AdEntity ada : ads) {
+                        if (ada != null && ada.localPath != null) {
+                            mediaModels.add(new MediaModel(contractId, "", maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId));
+                        }
+                    }
+                }
+                android.util.Log.i("SelectScreens", "   Created MediaModel list with " + mediaModels.size() + " items");
+
+                // Post UI updates back to main thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    DataHolder.getInstance().targetHours = targetHoursList;
+                    DataHolder.getInstance().allAds = mediaModels;
+                    android.util.Log.i("SelectScreens", "   ✅ Updated DataHolder.allAds with " + mediaModels.size() + " MediaModels");
+
+                    waitingLogo.animate()
+                            .scaleX(2.2f)
+                            .scaleY(2.2f)
+                            .alpha(0f)
+                            .setDuration(1000)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .withEndAction(() -> {
+                                android.util.Log.i("SelectScreens", "🚀 Launching AdvertWatching with " + mediaModels.size() + " ads");
+                                if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                                    Intent intent = new Intent(context, AdvertLandWatch.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(context, AdvertWatching.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                }
+                            })
+                            .start();
+                });
+            });
+        }
     }
 
 
@@ -626,23 +767,43 @@ public class SelectScreens extends AppCompatActivity {
                 .build();
 
         try (okhttp3.Response response = client.newCall(request).execute()) {
+            android.util.Log.d("SelectScreens", "   📡 HTTP Response code: " + response.code() + " for URL: " + fileUrl);
+
             if (response.isSuccessful()) {
                 InputStream inputStream = response.body().byteStream();
                 File file = new File(context.getFilesDir(), fileName);
                 FileOutputStream outputStream = new FileOutputStream(file);
                 byte[] buffer = new byte[4096];
                 int bytesRead;
+                long totalBytes = 0;
 
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
+                    totalBytes += bytesRead;
                 }
 
                 outputStream.close();
                 inputStream.close();
 
+                android.util.Log.d("SelectScreens", "   ✅ Downloaded " + totalBytes + " bytes to: " + file.getAbsolutePath());
                 return file.getAbsolutePath();
+            } else {
+                android.util.Log.e("SelectScreens", "   ❌ HTTP Error " + response.code() + ": " + response.message());
+                if (response.body() != null) {
+                    try {
+                        String errorBody = response.body().string();
+                        android.util.Log.e("SelectScreens", "   Error response body: " + errorBody.substring(0, Math.min(500, errorBody.length())));
+                    } catch (Exception e) {
+                        android.util.Log.e("SelectScreens", "   Could not read error body: " + e.getMessage());
+                    }
+                }
             }
         } catch (IOException e) {
+            android.util.Log.e("SelectScreens", "   🔥 IOException downloading " + fileUrl);
+            android.util.Log.e("SelectScreens", "   Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            if (e.getCause() != null) {
+                android.util.Log.e("SelectScreens", "   Caused by: " + e.getCause().getMessage());
+            }
             e.printStackTrace();
         }
 
