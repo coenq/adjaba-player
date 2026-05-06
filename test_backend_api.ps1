@@ -227,14 +227,15 @@ Write-Host "`n╔═════════════════════
 Write-Host "║  🎯 BACKEND API TEST COMPLETE                     ║" -ForegroundColor Green
 Write-Host "╚════════════════════════════════════════════════════╝`n" -ForegroundColor Green
 
-Write-Host "📊 RESULTS SUMMARY:" -ForegroundColor Cyan
-Write-Host "  ✅ Login: Working" -ForegroundColor Green
-Write-Host "  ✅ Get Screens: Working" -ForegroundColor Green
-Write-Host "  ✅ Get Playlist: Working" -ForegroundColor Green
+Write-Host "RESULTS SUMMARY:" -ForegroundColor Cyan
+Write-Host "  Login: Working" -ForegroundColor Green
+Write-Host "  Get Screens: Working" -ForegroundColor Green
+Write-Host "  Get Playlist: Working" -ForegroundColor Green
 Write-Host ""
-Write-Host "💡 Next Steps:" -ForegroundColor Yellow
+Write-Host "Next Steps:" -ForegroundColor Yellow
 Write-Host "  1. Check if ads exist in the playlist" -ForegroundColor White
 Write-Host "  2. Test media download endpoint" -ForegroundColor White
 Write-Host "  3. Compare results with app behavior" -ForegroundColor White
 Write-Host ""
+
 
