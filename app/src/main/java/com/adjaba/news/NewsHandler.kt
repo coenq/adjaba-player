@@ -35,50 +35,47 @@ class NewsHandler(var index: Int) {
         var link: String? = null
         var description: String? = null
         var thumbnail: String? = null
-        while (items.isEmpty()) {
 
-            while (event != XmlPullParser.END_DOCUMENT) {
-                when (event) {
+        while (event != XmlPullParser.END_DOCUMENT) {
+            when (event) {
 
-                    XmlPullParser.START_TAG -> {
-                        when (parser.name) {
-                            "item" -> {
-                                // reset values for new item
-                                title = null
-                                link = null
-                                description = null
-                                thumbnail = null
-                            }
-
-                            "title" -> if (title == null) title = parser.nextText()
-                            "link" -> if (link == null) link = parser.nextText()
-                            "description" -> if (description == null) description =
-                                parser.nextText()
-
-                            "thumbnail", "media:thumbnail", "media:content" -> {
-                                thumbnail = parser.getAttributeValue(null, "url")
-                            }
+                XmlPullParser.START_TAG -> {
+                    when (parser.name) {
+                        "item" -> {
+                            title = null
+                            link = null
+                            description = null
+                            thumbnail = null
                         }
-                    }
 
-                    XmlPullParser.END_TAG -> {
-                        if (parser.name == "item") {
-                            items.add(
-                                RssItem(
-                                    title ?: "",
-                                    link ?: "",
-                                    description ?: "",
-                                    "", "", thumbnail ?: ""
-                                )
-                            )
+                        "title" -> if (title == null) title = parser.nextText()
+                        "link" -> if (link == null) link = parser.nextText()
+                        "description" -> if (description == null) description =
+                            parser.nextText()
+
+                        "thumbnail", "media:thumbnail", "media:content" -> {
+                            thumbnail = parser.getAttributeValue(null, "url")
                         }
                     }
                 }
 
-                event = parser.next()
+                XmlPullParser.END_TAG -> {
+                    if (parser.name == "item") {
+                        items.add(
+                            RssItem(
+                                title ?: "",
+                                link ?: "",
+                                description ?: "",
+                                "", "", thumbnail ?: ""
+                            )
+                        )
+                    }
+                }
             }
 
+            event = parser.next()
         }
+
         return items
     }
 

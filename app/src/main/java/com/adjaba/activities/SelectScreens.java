@@ -490,9 +490,11 @@ public class SelectScreens extends AppCompatActivity {
         }).start();
     }
 
-    private void getUrl(String currency, String contractId, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder) {
+    private void getUrl(String contractId, String currency, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder) {
         if (path == null || path.isEmpty()) {
             android.util.Log.w("SelectScreens", "⚠️ Ad " + advertId + " has empty path - skipping");
+            loadedCount[0]++;
+            checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
             return;
         }
 

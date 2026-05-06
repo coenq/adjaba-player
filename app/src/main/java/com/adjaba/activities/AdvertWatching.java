@@ -569,7 +569,8 @@ public class AdvertWatching extends AppCompatActivity {
         retrofitBuilder.apiCalls2().getWeather(Config.weatherKey, loc).enqueue(new Callback<WeatherModel>() {
             @Override
             public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().current != null && response.body().current.condition != null) {
                     if (!isFinishing() && !isDestroyed()) {
                         String iconUrl = "https:" + response.body().current.condition.icon
                                 .replace("/64x64/", "/128x128/");
@@ -1022,11 +1023,8 @@ public class AdvertWatching extends AppCompatActivity {
         return new SimpleDateFormat("H", Locale.getDefault()).format(new Date());
     }
 
-    // دالة تحقق اتصال الانترنت (مثال بسيط)
     private boolean isInternetAvailable(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isInternetAvailable();
     }
 
 
