@@ -498,131 +498,53 @@ public class SelectScreens extends AppCompatActivity {
             return;
         }
 
-        android.util.Log.d("SelectScreens", "🌐 Calling /media/{path} API for ad " + advertId);
-        android.util.Log.d("SelectScreens", "   Path: " + path);
+        // /media/{path} streams the file directly (no JSON wrapper) — download with auth header
+        String downloadUrl = Config.BASE_URL + "/media/" + path;
+        String token = AuthManager.getToken(this);
+        String extension;
+        try {
+            int dot = path.lastIndexOf('.');
+            extension = dot >= 0 ? path.substring(dot + 1) : "mp4";
+        } catch (Exception e) {
+            extension = "mp4";
+        }
+        String fileName = UUID.randomUUID().toString() + "." + extension;
+        android.util.Log.d("SelectScreens", "📥 Downloading ad " + advertId + " → " + downloadUrl);
 
-        retrofitBuilder.apiCalls().getUrl("Bearer " + AuthManager.getToken(this), path).enqueue(new Callback<VideoImageModel>() {
-            @Override
-            public void onResponse(Call<VideoImageModel> call, Response<VideoImageModel> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String resolvedUrl = response.body().url;
-                    android.util.Log.d("SelectScreens", "  ✅ Got URL from API: " + resolvedUrl.substring(0, Math.min(100, resolvedUrl.length())));
-
-                    String extension;
-                    try {
-                        int start = resolvedUrl.lastIndexOf('.') + 1;
-                        int end = resolvedUrl.contains("?") ? resolvedUrl.indexOf("?") : resolvedUrl.length();
-                        extension = resolvedUrl.substring(start, end);
-                    } catch (Exception e) {
-                        extension = "mp4";
-                    }
-                    String fileName = UUID.randomUUID().toString() + "." + extension;
-
-                    Executors.newSingleThreadExecutor().execute(() -> {
-                        String localPath = downloadFileToInternalStorage(context, resolvedUrl, fileName);
-                        if (localPath != null) {
-                            android.util.Log.d("SelectScreens", "  💾 Saved ad " + advertId + " locally: " + fileName);
-                            if (Objects.equals(path, "") || isImage(path)) {
-                                mediaFormat = "Image";
-                            } else if (isVideo(path)) {
-                                mediaFormat = "Video";
-                            }
-                            AdEntity ad = new AdEntity(
-                                    advertId,
-                                    mediaFormat.toUpperCase(),
-                                    localPath,
-                                    txtTop, info, txtLeft, txtRight,
-                                    duration * 1000,
-                                    "Landscape",
-                                    screenId,
-                                    contractId, listToString(targetHours), serverOrder, currency, maxBid
-                            );
-                            AdDatabase db = AdDatabase.getInstance(context);
-                            db.adDao().insertAd(ad);
-                            android.util.Log.d("SelectScreens", "  📊 Inserted ad " + advertId + " to Room DB");
-
-                            loadedCount[0]++;
-                            targetHoursList.add(new TargetHours(advertId, targetHours));
-                            android.util.Log.i("SelectScreens", "📈 Progress: " + loadedCount[0] + "/" + totalCount + " ads loaded");
-
-                            if (loadedCount[0] == totalCount) {
-                                android.util.Log.i("SelectScreens", "🎉 ALL ADS DOWNLOADED! Preparing to launch AdvertWatching...");
-                                List<AdEntity> ads = db.adDao().getAllAds(screenId);
-                                android.util.Log.i("SelectScreens", "   Retrieved " + (ads == null ? "0" : ads.size()) + " ads from DB for screenId: " + screenId);
-                                mediaModels.clear();
-                                if (ads != null && !ads.isEmpty()) {
-                                    for (AdEntity ada : ads) {
-                                        if (ada != null && ada.localPath != null) {
-                                            mediaModels.add(new MediaModel(contractId, currency, maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId));
-                                        }
-                                    }
-                                }
-                                android.util.Log.i("SelectScreens", "   Created MediaModel list with " + mediaModels.size() + " items");
-
-                                new Handler(Looper.getMainLooper()).post(() -> {
-                                    DataHolder.getInstance().targetHours = targetHoursList;
-                                    DataHolder.getInstance().allAds = mediaModels;
-                                    android.util.Log.i("SelectScreens", "   ✅ Updated DataHolder.allAds with " + mediaModels.size() + " MediaModels");
-
-                                    waitingLogo.animate()
-                                            .scaleX(2.2f)
-                                            .scaleY(2.2f)
-                                            .alpha(0f)
-                                            .setDuration(1000)
-                                            .setInterpolator(new DecelerateInterpolator())
-                                            .withEndAction(() -> {
-                                                android.util.Log.i("SelectScreens", "🚀 Launching AdvertWatching with " + mediaModels.size() + " ads");
-                                                if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
-                                                    Intent intent = new Intent(context, AdvertLandWatch.class);
-                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    context.startActivity(intent);
-                                                } else {
-                                                    Intent intent = new Intent(context, AdvertWatching.class);
-                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    context.startActivity(intent);
-                                                }
-                                            })
-                                            .start();
-                                });
-                            }
-                        } else {
-                            android.util.Log.e("SelectScreens", "❌ Failed to download ad " + advertId + " from resolved URL");
-                            loadedCount[0]++;
-                            updateDownloadProgress(loadedCount[0], totalCount);
-                            AdDatabase db = AdDatabase.getInstance(context);
-                            db.infoDao().insertInfo(new InfoEntity("Failed to download media: " + path));
-                            // ✅ Check if ALL ads processed (success or failure) and launch if done
-                            checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
-                        }
-                    });
+        Executors.newSingleThreadExecutor().execute(() -> {
+            String localPath = downloadFileWithAuth(context, downloadUrl, fileName, token);
+            if (localPath != null) {
+                android.util.Log.d("SelectScreens", "  💾 Saved ad " + advertId + " locally: " + fileName);
+                if (isImage(path)) {
+                    mediaFormat = "IMAGE";
+                } else if (isVideo(path)) {
+                    mediaFormat = "VIDEO";
                 } else {
-                    android.util.Log.e("SelectScreens", "❌ API /media/{path} returned error code: " + response.code());
-                    if (response.errorBody() != null) {
-                        try {
-                            String errorBody = response.errorBody().string();
-                            android.util.Log.e("SelectScreens", "   Error body: " + errorBody.substring(0, Math.min(200, errorBody.length())));
-                        } catch (Exception e) {
-                            android.util.Log.e("SelectScreens", "   Could not read error: " + e.getMessage());
-                        }
-                    }
-                    loadedCount[0]++;
-                    updateDownloadProgress(loadedCount[0], totalCount);
-                    // ✅ Check if ALL ads processed and launch if done
-                    checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
+                    mediaFormat = "IMAGE";
                 }
-            }
+                AdEntity ad = new AdEntity(
+                        advertId,
+                        mediaFormat,
+                        localPath,
+                        txtTop, info, txtLeft, txtRight,
+                        duration * 1000,
+                        "Landscape",
+                        screenId,
+                        contractId, listToString(targetHours), serverOrder, currency, maxBid
+                );
+                AdDatabase db = AdDatabase.getInstance(context);
+                db.adDao().insertAd(ad);
+                android.util.Log.d("SelectScreens", "  📊 Inserted ad " + advertId + " to Room DB");
 
-            @Override
-            public void onFailure(Call<VideoImageModel> call, Throwable t) {
-                String errorMsg = t != null ? t.getMessage() : "unknown";
-                android.util.Log.e("SelectScreens", "❌ Network error calling /media/{path} API for ad " + advertId);
-                android.util.Log.e("SelectScreens", "   Error: " + (t != null ? t.getClass().getSimpleName() : "null") + " - " + errorMsg);
-                if (t != null) {
-                    android.util.Log.e("SelectScreens", "   Stack: ", t);
-                }
+                loadedCount[0]++;
+                targetHoursList.add(new TargetHours(advertId, targetHours));
+                android.util.Log.i("SelectScreens", "📈 Progress: " + loadedCount[0] + "/" + totalCount + " ads loaded");
+                updateDownloadProgress(loadedCount[0], totalCount);
+                checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
+            } else {
+                android.util.Log.e("SelectScreens", "❌ Failed to download ad " + advertId);
                 loadedCount[0]++;
                 updateDownloadProgress(loadedCount[0], totalCount);
-                // ✅ Check if ALL ads processed and launch if done
                 checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
             }
         });
@@ -757,6 +679,35 @@ public class SelectScreens extends AppCompatActivity {
             }
         });
         return screenOptions;
+    }
+
+    public static String downloadFileWithAuth(Context context, String fileUrl, String fileName, String token) {
+        OkHttpClient client = new OkHttpClient();
+        Request.Builder builder = new Request.Builder().url(fileUrl);
+        if (token != null) {
+            builder.addHeader("Authorization", "Bearer " + token);
+        }
+        try (okhttp3.Response response = client.newCall(builder.build()).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                InputStream inputStream = response.body().byteStream();
+                File file = new File(context.getFilesDir(), fileName);
+                FileOutputStream outputStream = new FileOutputStream(file);
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.close();
+                inputStream.close();
+                android.util.Log.d("SelectScreens", "  ✅ Downloaded " + file.length() + " bytes");
+                return file.getAbsolutePath();
+            } else {
+                android.util.Log.e("SelectScreens", "  ❌ HTTP " + response.code() + " downloading " + fileUrl);
+            }
+        } catch (IOException e) {
+            android.util.Log.e("SelectScreens", "  ❌ Download error: " + e.getMessage());
+        }
+        return null;
     }
 
     public static String downloadFileToInternalStorage(Context context, String fileUrl, String fileName) {

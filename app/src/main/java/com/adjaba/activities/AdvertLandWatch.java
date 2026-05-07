@@ -408,75 +408,46 @@ public class AdvertLandWatch extends AppCompatActivity {
 
     private void getUrl(String contractId, String currency, int maxBid, int serverOrder, String targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, Runnable onComplete) {
         if (path == null || path.isEmpty()) {
+            if (onComplete != null) new Handler(Looper.getMainLooper()).post(onComplete);
             return;
         }
-        retrofitBuilder.apiCalls().getUrl("Bearer " + AuthManager.getToken(this), path).enqueue(new Callback<VideoImageModel>() {
-            @Override
-            public void onResponse(Call<VideoImageModel> call, Response<VideoImageModel> response) {
-                try {
+        // /media/{path} streams the file directly — download with auth header
+        String downloadUrl = com.adjaba.utilities.Config.BASE_URL + "/media/" + path;
+        String token = AuthManager.getToken(this);
+        String extension;
+        try {
+            int dot = path.lastIndexOf('.');
+            extension = dot >= 0 ? path.substring(dot + 1) : "mp4";
+        } catch (Exception e) {
+            extension = "mp4";
+        }
+        String fileName = UUID.randomUUID().toString() + "." + extension;
 
-                    if (response.isSuccessful() && response.body() != null) {
-                        String resolvedUrl = response.body().url;
-
-                        // ✅ 1. استخراج اسم الملف
-                        // ✅ استخراج الامتداد بدون query params
-                        String extension;
-                        try {
-                            int start = resolvedUrl.lastIndexOf('.') + 1;
-                            int end = resolvedUrl.contains("?") ? resolvedUrl.indexOf("?") : resolvedUrl.length();
-                            extension = resolvedUrl.substring(start, end);
-                        } catch (Exception e) {
-                            extension = "mp4"; // fallback
-                        }
-
-                        String fileName = UUID.randomUUID().toString() + "." + extension;
-                        List<MediaModel> newMediaM = new ArrayList<>();
-                        // ✅ 2. تحميل الملف وحفظه في Room
-                        Executors.newSingleThreadExecutor().execute(() -> {
-                            String localPath = downloadFileToInternalStorage(context, resolvedUrl, fileName);
-                            if (localPath != null) {
-                                if (Objects.equals(path, "") || isImage(path)) {
-                                    mediaFormat = "Image";
-                                } else if (isVideo(path)) {
-                                    mediaFormat = "Video";
-                                }
-                                // يمكنك تعديل القيم حسب ما هو متوفر
-                                AdEntity ad = new AdEntity(
-                                        advertId, // أو advertId لو عندك
-                                        mediaFormat.toUpperCase(), // format
-                                        localPath,
-                                        txtTop, // textTop
-                                        info, // textBottom
-                                        txtLeft, // textLeft
-                                        txtRight, // textRight
-                                        duration * 1000,
-                                        "Landscape", // orientation مؤقت
-                                        screenId,  // مؤقت
-                                        contractId, targetHours, serverOrder, currency, maxBid
-                                );
-
-                                AdDatabase db = AdDatabase.getInstance(context);
-                                db.adDao().insertAd(ad);
-
-                            }
-                            if (onComplete != null) {
-                                new Handler(Looper.getMainLooper()).post(onComplete); // نادِ الكولباك لكل إعلان فوراً بعد انتهاء تحميله
-                            }
-                        });
-                    } else {
-                    }
-
-
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(e);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            String localPath = downloadFileToInternalStorage(context, downloadUrl, fileName, token);
+            if (localPath != null) {
+                if (isImage(path)) {
+                    mediaFormat = "IMAGE";
+                } else if (isVideo(path)) {
+                    mediaFormat = "VIDEO";
+                } else {
+                    mediaFormat = "IMAGE";
                 }
+                AdEntity ad = new AdEntity(
+                        advertId,
+                        mediaFormat,
+                        localPath,
+                        txtTop, info, txtLeft, txtRight,
+                        duration * 1000,
+                        "Landscape",
+                        screenId,
+                        contractId, targetHours, serverOrder, currency, maxBid
+                );
+                AdDatabase db = AdDatabase.getInstance(context);
+                db.adDao().insertAd(ad);
             }
-
-            @Override
-            public void onFailure(Call<VideoImageModel> call, Throwable t) {
-                if (onComplete != null) {
-                    new Handler(Looper.getMainLooper()).post(onComplete);
-                }
+            if (onComplete != null) {
+                new Handler(Looper.getMainLooper()).post(onComplete);
             }
         });
     }
@@ -952,6 +923,26 @@ public class AdvertLandWatch extends AppCompatActivity {
         } else {
             playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         }
+    }
+
+    public static String downloadFileToInternalStorage(Context context, String fileUrl, String fileName, String token) {
+        OkHttpClient client = new OkHttpClient();
+        Request.Builder builder = new Request.Builder().url(fileUrl);
+        if (token != null) builder.addHeader("Authorization", "Bearer " + token);
+        try (okhttp3.Response response = client.newCall(builder.build()).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                InputStream inputStream = response.body().byteStream();
+                File file = new File(context.getFilesDir(), fileName);
+                FileOutputStream outputStream = new FileOutputStream(file);
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, bytesRead);
+                outputStream.close();
+                inputStream.close();
+                return file.getAbsolutePath();
+            }
+        } catch (IOException e) { e.printStackTrace(); }
+        return null;
     }
 
     public static String downloadFileToInternalStorage(Context context, String fileUrl, String fileName) {
