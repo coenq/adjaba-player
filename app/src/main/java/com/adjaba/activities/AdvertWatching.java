@@ -703,7 +703,7 @@ public class AdvertWatching extends AppCompatActivity {
                     QRCodeMaker(media.getInfo());
                     displayText.setText(media.getDisplayText());
                     qrImage.setVisibility(View.VISIBLE);
-                    logoImage.setVisibility(View.GONE); // Temporarily hide for testing
+                    logoImage.setVisibility(View.VISIBLE);
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
@@ -718,7 +718,7 @@ public class AdvertWatching extends AppCompatActivity {
                     waitingLogo.setVisibility(View.GONE);
                     displayText.setText(media.getDisplayText());
                     adPlayerView.setVisibility(View.INVISIBLE);
-                    logoImage.setVisibility(View.GONE); // Temporarily hide for testing
+                    logoImage.setVisibility(View.VISIBLE);
                     QRCodeMaker(media.getInfo());
                     qrImage.setVisibility(View.VISIBLE);
                     if (DataHolder.getInstance().displayFlag == 1) {

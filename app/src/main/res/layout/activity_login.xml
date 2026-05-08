@@ -78,6 +78,7 @@
                     android:background="@drawable/bg_tv_input"
                     android:fontFamily="sans-serif-light"
                     android:hint="Email address"
+                    android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:nextFocusDown="@+id/edt_password"
                     android:paddingStart="18dp"
