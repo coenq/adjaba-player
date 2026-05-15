@@ -1,0 +1,495 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainConstLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Waiting / splash logo -->
+    <ImageView
+        android:id="@+id/waitingLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rotation="-90"
+        android:src="@mipmap/app_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Ad image view -->
+    <ImageView
+        android:id="@+id/adImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:rotation="180"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Ad video player -->
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/adPlayerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:rotation="180"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/adImageView"
+        app:layout_constraintEnd_toEndOf="@id/adImageView"
+        app:layout_constraintStart_toStartOf="@id/adImageView"
+        app:layout_constraintTop_toTopOf="@id/adImageView"
+        app:resize_mode="fill"
+        app:surface_type="texture_view"
+        app:use_controller="false" />
+
+    <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+         WEATHER SLIDE ÔÇö landscape (device mounted portrait, content rotated -90-¦)
+         Two equal halves side-by-side, each rotated -90-¦ so content reads upright
+         Left half: clock  |  Right half: icon + temp + metrics
+         ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
+    <LinearLayout
+        android:id="@+id/weatherLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_weather_slide"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- LEFT HALF ÔÇö location + giant clock (rotated -90-¦) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:rotation="-90">
+
+            <!-- Location row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="@dimen/weather_metric_icon_size"
+                    android:layout_height="@dimen/weather_metric_icon_size"
+                    android:src="@drawable/baseline_location_pin_24"
+                    />
+
+                <TextView
+                    android:id="@+id/weatherLoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="London"
+                    android:textColor="#6EA8D4"
+                    android:textSize="@dimen/text_location"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Giant clock -->
+            <TextView
+                android:id="@+id/timeNow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:05"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_time"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:includeFontPadding="false" />
+
+            <!-- Condition -->
+            <TextView
+                android:id="@+id/currentStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sunny"
+                android:textColor="#7BA3CC"
+                android:textSize="@dimen/text_condition" />
+        </LinearLayout>
+
+        <!-- RIGHT HALF ÔÇö icon + temp + metrics (rotated -90-¦) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:rotation="-90">
+
+            <!-- Icon + temperature row -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/currentWeatherImg"
+                    android:layout_width="@dimen/weather_icon_size"
+                    android:layout_height="@dimen/weather_icon_size"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/weatherTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="24-¦C"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_temp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false" />
+            </LinearLayout>
+
+            <!-- Thin divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#33FFFFFF" />
+
+            <!-- Metrics row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- Wind -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/weather_metric_icon_size"
+                        android:layout_height="@dimen/weather_metric_icon_size"
+                        android:src="@drawable/storm"
+                        android:tint="#90A4AE" />
+
+                    <TextView
+                        android:id="@+id/windW"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="32"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_metrics"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="km/h"
+                        android:textColor="#546E7A"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="@dimen/metric_divider_height"
+                    android:background="#33FFFFFF" />
+
+                <!-- Humidity -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/weather_metric_icon_size"
+                        android:layout_height="@dimen/weather_metric_icon_size"
+                        android:src="@drawable/humidity"
+                        android:tint="#90A4AE" />
+
+                    <TextView
+                        android:id="@+id/hamudity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="60"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_metrics"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="%"
+                        android:textColor="#546E7A"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="@dimen/metric_divider_height"
+                    android:background="#33FFFFFF" />
+
+                <!-- Rain -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="@dimen/weather_metric_icon_size"
+                        android:layout_height="@dimen/weather_metric_icon_size"
+                        android:src="@drawable/rainy"
+                        android:tint="#90A4AE" />
+
+                    <TextView
+                        android:id="@+id/rain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="5"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_metrics"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="mm"
+                        android:textColor="#546E7A"
+                        android:textSize="@dimen/text_label" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+         NEWS SLIDE ÔÇö landscape
+         Left half: image with headline  |  Right half: description
+         Both halves rotated -90-¦ for mounted portrait device
+         ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
+    <LinearLayout
+        android:id="@+id/newsLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#0D1117"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Shimmer (spans full width, GONE when content is ready) -->
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:visibility="gone">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#1A202C" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <!-- LEFT HALF ÔÇö "NEWS" badge + image + headline (rotated -90-¦) -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <!-- Inner content rotated -90-¦ -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:rotation="-90">
+
+                <!-- Full-bleed image -->
+                <ImageView
+                    android:id="@+id/news_img"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/background_port"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- Dark gradient at bottom of image -->
+                <View
+                    android:id="@+id/header_background"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/gradient_news_overlay"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_default="percent"
+                    app:layout_constraintHeight_percent="0.50"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0" />
+
+                <!-- "NEWS" pill badge ÔÇö top-left of image -->
+                <TextView
+                    android:id="@+id/newsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_news_badge"
+                    android:letterSpacing="0.12"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="NEWS"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_news_label"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+
+        <!-- RIGHT HALF ÔÇö headline + description (rotated -90-¦) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/newsFrame"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#13182B">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="@dimen/news_text_padding"
+                android:rotation="-90">
+
+                <!-- Headline -->
+                <TextView
+                    android:id="@+id/main_headerF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:lineSpacingMultiplier="1.15"
+                    android:maxLines="3"
+                    android:paddingBottom="12dp"
+                    android:text="Breaking news headline"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_news_headline"
+                    android:textStyle="bold" />
+
+                <!-- Thin separator -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="#33FFFFFF" />
+
+                <!-- Description -->
+                <TextView
+                    android:id="@+id/news_detailsF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:lineSpacingMultiplier="1.3"
+                    android:maxLines="5"
+                    android:text="News description goes here"
+                    android:textColor="#D0D8E8"
+                    android:textSize="@dimen/text_news_desc" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <!-- QR code (top-right corner, visible over ad slides) -->
+    <ImageView
+        android:id="@+id/qrCodeImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="QR Code"
+        android:scaleType="fitCenter"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95" />
+
+    <!-- Brand logo (bottom-right) -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:rotation="-90"
+        android:src="@drawable/final_logo"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Scrolling display text overlay -->
+    <TextView
+        android:id="@+id/displayText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:maxLines="3"
+        android:rotation="-90"
+        android:text="Advert is Here"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:translationX="-10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/loadBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Updating..."
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loadBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

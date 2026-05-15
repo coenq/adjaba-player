@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tvBg">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minHeight="600dp"
+            android:orientation="vertical"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="48dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:fontFamily="sans-serif-light"
+                android:letterSpacing="0.12"
+                android:text="SIGN IN WITH TV CODE"
+                android:textAllCaps="true"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/qr_code_image"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_marginBottom="12dp"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_qr_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_user_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.25"
+                android:textColor="@color/tvTextPrimary"
+                android:textSize="52sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="Scan the QR or visit adjaba.in/tv\nand enter this code"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                android:fontFamily="monospace"
+                android:textColor="@color/tvTextHint"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_back_to_login"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_tv_button_secondary"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.08"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="Back to Normal Login"
+                android:textColor="@color/tvTextPrimary"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

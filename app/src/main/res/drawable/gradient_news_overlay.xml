@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dark cinematic gradient at bottom of hero image for text readability -->
     <gradient
         android:angle="270"
         android:startColor="#00000000"
-        android:centerColor="#CC000000"
-        android:endColor="#F5000000"
+        android:centerColor="#66000000"
+        android:endColor="#FF000000"
         android:type="linear" />
 </shape>

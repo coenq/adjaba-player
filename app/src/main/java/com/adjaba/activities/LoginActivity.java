@@ -17,8 +17,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKey;
 
 import com.adjaba.Interface.ApiCalls;
 import com.adjaba.R;
@@ -28,8 +26,6 @@ import com.adjaba.room.AdDatabase;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.RetrofitBuilder;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -41,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     RetrofitBuilder retrofitBuilder;
     EditText etEmail, etPassword;
     Button btnLogin;
+    Button btnTvCode;
     ProgressBar progressBar;
     CheckBox checkBox;
     String token = "null";
@@ -53,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.edt_password);
         etEmail = findViewById(R.id.edt_email);
         btnLogin = findViewById(R.id.btn_login);
+        btnTvCode = findViewById(R.id.btn_tv_code);
         progressBar = findViewById(R.id.progressBarLogin);
         checkBox = findViewById(R.id.rememberMeCheckBox);
         progressBar.getIndeterminateDrawable().setColorFilter(
@@ -97,11 +95,13 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 btnLogin.setVisibility(View.GONE);
                 attemptLogin(editor);
             }
         });
+
+        btnTvCode.setOnClickListener(v ->
+                startActivity(new Intent(this, TvLoginActivity.class)));
 
     }
 
@@ -119,35 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     progressBar.setVisibility(View.GONE);
                     LoginResponse data = response.body();
-                    MasterKey masterKey = null;
-                    try {
-                        masterKey = new MasterKey.Builder(getApplicationContext())
-                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                                .build();
-                    } catch (GeneralSecurityException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    SharedPreferences securePrefs = null;
-                    try {
-                        securePrefs = EncryptedSharedPreferences.create(
-                                getApplicationContext(),
-                                "auth",
-                                masterKey,
-                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                        );
-                    } catch (GeneralSecurityException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    securePrefs.edit()
-                            .putString("token", data.loginToken)
-                            .apply();
+                    AuthManager.saveToken(getApplicationContext(), data.loginToken);
                     intentToPreview();
 
                 } else {

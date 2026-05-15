@@ -6,6 +6,8 @@ import com.adjaba.models.newmodels.LoginRequest;
 import com.adjaba.models.newmodels.LoginResponse;
 import com.adjaba.models.newmodels.GetAdvertsResponse;
 import com.adjaba.models.newmodels.Root;
+import com.adjaba.models.newmodels.TvPollAuthResponse;
+import com.adjaba.models.newmodels.TvStartAuthResponse;
 import com.adjaba.models.newmodels.VideoImageModel;
 import com.adjaba.models.newmodels.WatchingModel;
 import com.adjaba.models.newmodels.WeatherModel;
@@ -28,6 +30,12 @@ public interface ApiCalls {
     //sayed new login
     @POST("v2/authenticate_user")
     Call<LoginResponse> login(@Body LoginRequest request);
+
+    @POST("tv/start-auth")
+    Call<TvStartAuthResponse> tvStartAuth();
+
+    @GET("tv/poll-auth/{deviceCode}")
+    Call<TvPollAuthResponse> tvPollAuth(@Path("deviceCode") String deviceCode);
 
     @GET("get_screen_by_user")
     Call<List<Root>> getScreenResponse(@Header("Authorization") String authHeader);

@@ -89,6 +89,7 @@ public class SelectScreens extends AppCompatActivity {
 
     private final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
     List<String> screenOptions = new ArrayList<>();
+    List<String> screenIdForDisplay = new ArrayList<>();
     ArrayAdapter<String> spinnerAdapter;
     Button play, logOut;
     String mediaFormat = "";
@@ -112,6 +113,7 @@ public class SelectScreens extends AppCompatActivity {
         loadingBar = findViewById(R.id.loadingBar);
         logOut = findViewById(R.id.logOut);
         screenOptions = new ArrayList<>();
+        screenIdForDisplay = new ArrayList<>();
         screenOptions1 = new ArrayList<>();
         retrofitBuilder = new RetrofitBuilder();
         adList = new ArrayList<>();
@@ -124,9 +126,10 @@ public class SelectScreens extends AppCompatActivity {
         screenLocationMap = new HashMap<>();
         screenTags = new HashMap<>();
         screenOptions.add("Select Screen"); // العنصر الأول الثابت
+        screenIdForDisplay.add("Select Screen");
         //screenOptions1.add("Select Screen");
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, screenOptions);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
         logo = findViewById(R.id.loadingLogo);
         String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait"};
@@ -135,7 +138,7 @@ public class SelectScreens extends AppCompatActivity {
                 android.R.layout.simple_spinner_item,
                 orientationOptions
         );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         int spinner1Pos = prefs.getInt("spinner1_position", 0);
         int spinner2Pos = prefs.getInt("spinner2_position", 0);
         rememberMe.setChecked(true);
@@ -188,6 +191,14 @@ public class SelectScreens extends AppCompatActivity {
         });
         spinner1.setAdapter(adapter);
 
+        ArrayAdapter<String> intervalAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                getResources().getStringArray(R.array.interval_arrays)
+        );
+        intervalAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner2.setAdapter(intervalAdapter);
+
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -215,7 +226,7 @@ public class SelectScreens extends AppCompatActivity {
                             .putInt("spinner2_position", position)
                             .apply();
                 }
-                screen_id = screenOptions.get(position);
+                screen_id = screenIdForDisplay.get(position);
 
 
             }
@@ -653,7 +664,11 @@ public class SelectScreens extends AppCompatActivity {
                         screenTags.put(response.body().get(screen).screenId, response.body().get(screen).screenTags);
                         screenLocation.put(response.body().get(screen).screenId, response.body().get(screen).location);
 
-                        screenOptions.add(response.body().get(screen).getScreenId());
+                        String rawId = response.body().get(screen).getScreenId();
+                        String rawName = response.body().get(screen).screenName;
+                        String label = (rawName != null && !rawName.isEmpty()) ? rawName + " — " + rawId : rawId;
+                        screenOptions.add(label);
+                        screenIdForDisplay.add(rawId);
                     }
                     spinnerAdapter.notifyDataSetChanged();
 

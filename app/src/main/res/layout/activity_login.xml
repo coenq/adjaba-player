@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/tvBg">
+    android:background="#000000">
 
     <ScrollView
         android:layout_width="0dp"
@@ -27,11 +27,11 @@
             android:paddingBottom="48dp">
 
             <ImageView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_marginBottom="8dp"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_marginBottom="4dp"
                 android:scaleType="fitCenter"
-                android:src="@mipmap/logo1" />
+                android:src="@drawable/adjaba_logo_white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -124,9 +124,23 @@
                     android:background="@drawable/bg_tv_button"
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.08"
+                    android:nextFocusDown="@+id/btn_tv_code"
                     android:nextFocusUp="@+id/rememberMeCheckBox"
                     android:text="SIGN IN"
                     android:textAllCaps="true"
+                    android:textColor="@color/tvTextPrimary"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btn_tv_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_tv_button_secondary"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:nextFocusUp="@+id/btn_login"
+                    android:text="Sign in with TV Code"
                     android:textColor="@color/tvTextPrimary"
                     android:textSize="15sp" />
 

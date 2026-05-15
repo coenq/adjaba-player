@@ -13,13 +13,16 @@
     android:layout_height="match_parent"
     android:background="@color/tvBg">
 
-    <!-- Waiting logo (rotated to match physical portrait orientation) -->
+    <!-- Waiting / splash logo — full-screen black backdrop, -90° keeps logo upright on portrait-mounted TV -->
     <ImageView
         android:id="@+id/waitingLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000000"
+        android:padding="80dp"
         android:rotation="-90"
-        android:src="@mipmap/app_icon"
+        android:scaleType="fitCenter"
+        android:src="@drawable/adjaba_logo_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +69,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/bg_weather_slide"
+        android:clipChildren="false"
         android:orientation="horizontal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -73,11 +77,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- LEFT HALF → top panel: location + giant clock -->
+        <!-- LEFT HALF → top panel on portrait TV: location + giant clock -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clipChildren="false"
             android:gravity="center"
             android:orientation="vertical"
             android:rotation="-90">
@@ -101,6 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
                     android:maxLines="1"
                     android:text="London"
                     android:textColor="@color/tvTextSecondary"
@@ -111,26 +117,53 @@
                 android:id="@+id/timeNow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:letterSpacing="-0.02"
+                android:letterSpacing="0.01"
                 android:text="15:05"
                 android:textColor="@color/tvTextPrimary"
-                android:textSize="@dimen/text_time"
-                android:textStyle="bold" />
+                android:textSize="@dimen/text_time" />
+
+            <TextView
+                android:id="@+id/dateNow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:letterSpacing="0.18"
+                android:text="Thu, 15 May"
+                android:textAllCaps="true"
+                android:textColor="@color/tvTextSecondary"
+                android:textSize="@dimen/text_date" />
         </LinearLayout>
 
-        <!-- RIGHT HALF → bottom panel: icon + temp + condition + metrics -->
+        <!-- 4dp Netflix Red anchor line — appears as horizontal separator between top/bottom panels on portrait TV -->
+        <View
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@color/tvAccent"
+            android:elevation="8dp" />
+
+        <!-- RIGHT HALF → bottom panel on portrait TV: icon + temp + condition + metrics -->
+        <!--
+            The outer LinearLayout is rotated -90° so its vertical axis maps to the
+            horizontal axis visible to the viewer on the physical portrait TV.
+            The metrics container must be orientation="vertical" here so that after
+            the outer -90° rotation the three metrics appear SIDE-BY-SIDE (left→right)
+            on the physical portrait TV rather than stacked in a column.
+        -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/tvSurface"
+            android:clipChildren="false"
             android:gravity="center"
             android:orientation="vertical"
             android:rotation="-90">
 
-            <!-- Icon + temperature stacked -->
             <ImageView
                 android:id="@+id/currentWeatherImg"
                 android:layout_width="@dimen/weather_icon_size"
@@ -141,25 +174,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
                 android:includeFontPadding="false"
-                android:letterSpacing="-0.03"
+                android:letterSpacing="-0.02"
                 android:text="24°C"
                 android:textColor="@color/tvTextPrimary"
-                android:textSize="@dimen/text_temp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/text_temp" />
 
             <TextView
                 android:id="@+id/currentStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:letterSpacing="0.10"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.20"
                 android:text="PARTLY CLOUDY"
                 android:textAllCaps="true"
                 android:textColor="@color/tvTextSecondary"
                 android:textSize="@dimen/text_condition" />
 
-            <!-- Thin divider -->
+            <!-- Horizontal divider (appears vertical after outer -90° rotation) -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -169,98 +204,111 @@
                 android:layout_marginEnd="24dp"
                 android:background="@color/tvBorder" />
 
-            <!-- Metrics row: Wind | Humidity | Feels Like -->
+            <!--
+                Metrics: orientation="vertical" so that after the outer -90° rotation
+                the three items appear side-by-side horizontally on the physical portrait TV.
+            -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
+                <!-- Wind -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
 
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.75"
-                        android:src="@drawable/wind"
+                        android:alpha="0.80"
+                        android:src="@drawable/ic_wind"
                         android:tint="@color/tvTextSecondary" />
 
                     <TextView
                         android:id="@+id/windW"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="sans-serif-medium"
                         android:text="32"
                         android:textColor="@color/tvTextPrimary"
-                        android:textSize="@dimen/text_metrics"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/text_metrics" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="sans-serif-light"
                         android:text="km/h"
                         android:textColor="@color/tvTextSecondary"
                         android:textSize="@dimen/text_label" />
                 </LinearLayout>
 
                 <View
-                    android:layout_width="1dp"
-                    android:layout_height="@dimen/metric_divider_height"
+                    android:layout_width="@dimen/metric_divider_height"
+                    android:layout_height="1dp"
                     android:background="@color/tvBorder" />
 
+                <!-- Humidity -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
 
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.75"
-                        android:src="@drawable/humidity"
+                        android:alpha="0.80"
+                        android:src="@drawable/ic_humidity"
                         android:tint="@color/tvTextSecondary" />
 
                     <TextView
                         android:id="@+id/hamudity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="sans-serif-medium"
                         android:text="60%"
                         android:textColor="@color/tvTextPrimary"
-                        android:textSize="@dimen/text_metrics"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/text_metrics" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="sans-serif-light"
                         android:text="humidity"
                         android:textColor="@color/tvTextSecondary"
                         android:textSize="@dimen/text_label" />
                 </LinearLayout>
 
                 <View
-                    android:layout_width="1dp"
-                    android:layout_height="@dimen/metric_divider_height"
+                    android:layout_width="@dimen/metric_divider_height"
+                    android:layout_height="1dp"
                     android:background="@color/tvBorder" />
 
+                <!-- Feels Like -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
 
                     <ImageView
                         android:layout_width="@dimen/weather_metric_icon_size"
                         android:layout_height="@dimen/weather_metric_icon_size"
-                        android:alpha="0.75"
+                        android:alpha="0.80"
                         android:src="@drawable/ic_thermostat"
                         android:tint="@color/tvTextSecondary" />
 
@@ -268,15 +316,17 @@
                         android:id="@+id/rain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="sans-serif-medium"
                         android:text="22°"
                         android:textColor="@color/tvTextPrimary"
-                        android:textSize="@dimen/text_metrics"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/text_metrics" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="sans-serif-light"
                         android:text="feels like"
                         android:textColor="@color/tvTextSecondary"
                         android:textSize="@dimen/text_label" />
@@ -297,6 +347,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/tvBg"
+        android:clipChildren="false"
         android:orientation="horizontal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -317,15 +368,17 @@
                 android:background="@color/tvCard" />
         </com.facebook.shimmer.ShimmerFrameLayout>
 
-        <!-- LEFT HALF → top panel: full-bleed image + badge -->
+        <!-- LEFT HALF → top panel on portrait TV: full-bleed image + badge -->
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:clipChildren="false">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
                 android:rotation="-90">
 
                 <ImageView
@@ -375,17 +428,19 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
 
-        <!-- RIGHT HALF → bottom panel: headline + description -->
+        <!-- RIGHT HALF → bottom panel on portrait TV: headline + description -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/newsFrame"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/tvSurface">
+            android:background="@color/tvSurface"
+            android:clipChildren="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:padding="@dimen/news_text_padding"
@@ -468,7 +523,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Brand logo -->
+    <!-- Brand logo — bottom corner, -90° keeps it upright on portrait-mounted TV -->
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="100dp"

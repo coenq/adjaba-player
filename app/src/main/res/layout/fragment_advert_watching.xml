@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/tvBg">
 
-    <!-- Waiting / splash logo -->
+    <!-- Waiting / splash logo — full-screen black backdrop, logo centred -->
     <ImageView
         android:id="@+id/waitingLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/app_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000000"
+        android:padding="80dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/adjaba_logo_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +46,7 @@
         app:use_controller="false" />
 
     <!-- ═══════════════════════════════════════════════
-         WEATHER SLIDE — portrait
+         WEATHER SLIDE — portrait: clock top, weather bottom, metrics strip
          ═══════════════════════════════════════════════ -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/weatherLayout"
@@ -64,25 +67,68 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.82" />
 
-        <!-- Location row: pin + city -->
-        <ImageView
-            android:id="@+id/loc_pin_icon"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/baseline_location_pin_24"
-            android:tint="@color/tvAccent"
+        <!-- Clock / weather split at 47% -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/mid_split"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.47" />
+
+        <!-- Header panel bottom at ~9% of screen height -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/header_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.09" />
+
+        <!-- Solid black header panel — drawn first so pin/text render above it -->
+        <View
+            android:id="@+id/location_panel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#000000"
+            android:elevation="8dp"
+            app:layout_constraintBottom_toTopOf="@id/location_bar_line"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 4dp Netflix Red anchor line -->
+        <View
+            android:id="@+id/location_bar_line"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/tvAccent"
+            android:elevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/header_bottom" />
+
+        <!-- Location row: pin + city — vertically centred in header panel -->
+        <ImageView
+            android:id="@+id/loc_pin_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="24dp"
+            android:src="@drawable/baseline_location_pin_24"
+            android:tint="@color/tvAccent"
+            android:elevation="8dp"
+            app:layout_constraintBottom_toTopOf="@id/location_bar_line"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
 
         <TextView
             android:id="@+id/weatherLoc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="24dp"
             android:ellipsize="end"
+            android:elevation="8dp"
+            android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:text="London"
             android:textColor="@color/tvTextSecondary"
@@ -92,44 +138,77 @@
             app:layout_constraintStart_toEndOf="@id/loc_pin_icon"
             app:layout_constraintTop_toTopOf="@id/loc_pin_icon" />
 
-        <!-- Content chain: clock → icon → temp → condition -->
+        <!-- TOP HALF: clock + date, packed and vertically centred between header and mid_split -->
         <TextView
             android:id="@+id/timeNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
             android:includeFontPadding="false"
-            android:letterSpacing="-0.02"
+            android:letterSpacing="0.01"
             android:text="15:05"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_time"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/currentWeatherImg"
+            app:layout_constraintBottom_toTopOf="@id/dateNow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/loc_pin_icon"
-            app:layout_constraintVertical_bias="0.4"
+            app:layout_constraintTop_toBottomOf="@id/location_bar_line"
+            app:layout_constraintVertical_bias="0.5"
             app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/dateNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:letterSpacing="0.18"
+            android:text="Thu, 15 May"
+            android:textAllCaps="true"
+            android:textColor="@color/tvTextSecondary"
+            android:textSize="@dimen/text_date"
+            app:layout_constraintBottom_toTopOf="@id/mid_split"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/timeNow" />
+
+        <!-- BOTTOM HALF: red glow + weather icon + temp + condition -->
+        <!-- Glow rendered first so icon draws on top of it -->
+        <View
+            android:id="@+id/icon_glow"
+            android:layout_width="@dimen/weather_icon_glow_size"
+            android:layout_height="@dimen/weather_icon_glow_size"
+            android:alpha="0.55"
+            android:background="@drawable/bg_icon_glow"
+            app:layout_constraintBottom_toBottomOf="@id/currentWeatherImg"
+            app:layout_constraintEnd_toEndOf="@id/currentWeatherImg"
+            app:layout_constraintStart_toStartOf="@id/currentWeatherImg"
+            app:layout_constraintTop_toTopOf="@id/currentWeatherImg" />
 
         <ImageView
             android:id="@+id/currentWeatherImg"
             android:layout_width="@dimen/weather_icon_size"
             android:layout_height="@dimen/weather_icon_size"
-            android:layout_marginTop="4dp"
             app:layout_constraintBottom_toTopOf="@id/weatherTemp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timeNow" />
+            app:layout_constraintTop_toBottomOf="@id/mid_split"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/weatherTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
             android:includeFontPadding="false"
-            android:letterSpacing="-0.03"
+            android:letterSpacing="-0.02"
             android:text="24°C"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_temp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/currentStatus"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -140,7 +219,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:letterSpacing="0.10"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.20"
             android:text="PARTLY CLOUDY"
             android:textAllCaps="true"
             android:textColor="@color/tvTextSecondary"
@@ -183,8 +263,8 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.75"
-                    android:src="@drawable/wind"
+                    android:alpha="0.80"
+                    android:src="@drawable/ic_wind"
                     android:tint="@color/tvTextSecondary" />
 
                 <TextView
@@ -192,15 +272,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="32"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_metrics" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-light"
                     android:letterSpacing="0.08"
                     android:text="km/h"
                     android:textColor="@color/tvTextSecondary"
@@ -222,8 +303,8 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.75"
-                    android:src="@drawable/humidity"
+                    android:alpha="0.80"
+                    android:src="@drawable/ic_humidity"
                     android:tint="@color/tvTextSecondary" />
 
                 <TextView
@@ -231,15 +312,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="60%"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_metrics" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-light"
                     android:letterSpacing="0.08"
                     android:text="humidity"
                     android:textColor="@color/tvTextSecondary"
@@ -261,7 +343,7 @@
                 <ImageView
                     android:layout_width="@dimen/weather_metric_icon_size"
                     android:layout_height="@dimen/weather_metric_icon_size"
-                    android:alpha="0.75"
+                    android:alpha="0.80"
                     android:src="@drawable/ic_thermostat"
                     android:tint="@color/tvTextSecondary" />
 
@@ -270,15 +352,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="22°"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_metrics" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-light"
                     android:letterSpacing="0.08"
                     android:text="feels like"
                     android:textColor="@color/tvTextSecondary"
@@ -289,13 +372,18 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ═══════════════════════════════════════════════
-         NEWS SLIDE — portrait: image top 62%, text bottom 38%
+         NEWS SLIDE (REFACTORED) — Modern cinematic vertical stack:
+         TOP:    Hero image 45-50% + dark gradient overlay + Ken Burns zoom
+         MIDDLE: Large bold headline (white, centered, 2-3 lines)
+         BOTTOM: Description text (light gray, 3-5 lines)
+         Background: Pure black (#000000)
+         Accent: Netflix red (#E50914)
          ═══════════════════════════════════════════════ -->
     <FrameLayout
         android:id="@+id/newsLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/tvBg"
+        android:background="#000000"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -311,123 +399,145 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/tvCard" />
+                android:background="#1a1a1a" />
         </com.facebook.shimmer.ShimmerFrameLayout>
 
-        <!-- News content -->
+        <!-- News content: vertical stack layout -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/newsFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="#000000">
 
-            <!-- Split: image = top 62%, text = bottom 38% -->
+            <!-- HERO IMAGE SECTION (45% of screen height) -->
+            <!-- Hero image guideline: top section ends at 45% -->
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/news_split"
+                android:id="@+id/hero_section_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.62" />
+                app:layout_constraintGuide_percent="0.45" />
 
-            <!-- Full-bleed news image -->
+            <!-- Full-bleed hero image with edge-to-edge coverage -->
             <ImageView
                 android:id="@+id/news_img"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:scaleType="centerCrop"
+                android:contentDescription="News hero image"
                 android:src="@mipmap/background_port"
-                app:layout_constraintBottom_toTopOf="@id/news_split"
+                app:layout_constraintBottom_toTopOf="@id/hero_section_end"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Dark gradient at bottom of image for headline legibility -->
+            <!-- Dark cinematic gradient overlay at bottom of hero image for text readability -->
             <View
                 android:id="@+id/header_background"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@drawable/gradient_news_overlay"
-                app:layout_constraintBottom_toTopOf="@id/news_split"
+                android:elevation="2dp"
+                app:layout_constraintBottom_toTopOf="@id/hero_section_end"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="percent"
-                app:layout_constraintHeight_percent="0.55"
+                app:layout_constraintHeight_percent="0.35"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/news_img"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1.0" />
 
-            <!-- "NEWS" pill badge — top-left -->
+            <!-- NEWS label badge — top-left corner of hero image -->
             <TextView
                 android:id="@+id/newsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/news_text_padding"
-                android:layout_marginTop="@dimen/news_header_padding"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/bg_news_badge"
                 android:letterSpacing="0.15"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:text="NEWS"
-                android:textColor="@color/tvTextPrimary"
+                android:textColor="#FFFFFF"
                 android:textSize="@dimen/text_news_label"
                 android:textStyle="bold"
+                android:elevation="4dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Headline over gradient -->
+            <!-- HEADLINE SECTION (10-15% of screen) — below hero image -->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/headline_section_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.60" />
+
+            <!-- Headline: Large, bold, white, centered, 2-3 lines max -->
+            <!-- Safe area padding: ~4vh horizontal = ~40dp on typical portrait -->
             <TextView
                 android:id="@+id/main_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="20dp"
                 android:ellipsize="end"
-                android:gravity="start"
-                android:lineSpacingMultiplier="1.1"
-                android:maxLines="2"
-                android:paddingStart="@dimen/news_text_padding"
-                android:paddingEnd="@dimen/news_text_padding"
-                android:paddingBottom="14dp"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
+                android:maxLines="3"
                 android:text="Breaking news headline"
-                android:textColor="@color/tvTextPrimary"
-                android:textSize="@dimen/text_news_headline"
+                android:textColor="#FFFFFF"
+                android:textSize="42sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/news_split"
+                app:layout_constraintBottom_toTopOf="@id/headline_section_end"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/hero_section_end" />
 
-            <!-- Description panel -->
+            <!-- DESCRIPTION SECTION (remaining space ~25-30%) -->
+            <!-- Container for description with proper spacing -->
             <LinearLayout
                 android:id="@+id/desc_panel"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/tvSurface"
-                android:gravity="center_vertical"
+                android:background="#000000"
+                android:gravity="top|center_horizontal"
                 android:orientation="vertical"
-                android:paddingStart="@dimen/news_text_padding"
-                android:paddingEnd="@dimen/news_text_padding"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/news_split">
+                app:layout_constraintTop_toTopOf="@id/headline_section_end">
 
+                <!-- Subtle Netflix red accent line above description -->
                 <View
-                    android:layout_width="32dp"
-                    android:layout_height="3dp"
-                    android:layout_marginBottom="12dp"
+                    android:layout_width="48dp"
+                    android:layout_height="4dp"
+                    android:layout_marginBottom="20dp"
                     android:background="@color/tvAccent" />
 
+                <!-- Summary/Description text: light gray, 3-5 lines, excellent readability -->
                 <TextView
                     android:id="@+id/news_details"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:gravity="start"
-                    android:lineSpacingMultiplier="1.4"
-                    android:maxLines="4"
-                    android:text="News description text"
-                    android:textColor="@color/tvTextSecondary"
-                    android:textSize="@dimen/text_news_desc" />
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.5"
+                    android:maxLines="5"
+                    android:text="News summary and description text goes here"
+                    android:textColor="#B3B3B3"
+                    android:textSize="18sp" />
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

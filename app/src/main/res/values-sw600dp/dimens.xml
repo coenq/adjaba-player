@@ -4,6 +4,7 @@
 
     <!-- ── Weather text ── -->
     <dimen name="text_time">96sp</dimen>
+    <dimen name="text_date">30sp</dimen>
     <dimen name="text_temp">96sp</dimen>
     <dimen name="text_location">22sp</dimen>
     <dimen name="text_condition">20sp</dimen>
@@ -22,5 +23,6 @@
 
     <!-- ── Icons ── -->
     <dimen name="weather_icon_size">110dp</dimen>
+    <dimen name="weather_icon_glow_size">180dp</dimen>
     <dimen name="weather_metric_icon_size">36dp</dimen>
 </resources>

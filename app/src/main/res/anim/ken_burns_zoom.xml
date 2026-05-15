@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ken Burns zoom effect: slow, subtle zoom in over time for cinematic feel -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true"
+    android:shareInterpolator="false">
+
+    <!-- Slow zoom in (1.0 to 1.15 scale) over 8 seconds for premium cinematic effect -->
+    <scale
+        android:fromXScale="1.0"
+        android:toXScale="1.15"
+        android:fromYScale="1.0"
+        android:toYScale="1.15"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:duration="8000"
+        android:interpolator="@android:interpolator/accelerate_decelerate" />
+
+</set>
+

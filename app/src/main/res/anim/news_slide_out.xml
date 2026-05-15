@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Smooth slide out fade animation for transitioning between news items -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true"
+    android:shareInterpolator="false">
+
+    <!-- Slide down and fade out -->
+    <translate
+        android:fromYDelta="0dp"
+        android:toYDelta="30dp"
+        android:duration="400"
+        android:interpolator="@android:interpolator/accelerate_cubic" />
+
+    <alpha
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+        android:duration="400"
+        android:interpolator="@android:interpolator/accelerate_cubic" />
+
+</set>
+

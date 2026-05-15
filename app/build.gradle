@@ -5,12 +5,22 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
 
 def WEATHER_API_KEY = ""
+def KEYSTORE_FILE   = ""
+def KEYSTORE_PASS   = ""
+def KEY_ALIAS       = ""
+def KEY_PASS        = ""
+
 Properties properties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     properties.load(new FileInputStream(localPropertiesFile))
     WEATHER_API_KEY = properties.getProperty("WEATHER_API_KEY", "")
+    KEYSTORE_FILE   = properties.getProperty("KEYSTORE_FILE", "")
+    KEYSTORE_PASS   = properties.getProperty("KEYSTORE_PASS", "")
+    KEY_ALIAS       = properties.getProperty("KEY_ALIAS", "")
+    KEY_PASS        = properties.getProperty("KEY_PASS", "")
 }
+
 android {
     namespace 'com.adjaba'
 
@@ -19,18 +29,37 @@ android {
         applicationId "com.adjaba"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.3"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
         buildConfigField "String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\""
     }
+
+    signingConfigs {
+        release {
+            storeFile     KEYSTORE_FILE ? file(KEYSTORE_FILE) : null
+            storePassword KEYSTORE_PASS
+            keyAlias      KEY_ALIAS
+            keyPassword   KEY_PASS
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == "release") {
+                outputFileName = "ADPLAYER-v${variant.versionName}-release.apk"
+            }
         }
     }
     // Temporary fix until alpha10

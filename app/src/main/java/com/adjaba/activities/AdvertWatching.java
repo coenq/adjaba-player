@@ -2,6 +2,10 @@ package com.adjaba.activities;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.text.SpannableString;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -134,7 +138,8 @@ public class AdvertWatching extends AppCompatActivity {
     private RetrofitBuilder retrofitBuilder = new RetrofitBuilder();
     private ImageView adImageView, noAdsLogo;
     private ImageView weatherImg;
-    TextView tvTemp, tvLoc, tvStatus, timeNow, wind, rain, humadity, progressText;
+    private ObjectAnimator breatheAnimator;
+    TextView tvTemp, tvLoc, tvStatus, timeNow, dateNow, wind, rain, humadity, progressText;
     private Runnable mediaSwitcher;
     private PlayerView adPlayerView;
     ConstraintLayout constLayout;
@@ -187,6 +192,7 @@ public class AdvertWatching extends AppCompatActivity {
         newsTitle = findViewById(R.id.newsTitle);
         newsImg = findViewById(R.id.news_img);
         timeNow = findViewById(R.id.timeNow);
+        dateNow = findViewById(R.id.dateNow);
         shimmer = findViewById(R.id.shimmer);
         waitingLogo = findViewById(R.id.waitingLogo);
         tvTemp = findViewById(R.id.weatherTemp);
@@ -203,15 +209,6 @@ public class AdvertWatching extends AppCompatActivity {
         }
         displayText = findViewById(R.id.displayText);
         debugOverlay = findViewById(R.id.debugOverlay);
-        android.util.Log.e("AdvertWatching", "🐛 DEBUG: debugOverlay = " + (debugOverlay == null ? "NULL" : "FOUND"));
-        if (debugOverlay != null) {
-            debugOverlay.setVisibility(View.VISIBLE); // Show debug info
-            debugOverlay.setBackgroundColor(0xCC000000); // Semi-transparent black
-            debugOverlay.setTextColor(0xFF00FF00); // Bright green
-            android.util.Log.e("AdvertWatching", "🐛 DEBUG: debugOverlay visibility set to VISIBLE");
-        } else {
-            android.util.Log.e("AdvertWatching", "🐛 WARNING: debugOverlay view not found in layout!");
-        }
         context = this;
         advertHoursMap = new HashMap<>();
         rain = findViewById(R.id.rain);
@@ -293,6 +290,7 @@ public class AdvertWatching extends AppCompatActivity {
             newTime = 100;
         }
         startLiveClock(timeNow);
+        startBreatheAnimation();
         List<MediaModel> mediaModels = new ArrayList<>();
         screenLoc = location;
         if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape") || orient.equals("forced portrait")) {
@@ -300,13 +298,11 @@ public class AdvertWatching extends AppCompatActivity {
             android.util.Log.i("AdvertWatching", "   isDataLoaded: " + isDataLoaded);
             android.util.Log.i("AdvertWatching", "   DataHolder.allAds: " + (DataHolder.getInstance().allAds == null ? "NULL" : DataHolder.getInstance().allAds.size() + " ads"));
 
-            newsHandler = new NewsHandler(newsIndex);
+            newsHandler = new NewsHandler(0);
             newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
-                if (i != 1) {
-                    newsIndex = 1;
-                }
-                getNews = rss;
-                getBackupNews=rss;
+                getNews = new ArrayList<>(rss);
+                getBackupNews = new ArrayList<>(rss);
+                newsIndex = 0;
                 android.util.Log.d("AdvertWatching", "   📰 News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
                 updateDebugText("News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
                 return Unit.INSTANCE;
@@ -371,13 +367,12 @@ public class AdvertWatching extends AppCompatActivity {
             @Override
             public void run() {
                 if (!isFinishing() && !isDestroyed()) {
+                    Utils.INSTANCE.getNewsList().clear(); // force fresh network fetch
                     newsHandler = new NewsHandler(0);
                     newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                        getNews = new ArrayList<>(rss);
+                        getBackupNews = new ArrayList<>(rss);
                         newsIndex = 0;
-                        getNews = rss;
-                        getBackupNews = rss;
-                        Utils.INSTANCE.getNewsList().clear();
-                        Utils.INSTANCE.getNewsList().addAll(rss);
                         return Unit.INSTANCE;
                     }, bar -> Unit.INSTANCE);
                 }
@@ -622,17 +617,35 @@ public class AdvertWatching extends AppCompatActivity {
         timeRunnable = new Runnable() {
             @Override
             public void run() {
-                String currentTime = new SimpleDateFormat("hh:mm a", Locale.getDefault())
-                        .format(new Date());
-                timeTextView.setText(currentTime);
-
-                // إعادة التحديث كل ثانية
+                Date now = new Date();
+                String currentTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(now);
+                SpannableString spannable = new SpannableString(currentTime);
+                int colon = currentTime.indexOf(':');
+                if (colon >= 0) {
+                    spannable.setSpan(
+                        new ForegroundColorSpan(0xFFE50914),
+                        colon, colon + 1,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                timeTextView.setText(spannable);
+                if (dateNow != null) {
+                    dateNow.setText(new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault()));
+                }
                 timeHandler.postDelayed(this, 1000);
             }
         };
-
-        // بدء الساعة
         timeHandler.post(timeRunnable);
+    }
+
+    private void startBreatheAnimation() {
+        View pinIcon = findViewById(R.id.loc_pin_icon);
+        if (pinIcon == null) return;
+        breatheAnimator = ObjectAnimator.ofFloat(pinIcon, "alpha", 1.0f, 0.35f);
+        breatheAnimator.setDuration(2000);
+        breatheAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        breatheAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        breatheAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        breatheAnimator.start();
     }
 
     private void stopLiveClock() {
@@ -676,11 +689,12 @@ public class AdvertWatching extends AppCompatActivity {
                 else if (weatherLayout.getVisibility() == View.VISIBLE) currentVisible = weatherLayout;
                 else if (newsLayout.getVisibility() == View.VISIBLE) currentVisible = newsLayout;
 
-                adImageView.setVisibility(View.GONE);
-                adPlayerView.setVisibility(View.GONE);
-                weatherLayout.setVisibility(View.GONE);
-                newsLayout.setVisibility(View.GONE);
                 releaseExoPlayer();
+                adPlayerView.setVisibility(View.GONE);
+                if (currentVisible == adPlayerView) currentVisible = null;
+                if (currentVisible != adImageView)   adImageView.setVisibility(View.GONE);
+                if (currentVisible != weatherLayout) weatherLayout.setVisibility(View.GONE);
+                if (currentVisible != newsLayout)    newsLayout.setVisibility(View.GONE);
 
                 MediaModel media = mediaList.get(currentIndex);
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
@@ -747,21 +761,18 @@ public class AdvertWatching extends AppCompatActivity {
                     qrImage.setVisibility(View.GONE);
                     displayText.setVisibility(View.GONE);
 
-                    // Refresh news list when exhausted
-                    if (getNews.size() > 0 && newsIndex >= getNews.size()) {
-                        Utils.INSTANCE.getNewsList().clear();
-                        getNews.clear();
+                    if (newsIndex >= getNews.size()) {
                         newsIndex = 0;
                     }
-                    if (Utils.INSTANCE.getNewsList().size() == 0) {
+                    if (getNews.isEmpty()) {
                         shimmer.startShimmer();
                         shimmer.setVisibility(View.VISIBLE);
-                        newsHandler = new NewsHandler(newsIndex);
+                        newsHandler = new NewsHandler(0);
                         try {
                             newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
-                                if (i != 1) newsIndex = 0;
-                                getNews = rss;
-                                getBackupNews = rss;
+                                getNews = new ArrayList<>(rss);
+                                getBackupNews = new ArrayList<>(rss);
+                                newsIndex = 0;
                                 shimmer.stopShimmer();
                                 shimmer.setVisibility(View.GONE);
                                 return Unit.INSTANCE;
@@ -771,13 +782,13 @@ public class AdvertWatching extends AppCompatActivity {
                                 return Unit.INSTANCE;
                             });
                         } catch (Exception e) {
-                            getNews = getBackupNews;
+                            getNews = new ArrayList<>(getBackupNews);
                             shimmer.stopShimmer();
                             shimmer.setVisibility(View.GONE);
                         }
                     }
 
-                    if (Utils.INSTANCE.getNewsList().size() > 0 && newsIndex < getNews.size()) {
+                    if (!getNews.isEmpty() && newsIndex < getNews.size()) {
                         if (getNews.get(newsIndex).getThumbnailUrl().endsWith(".gif")) {
                             Glide.with(context).asGif()
                                     .load(getNews.get(newsIndex).getThumbnailUrl())
@@ -795,6 +806,38 @@ public class AdvertWatching extends AppCompatActivity {
                     newsHeader.setVisibility(View.VISIBLE);
                     newsDesc.setVisibility(View.VISIBLE);
                     newsImg.setVisibility(View.VISIBLE);
+                    
+                    // 🎬 Apply Ken Burns zoom animation to hero image
+                    if (newsImg != null) {
+                        newsImg.clearAnimation(); // Clear any previous animation
+                        Animation kenBurnsZoom = AnimationUtils.loadAnimation(context, R.anim.ken_burns_zoom);
+                        if (kenBurnsZoom != null) {
+                            newsImg.startAnimation(kenBurnsZoom);
+                        }
+                    }
+                    
+                    // ✨ Apply fade-up animation to headline
+                    if (newsHeader != null) {
+                        newsHeader.clearAnimation();
+                        newsHeader.setAlpha(0f);
+                        Animation headlineFadeUp = AnimationUtils.loadAnimation(context, R.anim.headline_fade_up);
+                        if (headlineFadeUp != null) {
+                            headlineFadeUp.setAnimationListener(new Animation.AnimationListener() {
+                                @Override
+                                public void onAnimationStart(Animation animation) {}
+                                @Override
+                                public void onAnimationEnd(Animation animation) {
+                                    newsHeader.setAlpha(1f);
+                                }
+                                @Override
+                                public void onAnimationRepeat(Animation animation) {}
+                            });
+                            newsHeader.startAnimation(headlineFadeUp);
+                        } else {
+                            newsHeader.setAlpha(1f);
+                        }
+                    }
+                    
                     slideTransition(newsLayout, currentVisible);
                     handler.postDelayed(this, durationMs);
                 }
@@ -827,7 +870,8 @@ public class AdvertWatching extends AppCompatActivity {
             NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
             return capabilities != null &&
                     (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR));
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
         }
         return false;
     }
@@ -941,13 +985,12 @@ public class AdvertWatching extends AppCompatActivity {
     public void saveAndSendImpression(MediaModel media, long durationMs, Context context) {
         ImpressionEntity impression = new ImpressionEntity();
 
-        // توليد impressionId: screenId + advertId + رقم عشوائي 3 خانات
-        impression.impressionId = DataHolder.getInstance().screenID + media.getAdvertId() + String.format("%03d", new Random().nextInt(1000));
+        impression.impressionId = UUID.randomUUID().toString();
 
         impression.advertId = media.getAdvertId();
         impression.amountSettled = false;
         impression.contractId = media.getContractId(); // ممكن تغيرها لو عندك بيانات ديناميكية
-        impression.currency = "USD";      // ممكن تغيرها لو عندك بيانات من JSON
+        impression.currency = media.getCurrency();
         impression.dayHour = Integer.parseInt(getCurrentHourFormatted());
         impression.playSec = (int) (durationMs / 1000);
         impression.format = media.getType();
@@ -1192,5 +1235,6 @@ public class AdvertWatching extends AppCompatActivity {
         if (weatherRefreshRunnable != null) weatherRefreshHandler.removeCallbacks(weatherRefreshRunnable);
         if (newsRefreshRunnable != null) newsRefreshHandler.removeCallbacks(newsRefreshRunnable);
         stopLiveClock();
+        if (breatheAnimator != null) breatheAnimator.cancel();
     }
 }

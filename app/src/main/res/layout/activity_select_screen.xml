@@ -7,12 +7,15 @@
     android:layout_height="match_parent"
     android:background="@color/tvBg">
 
-    <!-- Waiting overlay -->
+    <!-- Waiting / splash logo — full-screen black backdrop, logo centred -->
     <ImageView
         android:id="@+id/waitingLogo"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:src="@mipmap/app_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000000"
+        android:padding="96dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/adjaba_logo_white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +138,7 @@
                     android:layout_marginBottom="8dp"
                     android:fontFamily="sans-serif-light"
                     android:letterSpacing="0.06"
-                    android:text="SCREEN ID"
+                    android:text="SCREEN"
                     android:textAllCaps="true"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="11sp" />
