@@ -2,7 +2,7 @@
     <!--    <string name="server_client_id">152027521814-c1ac5rg42adce573a9m6v65i5d221uin.apps.googleusercontent.com</string>-->
     <!--    <string name="server_client_id">152027521814-m26p98qupp12npipne19ccb8dt9qjldt.apps.googleusercontent.com</string>-->
     <string name="server_client_id">152027521814-c1ac5rg42adce573a9m6v65i5d221uin.apps.googleusercontent.com</string>
-    <string name="app_name">Adjaba</string>
+    <string name="app_name">Adjaba Player</string>
     <string name="sign_in_to_start">LOGIN TO START</string>
     <string name="booking">Age and Gender Estimation</string>
     <string name="login">Play</string>
