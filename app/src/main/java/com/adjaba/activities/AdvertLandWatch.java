@@ -29,6 +29,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -569,10 +572,40 @@ public class AdvertLandWatch extends AppCompatActivity {
             public void run() {
                 Date now = new Date();
                 String currentTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(now);
-                timeTextView.setText(currentTime);
-                if (dateNow != null) {
-                    dateNow.setText(new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault()));
+
+                // ✨ Premium styling: Netflix red colon
+                SpannableString spannable = new SpannableString(currentTime);
+                int colon = currentTime.indexOf(':');
+                if (colon >= 0) {
+                    spannable.setSpan(
+                        new ForegroundColorSpan(0xFFE50914),
+                        colon, colon + 1,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
+
+                // 🎬 Apply smooth time digit fade animation
+                if (timeTextView != null) {
+                    Animation timeFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
+                    if (timeFadeAnim != null) {
+                        timeTextView.clearAnimation();
+                        timeTextView.startAnimation(timeFadeAnim);
+                    }
+                }
+
+                timeTextView.setText(spannable);
+
+                if (dateNow != null) {
+                    String dateText = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault());
+
+                    // 🎬 Apply smooth date update animation
+                    Animation dateFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
+                    if (dateFadeAnim != null) {
+                        dateNow.clearAnimation();
+                        dateNow.startAnimation(dateFadeAnim);
+                    }
+                    dateNow.setText(dateText);
+                }
+
                 timeHandler.postDelayed(this, 1000);
             }
         };

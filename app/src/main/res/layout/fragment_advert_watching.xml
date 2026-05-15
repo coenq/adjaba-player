@@ -124,11 +124,12 @@
             android:id="@+id/weatherLoc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginEnd="24dp"
             android:ellipsize="end"
             android:elevation="8dp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.08"
             android:maxLines="1"
             android:text="London"
             android:textColor="@color/tvTextSecondary"
@@ -139,6 +140,7 @@
             app:layout_constraintTop_toTopOf="@id/loc_pin_icon" />
 
         <!-- TOP HALF: clock + date, packed and vertically centred between header and mid_split -->
+        <!-- ✨ ENHANCED: Premium clock typography with subtle animations -->
         <TextView
             android:id="@+id/timeNow"
             android:layout_width="wrap_content"
@@ -146,10 +148,11 @@
             android:fontFamily="sans-serif-black"
             android:gravity="center"
             android:includeFontPadding="false"
-            android:letterSpacing="0.01"
+            android:letterSpacing="0.05"
             android:text="15:05"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_time"
+            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/dateNow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -157,14 +160,15 @@
             app:layout_constraintVertical_bias="0.5"
             app:layout_constraintVertical_chainStyle="packed" />
 
+        <!-- Enhanced date styling: elegant secondary typography -->
         <TextView
             android:id="@+id/dateNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif-light"
             android:gravity="center"
-            android:letterSpacing="0.18"
+            android:letterSpacing="0.12"
             android:text="Thu, 15 May"
             android:textAllCaps="true"
             android:textColor="@color/tvTextSecondary"
@@ -198,6 +202,7 @@
             app:layout_constraintVertical_bias="0.3"
             app:layout_constraintVertical_chainStyle="packed" />
 
+        <!-- ✨ ENHANCED: Premium temperature display -->
         <TextView
             android:id="@+id/weatherTemp"
             android:layout_width="wrap_content"
@@ -205,22 +210,24 @@
             android:fontFamily="sans-serif-black"
             android:gravity="center"
             android:includeFontPadding="false"
-            android:letterSpacing="-0.02"
+            android:letterSpacing="-0.01"
             android:text="24°C"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_temp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/currentStatus"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/currentWeatherImg" />
 
+        <!-- ✨ ENHANCED: Elegant weather condition text -->
         <TextView
             android:id="@+id/currentStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.20"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.08"
             android:text="PARTLY CLOUDY"
             android:textAllCaps="true"
             android:textColor="@color/tvTextSecondary"
@@ -271,18 +278,19 @@
                     android:id="@+id/windW"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-black"
                     android:text="32"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics" />
+                    android:textSize="@dimen/text_metrics"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:fontFamily="sans-serif-light"
-                    android:letterSpacing="0.08"
+                    android:letterSpacing="0.05"
                     android:text="km/h"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_label" />
@@ -311,18 +319,19 @@
                     android:id="@+id/hamudity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-black"
                     android:text="60%"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics" />
+                    android:textSize="@dimen/text_metrics"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:fontFamily="sans-serif-light"
-                    android:letterSpacing="0.08"
+                    android:letterSpacing="0.05"
                     android:text="humidity"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_label" />
@@ -351,18 +360,19 @@
                     android:id="@+id/rain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-black"
                     android:text="22°"
                     android:textColor="@color/tvTextPrimary"
-                    android:textSize="@dimen/text_metrics" />
+                    android:textSize="@dimen/text_metrics"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:fontFamily="sans-serif-light"
-                    android:letterSpacing="0.08"
+                    android:letterSpacing="0.05"
                     android:text="feels like"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_label" />

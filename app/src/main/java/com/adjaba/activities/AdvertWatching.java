@@ -627,10 +627,30 @@ public class AdvertWatching extends AppCompatActivity {
                         colon, colon + 1,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
-                timeTextView.setText(spannable);
-                if (dateNow != null) {
-                    dateNow.setText(new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault()));
+
+                // 🎬 Apply smooth time digit fade animation
+                if (timeTextView != null) {
+                    Animation timeFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
+                    if (timeFadeAnim != null) {
+                        timeTextView.clearAnimation();
+                        timeTextView.startAnimation(timeFadeAnim);
+                    }
                 }
+
+                timeTextView.setText(spannable);
+
+                if (dateNow != null) {
+                    String dateText = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault());
+
+                    // 🎬 Apply smooth date update animation
+                    Animation dateFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
+                    if (dateFadeAnim != null) {
+                        dateNow.clearAnimation();
+                        dateNow.startAnimation(dateFadeAnim);
+                    }
+                    dateNow.setText(dateText);
+                }
+
                 timeHandler.postDelayed(this, 1000);
             }
         };

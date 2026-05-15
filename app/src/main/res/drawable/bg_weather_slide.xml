@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Premium cinematic gradient: deep black with subtle warm undertone -->
     <gradient
         android:angle="270"
-        android:startColor="#0A0A0A"
+        android:startColor="#050505"
+        android:centerColor="#0F0F0F"
         android:endColor="#000000"
         android:type="linear" />
 </shape>
