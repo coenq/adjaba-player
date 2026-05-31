@@ -64,10 +64,8 @@ public class SecureSignageWebView extends WebView {
         settings.setAllowContentAccess(false); // Disable content provider access
         settings.setGeolocationEnabled(false); // Disable geolocation
         settings.setMediaPlaybackRequiresUserGesture(false); // Allow autoplay
-
-        /
-
-/ Mixed content (HTTP in HTTPS)
+        
+        // Mixed content (HTTP in HTTPS)
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
         // Display settings
@@ -208,4 +206,5 @@ public class SecureSignageWebView extends WebView {
         destroy();
     }
 }
+
 
