@@ -138,6 +138,19 @@
             app:layout_constraintTop_toTopOf="@id/loc_pin_icon" />
 
         <!-- LEFT: time + date — packed, centred between header line and metrics -->
+        <!-- Background underlay for professional appearance -->
+        <View
+            android:id="@+id/time_underlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_time_underlay_land"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toTopOf="@id/h_metrics"
+            app:layout_constraintEnd_toStartOf="@id/v_center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/location_bar_line"
+            app:layout_constraintVertical_bias="0.5" />
+
         <TextView
             android:id="@+id/timeNow"
             android:layout_width="0dp"
@@ -151,6 +164,7 @@
             android:text="15:05"
             android:textColor="@color/tvTextPrimary"
             android:textSize="@dimen/text_time"
+            android:elevation="3dp"
             app:layout_constraintBottom_toTopOf="@id/dateNow"
             app:layout_constraintEnd_toStartOf="@id/v_center"
             app:layout_constraintStart_toStartOf="parent"
@@ -172,6 +186,7 @@
             android:textAllCaps="true"
             android:textColor="@color/tvTextSecondary"
             android:textSize="@dimen/text_date"
+            android:elevation="3dp"
             app:layout_constraintBottom_toTopOf="@id/h_metrics"
             app:layout_constraintEnd_toStartOf="@id/v_center"
             app:layout_constraintStart_toStartOf="parent"
@@ -465,7 +480,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/news_text_padding"
                     android:layout_marginEnd="@dimen/news_text_padding"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="56dp"
                     android:ellipsize="end"
                     android:lineSpacingMultiplier="1.1"
                     android:maxLines="2"
@@ -514,6 +529,20 @@
                     android:text="News description"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_news_desc" />
+
+                <!-- News source label -->
+                <TextView
+                    android:id="@+id/newsSource"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.10"
+                    android:text="BBC News"
+                    android:textColor="@color/tvAccent"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
@@ -526,6 +555,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="QR Code"
         android:scaleType="fitCenter"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -585,5 +615,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/loadBar" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

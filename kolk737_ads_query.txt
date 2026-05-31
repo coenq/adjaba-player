@@ -1,0 +1,202 @@
+============================================ 
+ADS QUERY FOR SCREEN: kolk737 
+============================================ 
+Timestamp: 16/05/2026 23:55:37.90 
+ 
+[1] TOTAL ADS COUNT 
+ 
+/system/bin/sh: findstr: inaccessible or not found
+cat: /data/data/com.adjaba/databases/adbase: No such file or directory
+ 
+[2] CHECKING DATAHOLDER LOGS 
+ 
+05-16 23:25:31.476 13019 13019 E AdvertWatching: 🐛 23:25:31 | Rotation: 6 items (ads+weather+news)
+05-16 23:25:31.476 13019 13019 E AdvertWatching: 🔴 STARTING AD+WEATHER+NEWS ROTATION with 6 items
+05-16 23:25:31.476 13019 13019 E AdvertWatching: 🔴🔴🔴 startMediaRotation() CALLED - Total items: 6
+05-16 23:25:31.612 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:25:58.845 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:26:04.000 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:26:09.098 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:26:14.120 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:26:24.137 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:26:34.166 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:27:00.702 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:27:05.803 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:27:10.897 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:27:15.913 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:27:25.928 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:27:35.961 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:28:02.421 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:28:07.499 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:28:12.590 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:28:17.608 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:28:27.623 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:28:37.653 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:29:04.113 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:29:11.966 13019 13019 E AdvertWatching: 🔴 STARTING WEATHER+NEWS ROTATION (no ads)
+05-16 23:29:11.966 13019 13019 E AdvertWatching: 🔴🔴🔴 startMediaRotation() CALLED - Total items: 2
+05-16 23:29:12.112 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:29:22.115 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:29:32.138 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:29:42.146 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:29:52.171 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:02.179 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:12.200 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:22.215 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:32.243 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:42.251 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:52.273 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:02.280 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:12.312 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:22.329 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:32.366 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:42.389 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:52.413 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:02.421 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:12.451 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:22.457 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:32.473 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:42.485 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:52.504 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:02.511 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:12.531 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:22.536 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:32.566 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:42.580 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:52.615 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:02.632 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:12.647 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:22.656 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:32.675 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:42.686 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:52.713 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:02.717 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:12.739 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:22.756 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:32.776 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:42.794 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:52.807 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:02.811 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:12.831 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:22.839 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:32.862 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:42.875 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:52.889 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:02.905 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:12.922 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:22.925 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:32.951 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:42.960 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:52.973 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:02.982 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:12.999 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:23.018 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:33.040 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:43.044 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:53.059 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:03.064 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:13.087 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:23.109 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:33.130 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:43.140 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:53.154 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:40:03.160 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:13.177 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:40:23.184 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:33.205 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:40:43.211 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:53.232 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:03.242 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:13.265 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:23.272 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:33.303 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:43.307 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:53.324 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:42:03.340 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:42:13.380 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:42:23.398 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:42:33.415 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:42:43.433 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:42:53.451 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:43:03.456 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:43:13.470 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:43:23.484 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:43:33.501 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:43:43.517 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:43:53.534 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:44:03.554 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:44:13.572 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:44:23.576 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:44:33.590 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:44:43.593 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:44:53.605 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:45:03.623 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:45:13.634 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:45:23.642 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:45:33.656 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:45:43.672 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:45:53.689 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:46:03.694 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:46:13.720 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:46:23.745 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:46:33.758 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:46:43.764 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:46:53.779 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:47:03.784 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:47:13.808 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:47:23.811 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:47:33.821 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:47:43.826 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:47:53.844 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:48:03.859 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:48:13.880 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:48:23.884 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:48:33.906 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:48:43.913 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:48:53.938 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:49:03.948 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:49:13.966 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:49:23.994 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:49:34.013 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:50:05.236 13019 13019 E AdvertWatching: 🐛 23:50:05 | Rotation: 6 items (ads+weather+news)
+05-16 23:50:05.236 13019 13019 E AdvertWatching: 🔴 STARTING AD+WEATHER+NEWS ROTATION with 6 items
+05-16 23:50:05.236 13019 13019 E AdvertWatching: 🔴🔴🔴 startMediaRotation() CALLED - Total items: 6
+05-16 23:50:05.327 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:50:31.934 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:50:37.008 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:50:42.132 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:50:47.140 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:50:57.143 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:51:07.158 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:51:33.605 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:51:38.676 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:51:43.764 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:51:48.774 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:51:58.779 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:52:08.799 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:52:35.268 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:52:40.332 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:52:45.420 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:52:50.430 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:53:00.440 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:53:10.458 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:53:36.874 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:53:41.952 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:53:47.040 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:53:52.051 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:54:02.068 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:54:12.081 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:54:38.519 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:54:43.643 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:54:48.735 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:54:53.746 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:55:03.760 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:55:13.778 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+ 
+[3] CHECKING SELECTSCREENS LOGS 
+ 
+ 
+[4] CHECKING REFRESH LOGS 
+ 
+'head' is not recognized as an internal or external command,
+operable program or batch file.

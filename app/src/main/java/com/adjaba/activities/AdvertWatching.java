@@ -7,7 +7,10 @@ import android.text.SpannableString;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,6 +32,7 @@ import android.os.Bundle;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,6 +53,7 @@ import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -61,7 +66,6 @@ import android.view.animation.RotateAnimation;
 import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,6 +76,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 import com.adjaba.R;
 import com.adjaba.activities.viewmodel.APIImpression;
 import com.adjaba.activities.viewmodel.DataHolder;
+import com.adjaba.models.DemographicData;
 import com.adjaba.models.newmodels.Forecastday;
 import com.adjaba.models.newmodels.Hour;
 import com.adjaba.models.newmodels.MediaModel;
@@ -84,6 +89,8 @@ import com.adjaba.room.AdEntity;
 import com.adjaba.room.ImpressionEntity;
 import com.adjaba.utilities.AuthManager;
 import com.adjaba.utilities.Config;
+import com.adjaba.utilities.MqttManager;
+import com.adjaba.utilities.PlaylistSyncManager;
 import com.adjaba.utilities.RetrofitBuilder;
 import com.bumptech.glide.Glide;
 
@@ -101,6 +108,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -119,7 +127,7 @@ public class AdvertWatching extends AppCompatActivity {
     private List<WatchingModel> adList = new ArrayList<>();
     List<MediaModel> mediaList = new ArrayList<>();
     int[] loadedCount = {0};
-    ConstraintLayout weatherLayout;
+    ViewGroup weatherLayout;  // ✅ FIXED: ViewGroup accepts both LinearLayout (portrait) and ConstraintLayout (landscape)
     FrameLayout newsLayout;
     ImageView waitingLogo, newsImg;
     int weatherCurrent;
@@ -139,7 +147,7 @@ public class AdvertWatching extends AppCompatActivity {
     private ImageView adImageView, noAdsLogo;
     private ImageView weatherImg;
     private ObjectAnimator breatheAnimator;
-    TextView tvTemp, tvLoc, tvStatus, timeNow, dateNow, wind, rain, humadity, progressText;
+    TextView tvTemp, tvLoc, tvStatus, timeNow, dateNow, wind, rain, humadity, pressureView, progressText;
     private Runnable mediaSwitcher;
     private PlayerView adPlayerView;
     ConstraintLayout constLayout;
@@ -165,9 +173,11 @@ public class AdvertWatching extends AppCompatActivity {
     private final Handler newsRefreshHandler    = new Handler(Looper.getMainLooper());
     private Runnable weatherRefreshRunnable;
     private Runnable newsRefreshRunnable;
+    // ── Playlist sync observer ───────────────────────────────────────────
+    private Observer<PlaylistSyncManager.PlaylistUpdate> playlistUpdateObserver;
     // ─────────────────────────────────────────────────────────────────────────
     String mediaFormat = "";
-    TextView displayText, newsHeader, newsDesc, newsTitle;
+    TextView displayText, newsHeader, newsDesc, newsTitle, newsSource;
     TextView debugOverlay; // Debug overlay for playback status
     String orient;
     NewsHandler newsHandler;
@@ -176,14 +186,40 @@ public class AdvertWatching extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_advert_watching);
+
+        //  EXPLICIT ORIENTATION LOCK & LAYOUT SELECTION - APPROACH A
+        // Decouple layout selection from device physical orientation
+        // Layout variant ONLY depends on user's selected orientation in DataHolder
+        orient = DataHolder.getInstance().orient.toLowerCase();
+
+        if ("landscape".equalsIgnoreCase(orient)) {
+            // Landscape mode: lock to landscape, load landscape layout variant
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setContentView(R.layout.fragment_advert_watching);  // Will load layout-land/ variant
+
+        } else if ("portrait".equalsIgnoreCase(orient)) {
+            // Portrait mode: lock to portrait, load portrait layout variant
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setContentView(R.layout.fragment_advert_watching);  // Will load layout/ variant
+
+        } else if ("forced portrait".equalsIgnoreCase(orient)) {
+            // Forced portrait uses AdvertLandWatch activity, shouldn't reach here
+            // But set landscape base for consistency
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setContentView(R.layout.fragment_advert_watching);
+            finish();
+            return;
+        } else {
+            // Default fallback to portrait
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setContentView(R.layout.fragment_advert_watching);
+        }
         constLayout = findViewById(R.id.mainConstLayout);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         boolean isDataLoaded = prefs.getBoolean("data_loaded", false);
         getNews = new ArrayList<>();
         getBackupNews=new ArrayList<>();
-        orient = DataHolder.getInstance().orient.toLowerCase();
         qrImage = findViewById(R.id.qrCodeImage);
         logoImage = findViewById(R.id.logoImage);
         adImageView = findViewById(R.id.adImageView);
@@ -198,15 +234,9 @@ public class AdvertWatching extends AppCompatActivity {
         tvTemp = findViewById(R.id.weatherTemp);
         newsDesc = findViewById(R.id.news_details);
         newsLayout = findViewById(R.id.newsLayout);
-        if ("landscape".equalsIgnoreCase(orient)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            prefs.edit().remove("data_loaded").apply();
-
-        } else if ("portrait".equalsIgnoreCase(orient)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            prefs.edit().remove("data_loaded").apply();
-
-        }
+        newsSource = findViewById(R.id.newsSource);
+        // Orientation already locked at start of onCreate
+        prefs.edit().remove("data_loaded").apply();
         displayText = findViewById(R.id.displayText);
         debugOverlay = findViewById(R.id.debugOverlay);
         context = this;
@@ -214,6 +244,7 @@ public class AdvertWatching extends AppCompatActivity {
         rain = findViewById(R.id.rain);
         wind = findViewById(R.id.windW);
         humadity = findViewById(R.id.hamudity);
+        pressureView = findViewById(R.id.pressure);
         progressBar = findViewById(R.id.loadBar);
         progressText = findViewById(R.id.progressText);
         weatherCurrent = 3;
@@ -223,6 +254,10 @@ public class AdvertWatching extends AppCompatActivity {
         adPlayerView = findViewById(R.id.adPlayerView);
         screenId = DataHolder.getInstance().screenID;
         location = DataHolder.getInstance().location;
+        // Set location label immediately so it shows the correct city even before the weather API responds
+        if (tvLoc != null && location != null && !location.isEmpty()) {
+            tvLoc.setText(location);
+        }
         qrImageDimension = qrCodeImageDimension();
         logoImage.setOnClickListener(new View.OnClickListener() {
             private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 300ms
@@ -243,9 +278,10 @@ public class AdvertWatching extends AppCompatActivity {
 
         boolean isTV = getPackageManager().hasSystemFeature("android.software.leanback");
         int percent=0;
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        // Use selected orientation, NOT device physical orientation
+        if ("landscape".equalsIgnoreCase(orient)) {
             percent = 12;
-        }else{
+        } else {
             percent = isTV?12:20;
         }
         ConstraintLayout.LayoutParams params =
@@ -261,6 +297,8 @@ public class AdvertWatching extends AppCompatActivity {
         params.height = size; // مربع
 
         qr.setLayoutParams(params);
+        // Ensure QR is hidden until an ad slide explicitly shows it
+        qrImage.setVisibility(View.GONE);
 
 
         refreshTime = Integer.parseInt(DataHolder.getInstance().time);
@@ -294,7 +332,7 @@ public class AdvertWatching extends AppCompatActivity {
         List<MediaModel> mediaModels = new ArrayList<>();
         screenLoc = location;
         if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape") || orient.equals("forced portrait")) {
-            android.util.Log.i("AdvertWatching", "🎬 onCreate() - Initializing playback");
+            android.util.Log.i("AdvertWatching", " onCreate() - Initializing playback");
             android.util.Log.i("AdvertWatching", "   isDataLoaded: " + isDataLoaded);
             android.util.Log.i("AdvertWatching", "   DataHolder.allAds: " + (DataHolder.getInstance().allAds == null ? "NULL" : DataHolder.getInstance().allAds.size() + " ads"));
 
@@ -303,7 +341,7 @@ public class AdvertWatching extends AppCompatActivity {
                 getNews = new ArrayList<>(rss);
                 getBackupNews = new ArrayList<>(rss);
                 newsIndex = 0;
-                android.util.Log.d("AdvertWatching", "   📰 News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
+                android.util.Log.d("AdvertWatching", "    News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
                 updateDebugText("News loaded: " + (rss == null ? "0" : rss.size()) + " articles");
                 return Unit.INSTANCE;
             }, bar -> {
@@ -321,7 +359,7 @@ public class AdvertWatching extends AppCompatActivity {
                 List<MediaModel> infoSlides = new ArrayList<>();
                 infoSlides.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
                 infoSlides.add(new MediaModel("", "", 0, "news", "", 10000, "", "", "", "", ""));
-                android.util.Log.e("AdvertWatching", "🔴 STARTING WEATHER+NEWS ROTATION (no ads)");
+                android.util.Log.e("AdvertWatching", " STARTING WEATHER+NEWS ROTATION (no ads)");
                 startMediaRotation(infoSlides, context);
             } else {
                 android.util.Log.i("AdvertWatching", "✨ Starting playback with " + DataHolder.getInstance().allAds.size() + " ads");
@@ -330,7 +368,7 @@ public class AdvertWatching extends AppCompatActivity {
                 List<MediaModel> rotationList = insertWeatherEveryThreeAds(DataHolder.getInstance().allAds);
                 android.util.Log.i("AdvertWatching", "   Total items in rotation: " + (rotationList == null ? "0" : rotationList.size()) + " (ads + weather + news)");
                 updateDebugText("Rotation: " + (rotationList == null ? "0" : rotationList.size()) + " items (ads+weather+news)");
-                android.util.Log.e("AdvertWatching", "🔴 STARTING AD+WEATHER+NEWS ROTATION with " + (rotationList == null ? 0 : rotationList.size()) + " items");
+                android.util.Log.e("AdvertWatching", " STARTING AD+WEATHER+NEWS ROTATION with " + (rotationList == null ? 0 : rotationList.size()) + " items");
                 startMediaRotation(rotationList, context);
             }
 
@@ -338,6 +376,10 @@ public class AdvertWatching extends AppCompatActivity {
             prefs.edit().putBoolean("data_loaded", true).apply();
             startWeatherAutoRefresh();
             startNewsAutoRefresh();
+            registerPlaylistSyncReceiver();
+
+            // Initialize MQTT for demographic-based ad switching
+            initializeMqtt(prefs);
         }
     }
 
@@ -380,6 +422,382 @@ public class AdvertWatching extends AppCompatActivity {
             }
         };
         newsRefreshHandler.postDelayed(newsRefreshRunnable, NEWS_REFRESH_INTERVAL_MS);
+    }
+
+    /**
+     * Register LiveData observer to listen for playlist sync updates from AdSyncWorker.
+     * When new ads are synced, reload the playlist from local database and update rotation.
+     */
+    private void registerPlaylistSyncReceiver() {
+        playlistUpdateObserver = playlistUpdate -> {
+            if (playlistUpdate == null) return;
+
+            String updatedScreenId = playlistUpdate.screenId;
+            int adsCount = playlistUpdate.adsCount;
+
+            android.util.Log.i("AdvertWatching", "📡 Playlist sync update received - screenId: " + updatedScreenId + ", ads: " + adsCount);
+
+            // Only reload if this is the current screen
+            if (screenId != null && screenId.equals(updatedScreenId)) {
+                android.util.Log.i("AdvertWatching", "   🔄 Reloading playlist from local database...");
+                reloadPlaylistFromDatabase();
+            }
+        };
+
+        PlaylistSyncManager.getInstance().getPlaylistUpdateLiveData().observe(this, playlistUpdateObserver);
+        android.util.Log.i("AdvertWatching", "✅ Registered playlist sync observer (LiveData)");
+    }
+
+    /**
+     * Reload ad playlist from local database and rebuild rotation.
+     * Called when AdSyncWorker notifies of playlist changes.
+     */
+    private void reloadPlaylistFromDatabase() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            AdDatabase db = AdDatabase.getInstance(context);
+            List<AdEntity> adEntities = db.adDao().getAllAds(screenId);
+
+            if (adEntities == null || adEntities.isEmpty()) {
+                android.util.Log.w("AdvertWatching", "⚠️ No ads in database after sync");
+                return;
+            }
+
+            android.util.Log.i("AdvertWatching", " Loaded " + adEntities.size() + " ads from database");
+
+            // Build MediaModel list from database
+            List<MediaModel> updatedAds = new ArrayList<>();
+            for (AdEntity ad : adEntities) {
+                if (ad.localPath != null) {
+                    updatedAds.add(new MediaModel(
+                            ad.contractId, ad.currency, ad.maxBid, ad.format,
+                            ad.localPath, ad.duration, ad.textBottom, ad.textTop,
+                            "", ad.targetHours, ad.advertId
+                    ));
+                }
+            }
+
+            // Update DataHolder and rebuild rotation on main thread
+            new Handler(Looper.getMainLooper()).post(() -> {
+                DataHolder.getInstance().allAds = updatedAds;
+                android.util.Log.i("AdvertWatching", "✅ Updated DataHolder.allAds with " + updatedAds.size() + " ads");
+
+                // Rebuild rotation list
+                List<MediaModel> newRotation = insertWeatherEveryThreeAds(updatedAds);
+                android.util.Log.i("AdvertWatching", "   New rotation has " + (newRotation == null ? 0 : newRotation.size()) + " items");
+
+                // Update mediaList for playback
+                // Note: Current playback continues, new ads will appear in next cycle
+                mediaList.clear();
+                if (newRotation != null) {
+                    mediaList.addAll(newRotation);
+                }
+
+                Toast.makeText(context, "Playlist updated: " + updatedAds.size() + " ads", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    /**
+     * Initialize MQTT connection for demographic-based ad switching.
+     * Connects to broker and subscribes to store/{screenId} topic.
+     */
+    private void initializeMqtt(SharedPreferences prefs) {
+        // Check if IOT is enabled in settings
+        boolean iotEnabled = prefs.getBoolean("iot_enabled", false);
+
+        if (!iotEnabled) {
+            android.util.Log.i("AdvertWatching", " IOT (MQTT) disabled in settings");
+            return;
+        }
+
+        if (screenId == null || screenId.isEmpty()) {
+            android.util.Log.w("AdvertWatching", "⚠️ Cannot start MQTT: screenId is null");
+            return;
+        }
+
+        android.util.Log.i("AdvertWatching", " Initializing MQTT demographics for screen: " + screenId);
+
+        MqttManager.getInstance().connect(this, screenId, new MqttManager.OnDemographicDataListener() {
+            @Override
+            public void onDemographicDataReceived(DemographicData data) {
+                android.util.Log.d("AdvertWatching", " Demographic data received: " + data.toString());
+
+                // Select best ad based on demographics
+                MediaModel selectedAd = selectBestAdForDemographic(data);
+
+                if (selectedAd != null) {
+                    android.util.Log.i("AdvertWatching", "✅ Selected ad based on demographics: " + selectedAd.getAdvertId());
+                    android.util.Log.i("AdvertWatching", "   Age: " + data.getAgeRange() + ", Gender: " + data.getGender());
+                    android.util.Log.i("AdvertWatching", "   Dominant emotion: " + data.getDominantEmotion());
+
+                    // Schedule the selected ad to play next (queue it instead of interrupting current ad)
+                    scheduleNextAd(selectedAd);
+                } else {
+                    android.util.Log.d("AdvertWatching", "   No matching ad found for demographics");
+                }
+            }
+
+            @Override
+            public void onConnected() {
+                android.util.Log.i("AdvertWatching", "✅ Connected to MQTT broker - listening for demographics");
+            }
+
+            @Override
+            public void onConnectionLost(Throwable cause) {
+                android.util.Log.w("AdvertWatching", "⚠️ MQTT connection lost: " +
+                    (cause != null ? cause.getMessage() : "unknown"));
+            }
+        });
+    }
+
+    /**
+     * Select the best ad from current playlist based on demographic data.
+     * Scores each ad by matching age group, gender, and target hours.
+     *
+     * @param data Demographic data from MQTT
+     * @return Best matching MediaModel or null if no match
+     */
+    private MediaModel selectBestAdForDemographic(DemographicData data) {
+        if (DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
+            return null;
+        }
+
+        // Skip if no audience or invalid data
+        if (data.getCustomerCount() <= 0) {
+            android.util.Log.d("AdvertWatching", "⏭️ No audience detected, skipping demographic-based selection");
+            return null;
+        }
+
+        int currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
+        int highestScore = 0;
+        MediaModel bestAd = null;
+
+        // Map MQTT gender ("M"/"F") → API gender ("MALE"/"FEMALE")
+        String viewerGender = data.getGender();
+        String viewerGenderApi = "M".equalsIgnoreCase(viewerGender) ? "MALE" : "FEMALE";
+        // ageBracket from MQTT already matches API format, e.g. "32-42"
+        String viewerAgeBracket = data.getAgeBracket();
+        // IOT ad tags, e.g. ["M", "32-42", "neutral"]
+        java.util.List<String> viewerTags = data.getAdTags();
+
+        for (MediaModel ad : DataHolder.getInstance().allAds) {
+            int score = 0;
+
+            // Skip special content types
+            if ("weather".equals(ad.getType()) || "news".equals(ad.getType())) {
+                continue;
+            }
+
+            // ✅ HOUR MATCHING (+15 pts)
+            List<Integer> targetHours = parseTargetHours(ad.getTargetHours());
+            if (targetHours != null && !targetHours.isEmpty() && targetHours.contains(currentHour)) {
+                score += 15;
+                android.util.Log.d("AdvertWatching", "  ⏰ Hour match: " + currentHour);
+            }
+
+            // ✅ GENDER MATCHING: match MQTT gender against ad's targetGender list (+15 pts)
+            String adGenderStr = ad.getTargetGender();
+            if (viewerGender != null && !viewerGender.isEmpty()) {
+                if (adGenderStr != null && !adGenderStr.isEmpty()) {
+                    // Ad has explicit gender targeting — reward a real match
+                    if (adGenderStr.toUpperCase().contains(viewerGenderApi)) {
+                        score += 15;
+                        android.util.Log.d("AdvertWatching", "   Gender match: " + viewerGenderApi);
+                    }
+                } else {
+                    // Ad targets all genders — small baseline bonus
+                    score += 5;
+                    android.util.Log.d("AdvertWatching", "   Gender detected (no ad filter): " + viewerGender);
+                }
+            }
+
+            // ✅ AGE BRACKET MATCHING: match MQTT ageBracket against ad's targetAgeGroup (+15 pts)
+            String adAgeStr = ad.getTargetAgeGroup();
+            if (viewerAgeBracket != null && !viewerAgeBracket.isEmpty()) {
+                if (adAgeStr != null && !adAgeStr.isEmpty()) {
+                    if (adAgeStr.contains(viewerAgeBracket)) {
+                        score += 15;
+                        android.util.Log.d("AdvertWatching", "   Age bracket match: " + viewerAgeBracket);
+                    }
+                } else {
+                    // Rough bracket detection fallback if no stored targeting
+                    String viewerAgeRange = data.getAgeRange();
+                    if (viewerAgeRange != null) {
+                        if (viewerAgeRange.contains("20, 32")) { score += 8; }
+                        else if (viewerAgeRange.contains("32, 43")) { score += 8; }
+                        else if (viewerAgeRange.contains("43")) { score += 5; }
+                    }
+                }
+            }
+
+            // ✅ TAG MATCHING: match IOT adTarget.tags against ad's targetTags (+5 pts per match)
+            String adTagsStr = ad.getTargetTags();
+            if (viewerTags != null && !viewerTags.isEmpty() && adTagsStr != null && !adTagsStr.isEmpty()) {
+                for (String tag : viewerTags) {
+                    if (adTagsStr.toLowerCase().contains(tag.toLowerCase())) {
+                        score += 5;
+                        android.util.Log.d("AdvertWatching", "  ️ Tag match: " + tag);
+                    }
+                }
+            }
+
+            // ✅ EMOTION MATCHING: Smart emotion-based targeting
+            String adEmotionStr = ad.getTargetEmotion();
+            String dominantEmotion = data.getDominantEmotion();
+            int happyScore = data.getHappy();
+
+            if (adEmotionStr != null && !adEmotionStr.isEmpty()) {
+                // Ad HAS emotion targeting — only score if it matches viewer's emotion
+                if (adEmotionStr.toLowerCase().contains(dominantEmotion.toLowerCase())) {
+                    if ("happy".equals(dominantEmotion)) {
+                        score += 25;
+                        android.util.Log.d("AdvertWatching", "   Happy emotion MATCH: Promo/upbeat ad");
+                    } else if ("neutral".equals(dominantEmotion)) {
+                        score += 15;
+                        android.util.Log.d("AdvertWatching", "   Neutral emotion MATCH: Brand/info ad");
+                    } else if ("sad".equals(dominantEmotion) || "angry".equals(dominantEmotion)) {
+                        score += 20;
+                        android.util.Log.d("AdvertWatching", "   Negative emotion MATCH: Comfort/support ad");
+                    } else if ("surprise".equals(dominantEmotion)) {
+                        score += 18;
+                        android.util.Log.d("AdvertWatching", "   Surprise emotion MATCH");
+                    } else {
+                        score += 10;
+                        android.util.Log.d("AdvertWatching", "   Other emotion MATCH: " + dominantEmotion);
+                    }
+                } else {
+                    android.util.Log.d("AdvertWatching", "  ⏭️ Emotion filter: ad wants " + adEmotionStr + ", viewer is " + dominantEmotion);
+                }
+            } else {
+                // Ad has NO emotion filter — give baseline emotion bonus to all ads
+                if ("happy".equals(dominantEmotion)) {
+                    score += 8;
+                    android.util.Log.d("AdvertWatching", "   Happy viewer: Baseline bonus");
+                } else if ("neutral".equals(dominantEmotion)) {
+                    score += 5;
+                    android.util.Log.d("AdvertWatching", "   Neutral viewer: Baseline bonus");
+                } else {
+                    score += 3;
+                    android.util.Log.d("AdvertWatching", "   " + dominantEmotion + " viewer: Baseline bonus");
+                }
+            }
+
+            // Bonus if happiness score is very high (> 60%)
+            if (happyScore > 60 && (adEmotionStr == null || adEmotionStr.toLowerCase().contains("happy"))) {
+                score += 15;
+                android.util.Log.d("AdvertWatching", "  ⭐ Very high happiness threshold met");
+            }
+
+            // ✅ ENGAGEMENT TIME MATCHING (+8 if long dwell)
+            int avgDwellSec = data.getAvgDwellSec();
+            int adDurationSec = ad.getDurationInMillis() / 1000;
+
+            if (avgDwellSec > 15 && adDurationSec > 10) {
+                score += 8;
+                android.util.Log.d("AdvertWatching", "  ⏳ High engagement time (" + avgDwellSec + "s): Select longer ads");
+            } else if (avgDwellSec <= 5 && adDurationSec <= 5) {
+                score += 5;
+                android.util.Log.d("AdvertWatching", "  ⚡ Quick engagement: Select short ads");
+            }
+
+            // ✅ AUDIENCE SIZE BONUS (+5 pts for group of 3+)
+            int audienceCount = data.getCustomerCount();
+            if (audienceCount >= 3) {
+                score += 5;
+                android.util.Log.d("AdvertWatching", "   Multi-person audience: Select group-appeal ads");
+            }
+
+            android.util.Log.d("AdvertWatching", "   Ad " + ad.getAdvertId()
+                    + " [gender=" + adGenderStr + " age=" + adAgeStr + " tags=" + adTagsStr + " emotion=" + adEmotionStr + "] score: " + score);
+
+            if (score > highestScore) {
+                highestScore = score;
+                bestAd = ad;
+            }
+        }
+
+        if (bestAd != null) {
+            android.util.Log.i("AdvertWatching", " DEMOGRAPHIC MATCH WINNER: " + bestAd.getAdvertId() + " (score: " + highestScore + ")");
+            android.util.Log.i("AdvertWatching", "   Viewer: " + viewerGender + " " + viewerAgeBracket
+                    + " | Emotion: " + data.getDominantEmotion() + " | Audience: " + data.getCustomerCount()
+                    + " | Tags: " + viewerTags);
+        } else {
+            android.util.Log.d("AdvertWatching", "⏭️ No suitable ad found for demographics");
+        }
+
+        return bestAd;
+    }
+
+    /**
+     * Parse target hours from comma-separated string.
+     * @param targetHoursStr String like "9,10,11,14,15,16"
+     * @return List of Integer hours or empty list
+     */
+    private List<Integer> parseTargetHours(String targetHoursStr) {
+        List<Integer> hours = new ArrayList<>();
+        if (targetHoursStr == null || targetHoursStr.isEmpty()) {
+            return hours;
+        }
+        try {
+            // targetHours are stored with "/" separator (see SelectScreens.listToString)
+            String[] parts = targetHoursStr.split("/");
+            for (String part : parts) {
+                hours.add(Integer.parseInt(part.trim()));
+            }
+        } catch (NumberFormatException e) {
+            android.util.Log.w("AdvertWatching", "Failed to parse target hours: " + targetHoursStr);
+        }
+        return hours;
+    }
+
+    /**
+     * Schedule the selected ad to play next in the rotation.
+     * Inserts the ad at currentIndex+1 so it plays after the current slot finishes.
+     * Must be called on the UI thread (or posts to it).
+     *
+     * @param ad The ad to schedule
+     */
+    private void scheduleNextAd(MediaModel ad) {
+        // The MQTT callback fires on a background thread — post to UI thread
+        runOnUiThread(() -> {
+            if (mediaList == null || mediaList.isEmpty()) {
+                android.util.Log.w("AdvertWatching", " Cannot schedule ad — mediaList is empty");
+                return;
+            }
+
+            // Remove any previous occurrence to avoid duplicates
+            mediaList.remove(ad);
+
+            // Insert immediately after the currently-playing slot
+            int insertAt = Math.min(currentIndex + 1, mediaList.size());
+            mediaList.add(insertAt, ad);
+
+            android.util.Log.i("AdvertWatching", " Queued demographic ad at position "
+                    + insertAt + "/" + mediaList.size() + ": " + ad.getAdvertId());
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Disconnect MQTT
+        MqttManager.getInstance().disconnect();
+        android.util.Log.i("AdvertWatching", "✅ Disconnected from MQTT broker");
+
+        // LiveData observer automatically unregistered on lifecycle destroy
+        android.util.Log.i("AdvertWatching", "✅ Playlist sync observer auto-cleanup (LiveData)");
+
+        // Stop auto-refresh handlers
+        if (weatherRefreshHandler != null && weatherRefreshRunnable != null) {
+            weatherRefreshHandler.removeCallbacks(weatherRefreshRunnable);
+        }
+        if (newsRefreshHandler != null && newsRefreshRunnable != null) {
+            newsRefreshHandler.removeCallbacks(newsRefreshRunnable);
+        }
+        if (handler != null && refreshRunnable != null) {
+            handler.removeCallbacks(refreshRunnable);
+        }
     }
 
     void getAds(int flag) {
@@ -487,7 +905,8 @@ public class AdvertWatching extends AppCompatActivity {
                         duration * 1000,
                         "Landscape",
                         screenId,
-                        contractId, targetHours, serverOrder, currency, maxBid
+                        contractId, targetHours, serverOrder, currency, maxBid,
+                        null, null, null, null  // targetGender/AgeGroup/Tags/Emotion not available here
                 );
                 AdDatabase db = AdDatabase.getInstance(context);
                 db.adDao().insertAd(ad);
@@ -522,9 +941,13 @@ public class AdvertWatching extends AppCompatActivity {
             count++;
             boolean cycleComplete = (originalList.size() == 1) || (count == originalList.size());
             if (cycleComplete) {
-                // After each full ad cycle: weather slide then news slide
-                newList.add(new MediaModel("", "", 0, "weather", "", 10000, "", "", "", "", ""));
-                newList.add(new MediaModel("", "", 0, "news",    "", 10000, "", "", "", "", ""));
+                // After each full ad cycle: weather slide then news slide (if enabled)
+                if (DataHolder.getInstance().weatherFlag == 1) {
+                    newList.add(new MediaModel("", "", 0, "weather", "", 6000, "", "", "", "", ""));
+                }
+                if (DataHolder.getInstance().newsFlag == 1) {
+                    newList.add(new MediaModel("", "", 0, "news", "", 6000, "", "", "", "", ""));
+                }
                 count = 0;
             }
         }
@@ -573,11 +996,16 @@ public class AdvertWatching extends AppCompatActivity {
                     humadity.setText(response.body().current.humidity + "%");
                     wind.setText(Math.round(response.body().current.wind_kph) + "");
                     rain.setText(Math.round(response.body().current.feelslike_c) + "°");
+                    if (pressureView != null) pressureView.setText(Math.round(response.body().current.pressure_mb) + "");
                     tvLoc.setText(DataHolder.getInstance().location);
                     tvTemp.setText(Math.round(response.body().current.temp_c) + "°C");
                     tvStatus.setText(response.body().current.condition.text);
 
                 } else {
+                    // Response came back but body/current is null — still update location label
+                    if (tvLoc != null) {
+                        tvLoc.setText(DataHolder.getInstance().location != null ? DataHolder.getInstance().location : "");
+                    }
                 }
                 //progressBar.setVisibility(View.GONE);
             }
@@ -592,6 +1020,7 @@ public class AdvertWatching extends AppCompatActivity {
                 humadity.setText("--");
                 wind.setText("--");
                 rain.setText("--");
+                if (pressureView != null) pressureView.setText("--");
                 android.util.Log.i("AdvertWatching", "✅ Set fallback weather values");
             }
         });
@@ -618,8 +1047,22 @@ public class AdvertWatching extends AppCompatActivity {
             @Override
             public void run() {
                 Date now = new Date();
+                
+                //  Get timezone for screen location
+                String location = DataHolder.getInstance().location;
+                TimeZone tz = getTimeZoneForLocation(location);
+                
                 String currentTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(now);
                 SpannableString spannable = new SpannableString(currentTime);
+                
+                // Apply timezone if available
+                if (tz != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                    sdf.setTimeZone(tz);
+                    currentTime = sdf.format(now);
+                    spannable = new SpannableString(currentTime);
+                }
+                
                 int colon = currentTime.indexOf(':');
                 if (colon >= 0) {
                     spannable.setSpan(
@@ -628,7 +1071,7 @@ public class AdvertWatching extends AppCompatActivity {
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
 
-                // 🎬 Apply smooth time digit fade animation
+                //  Apply smooth time digit fade animation
                 if (timeTextView != null) {
                     Animation timeFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
                     if (timeFadeAnim != null) {
@@ -642,7 +1085,7 @@ public class AdvertWatching extends AppCompatActivity {
                 if (dateNow != null) {
                     String dateText = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(now).toUpperCase(Locale.getDefault());
 
-                    // 🎬 Apply smooth date update animation
+                    //  Apply smooth date update animation
                     Animation dateFadeAnim = AnimationUtils.loadAnimation(context, R.anim.time_digit_fade);
                     if (dateFadeAnim != null) {
                         dateNow.clearAnimation();
@@ -672,12 +1115,53 @@ public class AdvertWatching extends AppCompatActivity {
         timeHandler.removeCallbacks(timeRunnable);
     }
 
+    //  Helper: Get timezone based on screen location
+    private TimeZone getTimeZoneForLocation(String location) {
+        if (location == null || location.isEmpty()) {
+            return null;  // Use device default
+        }
+        
+        // Import Utils to access cityTimeZones
+        String locationLower = location.toLowerCase();
+        
+        // Check if location contains any city/country from mapping
+        java.util.Map<String, String> cityTimeZones = new java.util.HashMap<String, String>();
+        cityTimeZones.put("kolkata", "Asia/Kolkata");
+        cityTimeZones.put("mumbai", "Asia/Kolkata");
+        cityTimeZones.put("delhi", "Asia/Kolkata");
+        cityTimeZones.put("bangalore", "Asia/Kolkata");
+        cityTimeZones.put("india", "Asia/Kolkata");
+        cityTimeZones.put("london", "Europe/London");
+        cityTimeZones.put("unitedkingdom", "Europe/London");
+        cityTimeZones.put("newyork", "America/New_York");
+        cityTimeZones.put("losangeles", "America/Los_Angeles");
+        cityTimeZones.put("chicago", "America/Chicago");
+        cityTimeZones.put("toronto", "America/Toronto");
+        cityTimeZones.put("sydney", "Australia/Sydney");
+        cityTimeZones.put("tokyo", "Asia/Tokyo");
+        cityTimeZones.put("dubai", "Asia/Dubai");
+        cityTimeZones.put("singapore", "Asia/Singapore");
+        cityTimeZones.put("hongkong", "Asia/Hong_Kong");
+        cityTimeZones.put("bangkok", "Asia/Bangkok");
+        cityTimeZones.put("paris", "Europe/Paris");
+        cityTimeZones.put("berlin", "Europe/Berlin");
+        
+        for (java.util.Map.Entry<String, String> entry : cityTimeZones.entrySet()) {
+            if (locationLower.contains(entry.getKey())) {
+                android.util.Log.d("AdvertWatching", " Timezone for '" + location + "': " + entry.getValue());
+                return TimeZone.getTimeZone(entry.getValue());
+            }
+        }
+        
+        android.util.Log.d("AdvertWatching", " No timezone match for '" + location + "', using device default");
+        return null;
+    }
 
     private void startMediaRotation(List<MediaModel> mediaList, Context context) {
         this.mediaList = mediaList;
         this.currentIndex = 0;
 
-        android.util.Log.e("AdvertWatching", "🔴🔴🔴 startMediaRotation() CALLED - Total items: " + (mediaList == null ? "0" : mediaList.size()));
+        android.util.Log.e("AdvertWatching", " startMediaRotation() CALLED - Total items: " + (mediaList == null ? "0" : mediaList.size()));
 
         if (mediaSwitcher != null) {
             handler.removeCallbacks(mediaSwitcher);
@@ -686,10 +1170,10 @@ public class AdvertWatching extends AppCompatActivity {
             @Override
             public void run() {
                 if (mediaList == null || mediaList.isEmpty()) {
-                    android.util.Log.e("AdvertWatching", "🔴 Media list is empty or null");
+                    android.util.Log.e("AdvertWatching", " Media list is empty or null");
                     return;
                 }
-                android.util.Log.e("AdvertWatching", "🔴 mediaSwitcher.run() - currentIndex=" + currentIndex + ", total=" + mediaList.size());
+                android.util.Log.e("AdvertWatching", " mediaSwitcher.run() - currentIndex=" + currentIndex + ", total=" + mediaList.size());
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
 
                 // ...existing mediaSwitcher logic...
@@ -716,6 +1200,10 @@ public class AdvertWatching extends AppCompatActivity {
                 if (currentVisible != weatherLayout) weatherLayout.setVisibility(View.GONE);
                 if (currentVisible != newsLayout)    newsLayout.setVisibility(View.GONE);
 
+                // Default: hide logo/QR for every slide; only ads (IMAGE/VIDEO) will re-show them
+                logoImage.setVisibility(View.GONE);
+                qrImage.setVisibility(View.GONE);
+
                 MediaModel media = mediaList.get(currentIndex);
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
                     String type = media.getType();
@@ -728,9 +1216,11 @@ public class AdvertWatching extends AppCompatActivity {
                     }
                 }
                 long durationMs = media.getDurationInMillis();
+                // Default to 6 seconds if the ad has no display time set
+                if (durationMs <= 0) { durationMs = 6000; }
 
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
-                    android.util.Log.d("AdvertWatching", "   🖼️  Displaying IMAGE");
+                    android.util.Log.d("AdvertWatching", "   ️  Displaying IMAGE");
                     updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | IMAGE | " + (durationMs/1000) + "s");
                     waitingLogo.setVisibility(View.GONE);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
@@ -747,7 +1237,7 @@ public class AdvertWatching extends AppCompatActivity {
                     saveAndSendImpression(media, durationMs, context);
 
                 } else if (media.getType().equals("VIDEO")) {
-                    android.util.Log.d("AdvertWatching", "   🎬 Playing VIDEO");
+                    android.util.Log.d("AdvertWatching", "    Playing VIDEO");
                     updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | VIDEO | " + (durationMs/1000) + "s");
                     waitingLogo.setVisibility(View.GONE);
                     displayText.setText(media.getDisplayText());
@@ -764,7 +1254,7 @@ public class AdvertWatching extends AppCompatActivity {
                     saveAndSendImpression(media, durationMs, context);
 
                 } else if (media.getType().equals("weather")) {
-                    android.util.Log.d("AdvertWatching", "   🌤️  Showing WEATHER");
+                    android.util.Log.d("AdvertWatching", "   ️  Showing WEATHER");
                     updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | WEATHER | 10s");
                     waitingLogo.setVisibility(View.GONE);
                     logoImage.setVisibility(View.GONE);
@@ -774,7 +1264,7 @@ public class AdvertWatching extends AppCompatActivity {
                     handler.postDelayed(this, durationMs);
 
                 } else if (media.getType().equals("news")) {
-                    android.util.Log.d("AdvertWatching", "   📰 Showing NEWS");
+                    android.util.Log.d("AdvertWatching", "    Showing NEWS");
                     updateDebugText("NEWS Slide " + (newsIndex + 1) + " | 10s");
                     waitingLogo.setVisibility(View.GONE);
                     logoImage.setVisibility(View.GONE);
@@ -819,7 +1309,22 @@ public class AdvertWatching extends AppCompatActivity {
                                     .into(newsImg);
                         }
                         newsHeader.setText(getNews.get(newsIndex).getTitle());
-                        newsDesc.setText(getNews.get(newsIndex).getDescription());
+                        // Strip HTML and use fallback if description is empty
+                        String description = getNews.get(newsIndex).getDescription();
+                        if (description == null || description.trim().isEmpty()) {
+                            description = "Breaking news from " + DataHolder.getInstance().location;
+                        }
+                        newsDesc.setText(description);
+                        // Show source label if available
+                        String src = getNews.get(newsIndex).getSource();
+                        if (newsSource != null) {
+                            if (src != null && !src.isEmpty()) {
+                                newsSource.setText(src);
+                                newsSource.setVisibility(View.VISIBLE);
+                            } else {
+                                newsSource.setVisibility(View.GONE);
+                            }
+                        }
                         newsIndex++;
                     }
 
@@ -827,7 +1332,7 @@ public class AdvertWatching extends AppCompatActivity {
                     newsDesc.setVisibility(View.VISIBLE);
                     newsImg.setVisibility(View.VISIBLE);
                     
-                    // 🎬 Apply Ken Burns zoom animation to hero image
+                    //  Apply Ken Burns zoom animation to hero image
                     if (newsImg != null) {
                         newsImg.clearAnimation(); // Clear any previous animation
                         Animation kenBurnsZoom = AnimationUtils.loadAnimation(context, R.anim.ken_burns_zoom);
@@ -868,9 +1373,9 @@ public class AdvertWatching extends AppCompatActivity {
 
         ;
         handler.removeCallbacks(mediaSwitcher);
-        android.util.Log.e("AdvertWatching", "🔴 About to post mediaSwitcher to handler");
+        android.util.Log.e("AdvertWatching", " About to post mediaSwitcher to handler");
         handler.post(mediaSwitcher);
-        android.util.Log.e("AdvertWatching", "🔴 mediaSwitcher posted to handler");
+        android.util.Log.e("AdvertWatching", " mediaSwitcher posted to handler");
 
         handler.removeCallbacks(refreshRunnable);
 
@@ -1226,35 +1731,20 @@ public class AdvertWatching extends AppCompatActivity {
         String fullMsg = timestamp + " | " + message;
 
         // Always log to logcat
-        android.util.Log.e("AdvertWatching", "🐛 " + fullMsg);
+        android.util.Log.e("AdvertWatching", " " + fullMsg);
 
         // Also try to update overlay if it exists
         if (debugOverlay != null) {
             runOnUiThread(() -> {
                 try {
                     debugOverlay.setText(fullMsg);
-                    android.util.Log.e("AdvertWatching", "🐛 Overlay updated: " + fullMsg);
+                    android.util.Log.e("AdvertWatching", " Overlay updated: " + fullMsg);
                 } catch (Exception e) {
-                    android.util.Log.e("AdvertWatching", "🐛 ERROR updating overlay: " + e.getMessage());
+                    android.util.Log.e("AdvertWatching", " ERROR updating overlay: " + e.getMessage());
                 }
             });
         } else {
-            android.util.Log.e("AdvertWatching", "🐛 WARNING: debugOverlay is NULL, can't update UI");
+            android.util.Log.e("AdvertWatching", " WARNING: debugOverlay is NULL, can't update UI");
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacks(mediaSwitcher);
-        releaseExoPlayer();
-        if (executorService != null) {
-            executorService.shutdownNow();
-        }
-        handler.removeCallbacks(refreshRunnable);
-        if (weatherRefreshRunnable != null) weatherRefreshHandler.removeCallbacks(weatherRefreshRunnable);
-        if (newsRefreshRunnable != null) newsRefreshHandler.removeCallbacks(newsRefreshRunnable);
-        stopLiveClock();
-        if (breatheAnimator != null) breatheAnimator.cancel();
     }
 }

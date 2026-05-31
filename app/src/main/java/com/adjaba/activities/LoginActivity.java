@@ -120,6 +120,11 @@ public class LoginActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     LoginResponse data = response.body();
                     AuthManager.saveToken(getApplicationContext(), data.loginToken);
+                    // Save timestamp and credentials for background re-authentication
+                    AuthManager.saveTokenTimestamp(getApplicationContext());
+                    AuthManager.saveCredentials(getApplicationContext(),
+                            etEmail.getText().toString().trim(),
+                            etPassword.getText().toString().trim());
                     intentToPreview();
 
                 } else {

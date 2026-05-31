@@ -1,0 +1,550 @@
+========================================== 
+COMPLETE ADS DIAGNOSTIC FOR SCREEN: kolk737 
+========================================== 
+Timestamp: 16/05/2026 23:42:11.06 
+ 
+[1] COUNTING TOTAL ADS FOR SCREEN kolk737 
+ 
+run-as: exec failed for sqlite3: No such file or directory
+ 
+[2] LISTING ALL ADS FOR SCREEN kolk737 
+ 
+run-as: exec failed for sqlite3: No such file or directory
+ 
+[3] CHECKING MEDIA FILES DOWNLOADED 
+ 
+total 31992
+drwxrwx--x 2 u0_a398 u0_a398     4096 2026-05-16 23:25 .
+drwx------ 7 u0_a398 u0_a398     4096 2026-05-16 23:24 ..
+-rw------- 1 u0_a398 u0_a398  1226394 2026-05-16 23:25 041c9a08-13b4-425f-b4db-ef86984485f0.png
+-rw------- 1 u0_a398 u0_a398   234146 2026-05-16 23:25 0c52daef-2a88-424d-8443-aae81f957b2d.jpg
+-rw------- 1 u0_a398 u0_a398   167468 2026-05-16 23:25 ace6629e-9832-402a-a7d6-422ac59e7305.avif
+-rw------- 1 u0_a398 u0_a398  1226394 2026-05-16 23:25 d01857ce-feab-4275-9432-72d370420e70.png
+-rw------- 1 u0_a398 u0_a398 29855664 2026-05-16 23:25 d36b04a8-ca24-4670-b6d2-282db53c1356.mp4
+ 
+[4] CHECKING APP LOGS FOR DOWNLOAD ERRORS 
+ 
+05-16 14:12:47.662 31245  3695 E AndroidRuntime: Process: com.adjaba, PID: 31245
+05-16 23:07:57.981  3923  5842 W ActivityManager: Slow operation: 624ms so far, now at attachApplicationLocked: immediately before bindApplication
+05-16 23:07:57.984  3923  5842 W ActivityManager: Slow operation: 626ms so far, now at attachApplicationLocked: immediately after bindApplication
+05-16 23:08:03.698  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_RESTARTED dat=package:com.adjaba flg=0x10 (has extras) } to android/com.kddi.android.CpaNotiReceiver
+05-16 23:08:10.383  3923  3923 W Looper  : Slow delivery took 354ms main h=com.android.server.media.MediaRouterService$UserHandler c=android.app.-$$Lambda$LoadedApk$ReceiverDispatcher$Args$_BumDX2UKsnxLVrE6UJsJZkotuA@663d257 m=0
+05-16 23:08:10.722  3923  5408 W ActivityManager: Slow operation: 116ms so far, now at attachApplicationLocked: immediately before bindApplication
+05-16 23:08:10.738  3923  5408 W ActivityManager: Slow operation: 132ms so far, now at attachApplicationLocked: immediately after bindApplication
+05-16 23:08:11.921  3923  5770 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.google.android.packageinstaller/com.android.packageinstaller.PackageInstalledReceiver
+05-16 23:08:11.927  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.android.vending/com.google.android.finsky.packagemonitor.impl.PackageMonitorReceiverImpl$RegisteredReceiver
+05-16 23:08:11.929  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.android.vending/com.google.android.finsky.packagemonitor.backgroundimpl.BackgroundPackageMonitorReceiverImpl$RegisteredReceiver
+05-16 23:08:11.929  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.google.android.gms/.gass.chimera.PackageChangeBroadcastReceiver
+05-16 23:08:11.930  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.google.android.gms/.chimera.GmsIntentOperationService$PersistentTrustedReceiver
+05-16 23:08:11.931  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.samsung.android.localeoverlaymanager/.PackageAddedReceiver
+05-16 23:08:11.935  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.samsung.android.sm.devicesecurity/.PackageReceiver
+05-16 23:08:11.935  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.sec.android.app.samsungapps/.receiver.PackageAddedReceiver
+05-16 23:08:11.936  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.sec.android.app.soundalive/.SAControlPanelReceiver
+05-16 23:08:11.937  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.sec.android.widgetapp.samsungapps/.PackageChangeReceiver
+05-16 23:08:11.940  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:com.adjaba flg=0x4000010 (has extras) } to com.sec.imsservice/com.sec.internal.ims.imsservice.ImsIntentReceiver
+05-16 23:08:13.781  3923  5533 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_FIRST_LAUNCH dat=package:com.adjaba flg=0x4000010 (has extras) } to com.android.vending/com.google.android.finsky.packagemonitor.impl.PackageMonitorReceiverImpl$RegisteredReceiver
+05-16 23:08:13.786  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_FIRST_LAUNCH dat=package:com.adjaba flg=0x4000010 (has extras) } to com.android.vending/com.google.android.finsky.packagemonitor.backgroundimpl.BackgroundPackageMonitorReceiverImpl$RegisteredReceiver
+05-16 23:08:13.787  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_FIRST_LAUNCH dat=package:com.adjaba flg=0x4000010 (has extras) } to com.sec.android.app.samsungapps/.receiver.PackageFirstLaunchReceiver
+05-16 23:09:51.926  3923  7547 E WindowManager: win=Window{e2bb159 u0 com.adjaba/com.adjaba.activities.LoginActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:10:07.803  3923  5537 E WindowManager: win=Window{85ec7a u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:10:14.305  3923  3923 W Looper  : Slow dispatch took 101ms main h=com.android.server.media.AudioPlayerStateMonitor$MessageHandler c=null m=1
+05-16 23:11:18.124  3923  5531 E WindowManager: win=Window{85ec7a u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:11:37.942  3923  5870 E WindowManager: win=Window{d56cc8b u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:12:11.288  3923  5533 E WindowManager: win=Window{d56cc8b u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:12:33.887  3923  4516 E WindowManager: win=Window{60923b2 u0 com.adjaba/com.adjaba.activities.AdvertLandWatch} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:13:02.192  3923  5537 E WindowManager: win=Window{87c5eb2 u0 com.adjaba/com.adjaba.activities.LoginActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:13:20.302  3923  5533 E WindowManager: win=Window{a65064e u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:13:21.643  3923  3923 W Looper  : Slow dispatch took 105ms main h=com.android.server.media.AudioPlayerStateMonitor$MessageHandler c=null m=1
+05-16 23:23:20.333  3923  4376 E WindowManager: win=Window{a65064e u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:23:50.677  3923  3945 W ActivityManager: Unable to start service Intent { act=com.netflix.intent.action.BIND pkg=com.netflix.mediaclient } U=0: not found
+05-16 23:23:52.701 15534 15567 W .osp.app.signi: ClassLoaderContext classpath size mismatch. expected=15, found=0 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[])
+05-16 23:23:52.860 15534 15567 W .osp.app.signi: ClassLoaderContext classpath size mismatch. expected=15, found=6 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk*2500235579:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes2.dex*2154323502:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes3.dex*106522967:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes4.dex*4004324646:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes5.dex*857950:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes6.dex*2248836506]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/samsungkeystoreutils.jar*3989702617]})
+05-16 23:23:53.927 15646 15726 W ung.android.fm: ClassLoaderContext classpath size mismatch. expected=15, found=0 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[])
+05-16 23:23:53.974 15646 15726 W ung.android.fm: ClassLoaderContext classpath size mismatch. expected=15, found=1 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[/data/app/~~xus9hO7P5O9-NAURwdWrGA==/com.samsung.android.fmm-hMvrGeRHgqUXh_gOfVvcrw==/base.apk*3333804397]{PCL[/system/framework/samsungkeystoreutils.jar*3989702617]#PCL[/system/framework/org.apache.http.legacy.jar*876722329]})
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase.getInstance(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoverySettings$Static.<clinit>(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoverySettings.getSettingValue(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoverySettings.isRecoveryInProcessing(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:5)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryManager.verifyState(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:16)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryManager.recover(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:22)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryService.lambda$onStartJob$0(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:3)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryService.c(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.301 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.c.run(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:50)
+05-16 23:24:05.302 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryService.lambda$onStartJob$2(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:7)
+05-16 23:24:05.302 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryService.a(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.302 16262 16434 W System.err: Caused by: java.lang.RuntimeException: Cannot find implementation for com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase. MediaRecoveryDatabase_Impl does not exist. Is Room annotation processor correctly configured?
+05-16 23:24:05.302 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase.create(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:17)
+05-16 23:24:05.303 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase.g(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.303 16262 16434 W System.err: 	at com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase$Holder.<clinit>(r8-map-id-764c62f694ce884bff376a6f60467832ea7698205721d20dd38df22723eabed2:1)
+05-16 23:24:05.308 16262 16434 W System.err: Caused by: java.lang.ClassNotFoundException: com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase_Impl
+05-16 23:24:05.310 16262 16434 W System.err: Caused by: java.lang.ClassNotFoundException: com.samsung.android.scloud.galleryproxy.mediarecovery.MediaRecoveryDatabase_Impl
+05-16 23:24:07.901 15509 15580 W PrefCtrlListHelper: Cannot instantiate controller from reflection: com.android.settings.notification.DockAudioMediaPreferenceController
+05-16 23:24:08.586 15509 15580 W AudioSwitchPrefCtrl: 	at com.android.settings.sound.MediaOutputPreferenceController.<init>(MediaOutputPreferenceController.java:54)
+05-16 23:24:08.588 15509 15580 W PrefCtrlListHelper: download_ringtone already has a controller
+05-16 23:24:10.960 15468 15617 W IndexDataConverter: Skipping index for null-key item IndexData.Builder {title: Media,package: com.android.settings}
+05-16 23:24:12.957 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.025 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.062 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.341 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.380 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.413 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.660 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.698 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:13.730 12288 12436 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:14.085 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:14.311 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:14.475 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:14.682 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:15.149 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:15.315 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:15.563 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:15.800 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:16.746 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:16.909 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:17.122 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:17.312 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:17.475 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:17.699 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:17.937 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:18.193 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:18.424 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:18.599 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:18.785 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:18.972 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:19.195 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:19.808 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:19.959 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.085 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.234 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.406 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.515 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.632 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.740 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:20.865 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:21.361 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:21.504 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:22.044 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:22.221 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:22.371 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:22.482 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:22.603 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:23.018 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:23.192 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:23.611 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:23.765 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:23.909 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.208 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.394 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.539 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.652 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.763 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:24.910 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:25.021 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:25.131 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:25.244 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.191 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.321 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.421 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.522 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.670 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.806 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:26.916 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.045 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.155 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.266 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.451 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.503  3923  3959 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_RESTARTED dat=package:com.adjaba flg=0x10 (has extras) } to android/com.kddi.android.CpaNotiReceiver
+05-16 23:24:27.697 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.822 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:27.955 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:28.134 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:28.338 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:28.567 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:28.828 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:29.007 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:29.158 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:29.329 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:29.470 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:29.740 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:30.098 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:30.443 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:30.749 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:31.018 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:31.128 16813 16856 W Settings: Setting download_manager_max_bytes_over_mobile has moved from android.provider.Settings.Secure to android.provider.Settings.Global.
+05-16 23:24:31.178 16813 16856 W Settings: Setting download_manager_recommended_max_bytes_over_mobile has moved from android.provider.Settings.Secure to android.provider.Settings.Global.
+05-16 23:24:31.277 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:31.519 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:31.811 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:31.923 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:32.037 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:32.693 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:32.892 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:33.110 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:33.334 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:33.823 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.005 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.193 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.332 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.548 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.743 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:34.993 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:35.206 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:35.418 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:35.664 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:36.082 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:36.284 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:36.477 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:36.654 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:36.836 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.001 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.224 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.406 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.575 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.792 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:37.980 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.109 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.280 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.491 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.652 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.786 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:38.919 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.060 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.196 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.348 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.646 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.769 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:39.895 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.022 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.145 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.277 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.390 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.519 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.642 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.756 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.865 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:40.953 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:41.042 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:41.175 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:41.322 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:41.457 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.237 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.361 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.532 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.710 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.844 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:42.956 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.076 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.223 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.341 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.457 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.588 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.734 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:43.873 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.004 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.155 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.290 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.442 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.589 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.738 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.870 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:44.999 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.147 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.295 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.441 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.580 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.732 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:45.874 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:46.022 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:46.161 12288 16681 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:24:52.051 24089 24089 W AppStartUtils: sendActiveLaunchBroadcast() v.hasOnClickListeners() : true, iconInfo : AppInfo(id=348 type=APP hidden=0 container=all_apps screen=1 rank=11 user=UserHandle{0} title=Adjaba Player componentName=ComponentInfo{com.adjaba/com.adjaba.activities.LoginActivity} screenType=0)
+05-16 23:24:52.055  5154 17192 E pageboostd: alp start : app comadjaba
+05-16 23:24:52.060  5154 17192 E pageboostd: comadjaba, amt 0 scnt 0 fcnt 0
+05-16 23:24:52.067  5154 17192 E pageboostd: comadjaba, amt 942080 scnt 2 fcnt 11
+05-16 23:24:52.067  5154 17192 E pageboostd: alp end : app comadjaba data_amount 942080
+05-16 23:24:52.407  3923  4145 W SemWifiTransportLayerUtils: getApplicationCategory - IOException com.adjaba
+05-16 23:24:52.407  3923  4145 W System.err: java.io.FileNotFoundException: https://play.google.com/store/apps/details?id=com.adjaba&hl=en
+05-16 23:24:52.797 13019 13019 W com.adjaba: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (greylist, reflection, allowed)
+05-16 23:24:53.037 13019 13019 W com.adjaba: Accessing hidden method Ljava/lang/invoke/MethodHandles$Lookup;-><init>(Ljava/lang/Class;I)V (greylist, reflection, allowed)
+05-16 23:24:53.771  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:24:53.772  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:24:53.853  3641  4759 E BufferQueueProducer: [com.adjaba/com.adjaba.activities.LoginActivity$_13019#0](id:e39000009fd,api:0,p:-1,c:3641) disconnect: not connected (req=1)
+05-16 23:24:53.916  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:24:53.917  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:25:15.510  3641  3666 E BufferQueueProducer: [com.adjaba/com.adjaba.activities.LoginActivity$_13019#0](id:e39000009fd,api:0,p:-1,c:3641) disconnect: not connected (req=1)
+05-16 23:25:15.542  3923  4108 E WindowManager: win=Window{703b597 u0 com.adjaba/com.adjaba.activities.LoginActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:25:31.476 13019 13019 E AdvertWatching: 🔴🔴🔴 startMediaRotation() CALLED - Total items: 6
+05-16 23:25:31.477 13019 13019 E AdvertWatching: 🔴 About to post mediaSwitcher to handler
+05-16 23:25:31.477 13019 13019 E AdvertWatching: 🔴 mediaSwitcher posted to handler
+05-16 23:25:31.612 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:25:31.781 13019 13019 W com.adjaba: Accessing hidden method Landroid/media/AudioTrack;->getLatency()I (greylist, reflection, allowed)
+05-16 23:25:32.051  3641  3667 E BufferQueueProducer: [com.adjaba/com.adjaba.activities.SelectScreens$_13019#0](id:e3900000a0a,api:0,p:-1,c:3641) disconnect: not connected (req=1)
+05-16 23:25:32.084  3923  5502 E WindowManager: win=Window{a638d89 u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:25:34.464 17521 17542 W .osp.app.signi: ClassLoaderContext classpath size mismatch. expected=15, found=0 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[])
+05-16 23:25:34.539 17521 17542 W .osp.app.signi: ClassLoaderContext classpath size mismatch. expected=15, found=6 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk*2500235579:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes2.dex*2154323502:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes3.dex*106522967:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes4.dex*4004324646:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes5.dex*857950:/data/app/~~cJrkc5JZcRgIiXJWgaJA5w==/com.osp.app.signin-ZYLwYJi7GGe-UBND_G0KhQ==/base.apk!classes6.dex*2248836506]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/samsungkeystoreutils.jar*3989702617]})
+05-16 23:25:58.845 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:26:04.000 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:26:09.098 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:26:09.591 13019 17729 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:26:09.619 13019 17729 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:26:09.647 13019 17729 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:26:09.660 13019 13019 W Glide   : Load failed for [/data/user/0/com.adjaba/files/ace6629e-9832-402a-a7d6-422ac59e7305.avif] with dimensions [1920x1177]
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:26:09.660 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.660 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:26:09.661 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.661 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:26:09.661 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:26:14.120 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:26:24.137 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:26:34.166 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:27:00.702 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:27:05.803 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:27:10.897 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:27:11.247 13019 17720 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:27:11.272 13019 17720 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:27:11.298 13019 17720 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:27:11.307 13019 13019 W Glide   : Load failed for [/data/user/0/com.adjaba/files/ace6629e-9832-402a-a7d6-422ac59e7305.avif] with dimensions [1920x1177]
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:27:11.307 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.307 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:27:11.309 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.309 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:27:11.309 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:27:15.913 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:27:25.928 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:27:35.961 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:28:02.421 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:28:07.499 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=2, total=6
+05-16 23:28:12.590 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=3, total=6
+05-16 23:28:12.953 13019 17714 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:28:12.986 13019 17714 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:28:13.020 13019 17714 E MediaMetadataRetrieverJNI: getFrameAtTime: videoFrame is a NULL pointer
+05-16 23:28:13.031 13019 13019 W Glide   : Load failed for [/data/user/0/com.adjaba/files/ace6629e-9832-402a-a7d6-422ac59e7305.avif] with dimensions [1920x1177]
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:28:13.031 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.031 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:28:13.032 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.032 13019 13019 W Glide   : com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException(MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details)
+05-16 23:28:13.032 13019 13019 W Glide   :       Cause (1 of 1): class com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoDecoderException: MediaMetadataRetriever failed to retrieve a frame without throwing, check the adb logs for .*MetadataRetriever.* prior to this exception for details
+05-16 23:28:17.608 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=4, total=6
+05-16 23:28:27.623 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=5, total=6
+05-16 23:28:37.653 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=6
+05-16 23:28:44.160 17899 17939 W ogle.android.g: ClassLoaderContext classpath size mismatch. expected=15, found=0 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[])
+05-16 23:28:47.968 17899 17939 W ogle.android.g: ClassLoaderContext classpath size mismatch. expected=15, found=9 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk*2149009615:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes2.dex*2941483380:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes3.dex*3728490981:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes4.dex*3739607178:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes5.dex*4209208065:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes6.dex*1248966504:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes7.dex*3204156700:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes8.dex*799059741:/data/app/~~XoSHNcWZxGzLQYGfj8U1RA==/com.google.android.gm-9Una5C7WY9z-7--fb7seqg==/base.apk!classes9.dex*1592994917]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]})
+05-16 23:29:04.113 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=6
+05-16 23:29:08.664  3641  4552 E BufferQueueProducer: [com.adjaba/com.adjaba.activities.AdvertWatching$_13019#0](id:e3900000a0d,api:0,p:-1,c:3641) disconnect: not connected (req=1)
+05-16 23:29:11.966 13019 13019 E AdvertWatching: 🔴🔴🔴 startMediaRotation() CALLED - Total items: 2
+05-16 23:29:11.966 13019 13019 E AdvertWatching: 🔴 About to post mediaSwitcher to handler
+05-16 23:29:11.966 13019 13019 E AdvertWatching: 🔴 mediaSwitcher posted to handler
+05-16 23:29:12.112 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:29:12.576  3641  4759 E BufferQueueProducer: [com.adjaba/com.adjaba.activities.SelectScreens$_13019#0](id:e3900000a12,api:0,p:-1,c:3641) disconnect: not connected (req=1)
+05-16 23:29:12.590  3923  5537 E WindowManager: win=Window{a638d89 u0 com.adjaba/com.adjaba.activities.SelectScreens} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.ActivityRecord.destroySurfaces:5251 com.android.server.wm.ActivityRecord.destroySurfaces:5232 com.android.server.wm.ActivityRecord.notifyAppStopped:5291 com.android.server.wm.ActivityRecord.activityStopped:5918 com.android.server.wm.ActivityTaskManagerService.activityStopped:2595 android.app.IActivityTaskManager$Stub.onTransact:2223 android.os.Binder.execTransactInternal:1190 
+05-16 23:29:22.115 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:29:32.138 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:29:42.146 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:29:52.171 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:02.179 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:12.200 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:22.215 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:32.243 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:30:42.251 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:30:52.273 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:02.280 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:12.312 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:22.329 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:32.366 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:31:42.389 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:31:52.413 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:02.421 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:12.451 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:22.457 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:32.473 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:32:42.485 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:32:52.504 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:02.511 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:12.531 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:22.536 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:32.566 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:33:42.580 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:33:52.615 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:01.535 18255 18307 W earchbox:searc: ClassLoaderContext classpath size mismatch. expected=15, found=0 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[])
+05-16 23:34:01.612 18255 18307 W earchbox:searc: ClassLoaderContext classpath size mismatch. expected=15, found=12 (DLC[];PCL[base.apk*759615804:base.apk!classes2.dex*2099024403:base.apk!classes3.dex*1674739552:base.apk!classes4.dex*3288849767:base.apk!classes5.dex*2505378666:base.apk!classes6.dex*2818885183:base.apk!classes7.dex*1056940960:base.apk!classes8.dex*3435159201:base.apk!classes9.dex*3882149830:base.apk!classes10.dex*2627354801:base.apk!classes11.dex*2669655367:base.apk!classes12.dex*3836627909:base.apk!classes13.dex*2566981479:base.apk!classes14.dex*2427130654:base.apk!classes15.dex*1931570971]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]#PCL[/system/framework/com.android.location.provider.jar*1664931834]#PCL[/system/framework/com.android.media.remotedisplay.jar*1573936315]} | DLC[];PCL[/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk*2573053455:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes2.dex*99843855:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes3.dex*997788386:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes4.dex*3197245:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes5.dex*3117030608:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes6.dex*1939065240:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes7.dex*4005337623:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes8.dex*4240125521:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes9.dex*568179184:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes10.dex*1962213217:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes11.dex*3802432104:/data/app/~~oj1QMyWrs-otNLY0JHw87w==/com.google.android.googlequicksearchbox-0I0SNFemz9Q2j4AI5493sw==/base.apk!classes12.dex*1646839706]{PCL[/system/framework/org.apache.http.legacy.jar*876722329]})
+05-16 23:34:02.632 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:12.647 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:22.656 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:32.675 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:34:42.686 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:34:52.713 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:02.717 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:06.595 12288 27525 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:06.597 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:07.925 12288 16782 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:07.941 12288 27525 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:08.119 12288 27525 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:08.160 12288 27525 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:10.383 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:10.538 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:10.741 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:10.954 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:11.512 12288 27525 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:11.651 12288 16348 W Auth    : [AccountStateDownloader] Unable to look up account state from server: couldn't fetch accessToken [CONTEXT service_id=343 ]
+05-16 23:35:12.739 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:22.756 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:32.776 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:35:42.794 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:35:52.807 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:02.811 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:12.831 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:22.839 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:32.862 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:36:42.875 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:36:52.889 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:02.905 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:12.922 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:22.925 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:32.951 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:37:42.960 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:37:52.973 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:02.982 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:12.999 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:23.018 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:33.040 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:38:43.044 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:38:53.059 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:03.064 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:13.087 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:23.109 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:33.130 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:43.140 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:39:53.154 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:39:54.220 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.220 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.231 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.231 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.240 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.240 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.246 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.246 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.251 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.251 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.255 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.255 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.261 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.261 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.265 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.265 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.270 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.270 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.274 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.274 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.278 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.278 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.281 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.282 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.285 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.285 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:39:54.289 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:39:54.289 13019 18540 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:03.160 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:13.177 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:40:23.184 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:24.393  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:40:24.394  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:40:24.584 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.584 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.595 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.595 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.604 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.604 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.609 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.609 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.614 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.614 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.618 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.618 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.623 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.623 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.627 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.627 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.632 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.632 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.636 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.636 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.639 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.639 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.643 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.643 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.647 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.647 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.651 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:40:24.651 13019 18556 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:40:24.700  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:40:24.700  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:40:33.205 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:40:43.211 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:40:53.232 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:03.242 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:13.265 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:23.272 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:24.736  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:41:24.737  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:41:24.943 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.943 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.953 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.953 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.961 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.961 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.966 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.967 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.971 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.971 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.975 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.975 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.979 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.980 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.984 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.984 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.988 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.988 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.991 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.992 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.995 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.995 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:24.999 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:24.999 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:25.003 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:25.003 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:25.006 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.sendImpression(ImpressionRetryWorker.java:103)
+05-16 23:41:25.006 13019 18578 W System.err: 	at com.adjaba.workers.ImpressionRetryWorker.doWork(ImpressionRetryWorker.java:48)
+05-16 23:41:25.050  3542  3546 E statsd  : Predicate -7037417284711607308 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:41:25.050  3542  3546 E statsd  : Predicate 5980654721335871649 dropping data for dimension key (10)0x2010101->10398[I] (10)0x30000->*job*/com.adjaba/androidx.work.impl.background.systemjob.SystemJobService[S] 
+05-16 23:41:33.303 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:41:43.307 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+05-16 23:41:53.324 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=0, total=2
+05-16 23:42:03.340 13019 13019 E AdvertWatching: 🔴 mediaSwitcher.run() - currentIndex=1, total=2
+ 
+[5] DATABASE INFO 
+ 
+run-as: exec failed for sqlite3: No such file or directory
+ 
+========================================== 
+DIAGNOSTIC COMPLETE 
+========================================== 

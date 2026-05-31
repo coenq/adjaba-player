@@ -1,0 +1,207 @@
+﻿
+05-16 13:43:00.607   429   429 E FeatureFlagsImplExport: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package 
+android.xr cannot be found on the device
+05-16 13:43:07.192   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package 
+com.android.update_engine cannot be found on the device
+05-16 13:43:07.192   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.194   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.195   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.195   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.197   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.198   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.200   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.201   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.202   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.203   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.204   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.204   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:07.204   661   746 E AconfigFlags: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr 
+cannot be found on the device
+05-16 13:43:19.834   661   661 E ArtService: java.io.FileNotFoundException: /data/system/package-dex-usage.pb: open failed: ENOENT (No such file 
+or directory)
+05-16 13:43:19.834   661   661 E ArtService: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+05-16 13:43:21.291   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:42.838   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:42.848   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:42.855   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:43.074   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:43.097   661   661 E SoundTriggerMiddlewareImpl: java.util.NoSuchElementException
+05-16 13:43:43.098   661   831 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: jobscheduler
+05-16 13:43:43.188   661   698 E UsbDeviceManager: java.util.NoSuchElementException
+05-16 13:43:43.589   661   661 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: hdmi_control
+05-16 13:43:43.617   661   661 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: fingerprint
+05-16 13:43:43.635   661   661 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: face
+05-16 13:43:44.261   661   661 E DisplayPowerController[0]: failed to set up display white-balance: java.lang.IllegalStateException: cannot find 
+light sensor
+05-16 13:43:44.282   661   713 E AppWidgetManager: java.lang.IllegalStateException: User 0 must be unlocked for widgets to be available
+05-16 13:43:44.602   661   661 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: fingerprint
+05-16 13:43:44.603   661   661 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: face
+05-16 13:43:46.339   661   661 E BitmapFactory: Unable to decode file: java.io.FileNotFoundException: /data/system/users/0/wallpaper_orig: open 
+failed: ENOENT (No such file or directory)
+05-16 13:43:47.120  1179  1179 E FeatureFlagsImplExport: android.os.flagging.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package 
+android.xr cannot be found on the device
+05-16 13:43:47.889   661  1244 E StatsCompanionService: android.content.pm.PackageManager$NameNotFoundException: 
+com.google.android.trichromelibrary
+05-16 13:43:47.933   661   724 E BluetoothPowerStatsCollector: java.util.concurrent.ExecutionException: java.lang.RuntimeException: error: 9
+05-16 13:43:47.933   661   724 E BluetoothPowerStatsCollector: Caused by: java.lang.RuntimeException: error: 9
+05-16 13:43:55.821   661  1719 E AdbDebuggingManager: Caught an exception opening the socket: java.io.IOException: Connection refused
+05-16 13:44:03.215  1488  2080 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:03.215  1488  2080 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:03.215  1488  2080 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:03.215  1488  2080 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:03.215  1488  2080 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:05.798  1970  2131 E katniss_search_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:06.038  1970  2159 E SQLiteDatabase: android.database.sqlite.SQLiteCantOpenDatabaseException: Cannot open database [unable to open 
+database file (code 14 SQLITE_CANTOPEN): No such file or directory] '/data/user/0/com.google.android.katniss/databases/voiceinteraction.db' with 
+flags 0x1: File /data/user/0/com.google.android.katniss/databases/voiceinteraction.db doesn't exist
+05-16 13:44:06.038  1970  2159 E SQLiteDatabase: Caused by: android.database.sqlite.SQLiteCantOpenDatabaseException: unable to open database file 
+(code 14 SQLITE_CANTOPEN): No such file or directory
+05-16 13:44:06.878  1970  2184 E katniss_search_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:07.327  1488  2085 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:07.352  1970  2208 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:07.352  1970  2208 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:07.352  1970  2208 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:07.352  1970  2208 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:07.352  1970  2208 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:07.718  1377  2216 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:07.718  1377  2216 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:07.718  1377  2216 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:07.718  1377  2216 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:07.718  1377  2216 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:08.603  1488  2085 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:09.058  1488  1704 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:09.219   661   661 E BootReceiver: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+05-16 13:44:09.592   661   713 E PackageManager: java.util.concurrent.TimeoutException: [Optimistic Bind] Didn't bind to resolver in time!
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: java.lang.SecurityException: Caller does not have the required permissions for this user. 
+Permission required: android.permission.MANAGE_DEVICE_POLICY_APPS_CONTROL.
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:09.861  1961  2311 E PackagePolicyHandler: Caused by: android.os.RemoteException: Remote stack trace:
+05-16 13:44:09.871  1961  2311 E DeviceLockControllerService: java.lang.IllegalStateException: Failed to enforce policies for provision state 0 
+and device state 0
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: Exception reporting user unlocked for: UserHandle{0}
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: android.devicelock.ParcelableException: java.lang.IllegalStateException: Failed to 
+enforce policies for provision state 0 and device state 0
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: 	at android.devicelock.ParcelableException$1.createFromParcel(ParcelableException.java:68)
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: 	at android.devicelock.ParcelableException$1.createFromParcel(ParcelableException.java:65)
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: 	at 
+com.android.server.devicelock.DeviceLockControllerConnectorImpl.maybeReportException(DeviceLockControllerConnectorImpl.java:286)
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: Caused by: java.lang.IllegalStateException: Failed to enforce policies for provision 
+state 0 and device state 0
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: 	at android.devicelock.ParcelableException.readFromParcel(ParcelableException.java:39)
+05-16 13:44:09.880   661  1358 E DeviceLockServiceImpl: 	at android.devicelock.ParcelableException.-$$Nest$smreadFromParcel(Unknown Source:0)
+05-16 13:44:10.240  1488  1706 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:10.245  1488  1704 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:11.335  1488  1704 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:11.588  1488  1704 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:11.690  1970  2104 E FirebaseInstanceId: Topic sync or token retrieval failed on hard failure exceptions: AUTHENTICATION_FAILED. 
+Won't retry the operation.
+05-16 13:44:12.539  1748  1940 E GmscoreIpa: java.io.FileNotFoundException: 
+/data/user/0/com.google.android.gms/files/apps_3p_corpus_component_names.txt: open failed: ENOENT (No such file or directory)
+05-16 13:44:12.539  1748  1940 E GmscoreIpa: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+05-16 13:44:12.720  1488  1704 E katniss_interactor_LoadCastServiceInfoTaskImpl: java.net.ConnectException: Failed to connect to 
+localhost/127.0.0.1:8008
+05-16 13:44:13.125  1461  1760 E PhenotypeModule: java.lang.IllegalStateException: Get empty configurations.
+05-16 13:44:13.126  1461  1760 E PhenotypeModule: java.lang.IllegalStateException: Get empty configurations.
+05-16 13:44:13.363  1488  2080 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:13.363  1488  2080 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:13.363  1488  2080 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:13.363  1488  2080 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:13.363  1488  2080 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:14.805  1748  2389 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+05-16 13:44:16.159   661   661 E CertificateTransparencyDownloader: java.security.GeneralSecurityException: Public key not in allowlist
+05-16 13:44:17.248  1970  2208 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:17.248  1970  2208 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:17.248  1970  2208 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:17.248  1970  2208 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:17.248  1970  2208 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:18.953  1377  2216 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:18.953  1377  2216 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:18.953  1377  2216 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:18.953  1377  2216 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:18.953  1377  2216 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:20.119  1488  1827 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:21.130  1488  1827 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:21.419  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:22.428  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:22.440  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:23.516  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:23.604  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:24.684  1488  1764 E katniss_interactor_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:44:24.773  2738  2896 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:24.773  2738  2896 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:24.773  2738  2896 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:24.773  2738  2896 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:24.773  2738  2896 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:44:28.145  1748  2201 E FA-SVC  : Failed to get experiments token: java.util.concurrent.TimeoutException: Timed out waiting for Task: 
+bojc.n(:com.google.android.gms@250834120@25.08.34 (180706-739221510):48)
+05-16 13:44:30.012  1417  2252 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+05-16 13:44:34.718  2738  2896 E GoogleApiManager: java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+05-16 13:44:34.718  2738  2896 E GoogleApiManager: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3340)
+05-16 13:44:34.718  2738  2896 E GoogleApiManager: 	at android.os.Parcel.createException(Parcel.java:3324)
+05-16 13:44:34.718  2738  2896 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3307)
+05-16 13:44:34.718  2738  2896 E GoogleApiManager: 	at android.os.Parcel.readException(Parcel.java:3249)
+05-16 13:45:04.000  1748  1940 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+05-16 13:45:24.345   661  1858 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: 
+persistent_data_block
+05-16 13:45:30.137  1748  3451 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+05-16 13:45:38.271  3744  3798 E Finsky  : [48] Failed refreshing cache rebuild with error: java.lang.IllegalStateException: Trying to refresh 
+recommendations for null or empty account.
+05-16 13:45:38.271  3744  3798 E Finsky  : [48] Failed refreshing cache rebuild with error: java.lang.IllegalStateException: Trying to refresh 
+recommendations for null or empty account.
+05-16 13:45:46.763  1748  3782 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+05-16 13:47:27.694  1748  3782 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+05-16 13:47:27.694  1748  3782 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+05-16 13:48:37.406   661  1459 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: 
+persistent_data_block
+05-16 13:48:40.684  3744  3873 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:48:40.691  3744  3873 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:48:40.693  3744  3873 E Finsky  : [75] VerifyApps: APK Analysis scan failed for com.adjaba
+05-16 13:48:40.693  3744  3873 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:48:45.431  1179  4248 E BackupHelper: java.io.FileNotFoundException: 
+/data/user_de/0/com.google.android.permissioncontroller/files/delayed_restore_permissions.xml: open failed: ENOENT (No such file or directory)
+05-16 13:48:45.431  1179  4248 E BackupHelper: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+05-16 13:48:47.519  3744  3825 E Finsky  : [60] ItemStore: getItems RPC failed for item com.adjaba
+05-16 13:48:47.521  3744  3825 E Finsky  : [60] ItemStore: getItems RPC failed for item com.adjaba
+05-16 13:48:51.496  1970  2156 E katniss_search_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:48:52.522  1970  2175 E katniss_search_LoadCastServiceInfoTaskImpl: org.json.JSONException: No value for sign
+05-16 13:48:55.791   661   724 E BluetoothPowerStatsCollector: java.util.concurrent.ExecutionException: java.lang.RuntimeException: error: 11
+05-16 13:48:55.791   661   724 E BluetoothPowerStatsCollector: Caused by: java.lang.RuntimeException: error: 11
+05-16 13:49:34.737   661  3221 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: 
+persistent_data_block
+05-16 13:49:36.497  3744  3825 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:49:36.503  3744  3825 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:49:36.504  3744  3825 E Finsky  : [60] VerifyApps: APK Analysis scan failed for com.adjaba
+05-16 13:49:36.504  3744  3825 E Finsky  : com.google.android.finsky.verifier.apkanalysis.client.ApkAnalysisException: 
+DOWNLOAD_FILE_NOT_FOUND_EXCEPTION while analyzing APK
+05-16 13:49:54.319  1748  2440 E czrn    : java.lang.RuntimeException: ManagedChannel allocation site
+
+

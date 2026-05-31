@@ -144,11 +144,15 @@ dependencies {
 // Optional: لو هتستخدم RxJava أو Coroutines
     implementation "androidx.room:room-ktx:2.6.1"
     kapt "androidx.room:room-compiler:2.6.1"
-    implementation "androidx.security:security-crypto:1.1.0-alpha06"
+    implementation "androidx.security:security-crypto:1.1.0"
 
     // WorkManager for offline impression retry
     implementation "androidx.work:work-runtime:2.9.0"
 
+
+    // MQTT for real-time demographic-based ad switching
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation "com.airbnb.android:lottie:6.1.0"
 

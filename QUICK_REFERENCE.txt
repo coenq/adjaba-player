@@ -1,0 +1,161 @@
+tot# QUICK REFERENCE CARD - Emulator Testing
+
+## ⚡ One-Command Deployment
+
+```batch
+cd C:\project\adjaba-player
+deploy_to_emulator.bat
+```
+
+**Done!** App will be running in 10 minutes.
+
+---
+
+## 📱 Manual Commands
+
+| Command | What It Does |
+|---------|-------------|
+| `setup_emulator.bat` | Create Android Virtual Device |
+| `run_emulator.bat` | Start the emulator |
+| `gradlew clean build` | Build the app |
+| `gradlew installDebug` | Install app on emulator |
+| `adb devices` | List connected devices |
+| `adb shell am start -n com.adjaba.adplayer/.activities.SelectScreens` | Launch app |
+| `adb logcat \| findstr "Adjaba"` | View app logs |
+| `adb shell am force-stop com.adjaba.adplayer` | Force stop app |
+| `adb emu kill` | Stop emulator |
+
+---
+
+## 🎮 Emulator Navigation
+
+| Key | Action |
+|-----|--------|
+| Arrow Keys | D-pad / Navigate UI |
+| Enter | Select |
+| Escape | Back |
+| Ctrl+F11 or F1 | Rotate landscape/portrait |
+| Ctrl+Home | Home button |
+| Ctrl+F5 | Menu |
+
+---
+
+## ✅ Testing Checklist
+
+```
+Using: Kolkata, India location
+
+☐ 1. Time: Shows IST (UTC+5:30) not device time
+☐ 2. Weather: Displays Kolkata weather correctly
+☐ 3. News: Images load from Times of India RSS
+☐ 4. Landscape: Headline positioned above logo (no overlap)
+☐ 5. QR Codes: Visible on ads only, hidden on news/weather
+
+All pass? → Production ready ✓
+```
+
+---
+
+## 🔴 Emergency Fixes
+
+### App won't start
+```batch
+adb uninstall com.adjaba.adplayer
+gradlew installDebug
+```
+
+### Still won't work?
+```batch
+adb logcat | findstr "Error"
+REM → Check output for crash details
+```
+
+### Emulator too slow?
+```batch
+REM Windows: Use compatibility mode
+REM Disable GPU: Edit run_emulator.bat (remove -gpu)
+REM Reduce RAM: Change hw.ramSize=1024
+```
+
+### Device not found?
+```batch
+adb kill-server
+adb start-server
+adb devices
+```
+
+---
+
+## 📍 SDK Paths (If Needed)
+
+- **SDK Root**: `C:\Users\User\AppData\Local\Android\Sdk`
+- **Android Virtual Device**: `C:\Users\User\.android\avd\Adjaba_TV_Test.avd`
+- **Project**: `C:\project\adjaba-player`
+
+---
+
+## 🎯 Expected Results
+
+### Feature: Kolkata Local Time
+- Clock at bottom: **Shows IST**
+- Format: `HH:MM AM/PM` in Asia/Kolkata timezone
+- Offset: UTC+5:30
+
+### Feature: Location-Based Weather
+- Weather section: **Shows Kolkata weather**
+- Location label: "Kolkata, India"
+- Uses: OpenWeatherMap API with Kolkata coordinates
+
+### Feature: News Images
+- News headlines: **Thumbnails display**
+- Source: Times of India RSS feed
+- Images: Should load in parallel
+
+### Feature: Landscape Headline
+- Bottom margin: **56dp** (from adjaba logo)
+- No overlap: ✓ Verified in code
+- Readable: ✓ Full text visible
+
+### Feature: QR Codes
+- Ads: **QR visible** ✓
+- News: **QR hidden** ✓
+- Weather: **QR hidden** ✓
+
+---
+
+## 📖 Full Documentation
+
+- **Complete Setup**: `EMULATOR_SETUP_GUIDE.md`
+- **Quick Start**: `EMULATOR_QUICK_START.md`
+- **Implementation**: `READY_FOR_DEPLOYMENT.md`
+
+---
+
+## ⏱️ Timing Guide
+
+| Step | Time |
+|------|------|
+| Setup AVD | 2-3 min |
+| First boot | 3-5 min |
+| Build | 2-3 min |
+| Install | 1 min |
+| **Total** | **~10 min** |
+| **Subsequent runs** | **~3-5 min** |
+
+---
+
+## 💾 Save This Card
+
+```
+Location: Keep with your project folder
+File: QUICK_REFERENCE.txt (this file)
+```
+
+---
+
+**Last Updated**: May 16, 2026
+**Status**: ✅ Ready to use
+**For Help**: See EMULATOR_SETUP_GUIDE.md
+
+
+la

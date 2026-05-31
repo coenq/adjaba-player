@@ -18,6 +18,8 @@ public class DataHolder {
     public String screenDevice;
     public List<String> tags;
     public List<String> advertIds = new ArrayList<>();
+    public int weatherFlag = 1;  // 1 = show weather, 0 = hide weather
+    public int newsFlag = 1;     // 1 = show news, 0 = hide news
 
     private DataHolder() {
     }

@@ -1,0 +1,28 @@
+======================================================== 
+SMART PLAYLIST SYNC DEPLOYMENT 
+======================================================== 
+Timestamp: 17/05/2026  1:02:05.56 
+ 
+[1] Checking connected devices... 
+List of devices attached
+R52MB18CEGR	device
+
+ 
+[2] Checking APK... 
+APK found: C:\project\adjaba-player\app\build\outputs\apk\debug\app-debug.apk 
+APK size: 31103390 bytes 
+Last modified: 16/05/2026 23:06 
+ 
+[3] Deploying to device... 
+Performing Streamed Install
+Success
+ 
+[4] Checking installation... 
+package:com.adjaba
+ 
+[5] Getting app version... 
+    versionName=1.0.3
+ 
+======================================================== 
+DEPLOYMENT COMPLETE 
+======================================================== 

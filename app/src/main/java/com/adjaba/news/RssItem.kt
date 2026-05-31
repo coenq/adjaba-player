@@ -8,5 +8,6 @@ data class RssItem(
     var guid: String? = null,
     var thumbnailUrl: String? = null,
     var thumbnailWidth: Int? = null,
-    var thumbnailHeight: Int? = null
+    var thumbnailHeight: Int? = null,
+    var source: String? = null   // Name of the news source / feed provider
 )

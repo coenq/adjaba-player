@@ -1,0 +1,11 @@
+﻿
+
+    Directory: C:\Users\User\AppData\Local\Android\Sdk\system-images
+
+
+Mode                 LastWriteTime         Length Name                                                                                            
+----                 -------------         ------ ----                                                                                            
+d-----        02/05/2026     18:25                android-36                                                                                      
+d-----        02/05/2026     18:13                android-37.0                                                                                    
+
+

@@ -25,6 +25,8 @@ public class APIImpression {
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Authorization", "Bearer " + AuthManager.getToken(context));
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(15000);
                 conn.setDoOutput(true);
 
                 JSONObject json = new JSONObject();
@@ -32,8 +34,8 @@ public class APIImpression {
                 json.put("advertId", impression.advertId);
                 json.put("amountSettled", impression.amountSettled);
                 json.put("contractId", impression.contractId);
-                json.put("duration", 5);
-                json.put("currency", "USD");
+                json.put("duration", impression.playSec);  // use real play duration
+                json.put("currency", impression.currency != null ? impression.currency : "USD");
                 json.put("dayHour", impression.dayHour);
                 json.put("female20", 0);
                 json.put("female32", 0);
@@ -59,23 +61,28 @@ public class APIImpression {
                 json.put("screenDevice", impression.screenDevice);
                 json.put("screenPlayer", impression.screenPlayer);
                 json.put("screenId", impression.screenId);
-                json.put("tags", new JSONArray(impression.tags));
+                // Guard against null tags to prevent NPE
+                json.put("tags", new JSONArray(impression.tags != null ? impression.tags : new java.util.ArrayList<>()));
+
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(json.toString().getBytes());
                 }
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
-                    AdDatabase adDatabase=AdDatabase.getInstance(context);
+                    AdDatabase adDatabase = AdDatabase.getInstance(context);
                     adDatabase.impDao().deleteAdById(impression.impressionId);
+                    android.util.Log.i("APIImpression", "✅ Impression sent: " + impression.impressionId);
                 } else {
+                    // Leave in DB — ImpressionRetryWorker will retry
+                    android.util.Log.w("APIImpression", "⚠️ Impression send failed (HTTP " + responseCode + ") — will retry: " + impression.impressionId);
                 }
 
                 conn.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
+                // Leave in DB — ImpressionRetryWorker will retry
+                android.util.Log.e("APIImpression", "❌ Exception sending impression, will retry: " + e.getMessage());
             }
         }).start();
     }
 }
-

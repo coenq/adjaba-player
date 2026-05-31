@@ -141,7 +141,7 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:prompt="@string/screen_prompt"
-                        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+                        android:theme="@style/ThemeOverlay.AppCompat.Light" />
 
                     <!-- Options -->
                     <LinearLayout
@@ -149,41 +149,97 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="24dp"
                         android:background="@drawable/bg_tv_card"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp">
 
-                        <CheckBox
-                            android:id="@+id/rememberMeCh"
-                            android:layout_width="0dp"
+                        <!-- Row 1: core options -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Remember Me"
-                            android:textColor="@color/tvTextPrimary"
-                            android:textSize="14sp"
-                            app:buttonTint="@color/tvAccent" />
+                            android:orientation="horizontal">
 
-                        <CheckBox
-                            android:id="@+id/text_display"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Display Text"
-                            android:textColor="@color/tvTextPrimary"
-                            android:textSize="14sp"
-                            app:buttonTint="@color/tvAccent" />
+                            <CheckBox
+                                android:id="@+id/rememberMeCh"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Remember Me"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
 
-                        <CheckBox
-                            android:id="@+id/business_rule"
-                            android:layout_width="0dp"
+                            <CheckBox
+                                android:id="@+id/text_display"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Display Text"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
+
+                            <CheckBox
+                                android:id="@+id/business_rule"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Business Rules"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="@color/tvDivider" />
+
+                        <!-- Row 2: content display options -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Business Rules"
-                            android:textColor="@color/tvTextPrimary"
-                            android:textSize="14sp"
-                            app:buttonTint="@color/tvAccent" />
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/weather_checkbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checked="true"
+                                android:text="Weather"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
+
+                            <CheckBox
+                                android:id="@+id/news_checkbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checked="true"
+                                android:text="News"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
+
+                            <CheckBox
+                                android:id="@+id/iot_checkbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checked="false"
+                                android:text="IOT"
+                                android:textColor="@color/tvTextPrimary"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/tvAccent" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -209,7 +265,7 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:prompt="@string/interval_prompt"
-                        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+                        android:theme="@style/ThemeOverlay.AppCompat.Light" />
 
                     <!-- Primary action -->
                     <LinearLayout

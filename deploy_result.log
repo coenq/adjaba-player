@@ -1,0 +1,21 @@
+
+========================================
+Adjaba Player - APK Deployment
+========================================
+
+Checking connected devices...
+List of devices attached
+R52MB18CEGR	device
+
+
+Installing APK to connected device...
+Performing Streamed Install
+Success
+
+========================================
+SUCCESS: APK installed successfully
+========================================
+
+Starting app...
+Starting: Intent { cmp=com.adjaba/.activities.SelectScreens }
+Press any key to continue . . . 

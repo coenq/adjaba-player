@@ -1,0 +1,4 @@
+﻿List of devices attached
+R52MB18CEGR	device
+emulator-5554	device
+

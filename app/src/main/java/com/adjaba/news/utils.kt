@@ -27,10 +27,7 @@ object Utils {
         "United Arab Emirates" to "https://gulfnews.com/rss?format=xml",
         "Qatar" to "https://www.gulf-times.com/rss",
         "Jordan" to "https://jordantimes.com/rss.xml",
-        "Lebanon" to "https://www.dailystar.com.lb/RSS",
         "Morocco" to "https://www.leconomiste.com/rss", // major francophone source
-        "Tunisia" to "https://www.tuniscope.com/rss",
-
         // Africa (selected)
         "South Africa" to "https://www.news24.com/rss",
         "Kenya" to "https://www.nation.africa/rss/latest/3514-4388274-format-rss.xml",
@@ -46,10 +43,9 @@ object Utils {
         "South Korea" to "http://www.koreaherald.com/rss/home.php",
         "Indonesia" to "https://www.thejakartapost.com/feed/",
         "Malaysia" to "https://www.thestar.com.my/rss/FeedProcessor.ashx?ContentType=RSS",
-        "Philippines" to "https://www.philstar.com/rss/top-stories",
-
         // Americas (selected)
         "Mexico" to "https://www.eluniversal.com.mx/rss/noticias.xml",
+
         "Brazil" to "https://g1.globo.com/dynamo/rss2.xml",
         "Argentina" to "https://www.clarin.com/rss",
         "Chile" to "https://www.emol.com/rss/portada.xml",
@@ -189,5 +185,30 @@ object Utils {
         "Zambia" to "",
         "Zimbabwe" to ""
     )
-     var NewsList: MutableList<RssItem> =mutableListOf()
+     var NewsList: MutableList<RssItem> = mutableListOf()
+    var newsListCountry: String = "" // tracks which country the cached list is for
+
+    // 🕐 TIMEZONE MAPPING: City/Region → IANA TimeZone ID
+    // Used for local time display when screen location is set
+    val cityTimeZones: Map<String, String> = mapOf(
+        "kolkata" to "Asia/Kolkata",        // IST UTC+5:30
+        "mumbai" to "Asia/Kolkata",         // IST UTC+5:30
+        "delhi" to "Asia/Kolkata",          // IST UTC+5:30
+        "bangalore" to "Asia/Kolkata",      // IST UTC+5:30
+        "india" to "Asia/Kolkata",          // Default for India
+        "london" to "Europe/London",        // GMT/BST
+        "unitedkingdom" to "Europe/London", // GMT/BST
+        "newyork" to "America/New_York",    // EST/EDT
+        "losangeles" to "America/Los_Angeles", // PST/PDT
+        "chicago" to "America/Chicago",     // CST/CDT
+        "toronto" to "America/Toronto",     // EST/EDT
+        "sydney" to "Australia/Sydney",     // AEST/AEDT
+        "tokyo" to "Asia/Tokyo",            // JST UTC+9
+        "dubai" to "Asia/Dubai",            // GST UTC+4
+        "singapore" to "Asia/Singapore",    // SGT UTC+8
+        "hongkong" to "Asia/Hong_Kong",     // HKT UTC+8
+        "bangkok" to "Asia/Bangkok",        // ICT UTC+7
+        "paris" to "Europe/Paris",          // CET/CEST
+        "berlin" to "Europe/Berlin"           // CET/CEST
+    )
 }

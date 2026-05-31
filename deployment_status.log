@@ -1,0 +1,19 @@
+[16/05/2026 22:54:33.44] Starting deployment check... 
+ 
+===== DEVICE CHECK ===== 
+List of devices attached
+R52MB18CEGR	device
+
+ 
+===== INSTALLING APK ===== 
+Performing Streamed Install
+Success
+ 
+===== PACKAGE CHECK ===== 
+/system/bin/sh: findstr: inaccessible or not found
+ 
+===== GETTING APP VERSION ===== 
+    versionName=1.0.3
+ 
+===== DEPLOYMENT COMPLETE ===== 
+[16/05/2026 22:54:56.52] Done 

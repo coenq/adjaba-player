@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters;
 import com.adjaba.room.AdDatabase;
 import com.adjaba.room.ImpressionEntity;
 import com.adjaba.utilities.AuthManager;
+import com.adjaba.utilities.Config;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImpressionRetryWorker extends Worker {
-
-    private static final String BASE_URL = "https://api.buyir.uk/";
 
     public ImpressionRetryWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
@@ -44,10 +43,27 @@ public class ImpressionRetryWorker extends Worker {
         }
 
         boolean allSent = true;
+        boolean tokenRefreshed = false;
+
         for (ImpressionEntity impression : pending) {
-            if (sendImpression(impression, token)) {
+            int code = sendImpression(impression, token);
+            if (code == 200) {
                 db.impDao().deleteAdById(impression.impressionId);
             } else {
+                // On first 401, refresh the token and retry this impression once
+                if (code == 401 && !tokenRefreshed) {
+                    tokenRefreshed = true;
+                    android.util.Log.w("ImpressionRetryWorker", "⚠️ 401 — refreshing token and retrying...");
+                    String newToken = AuthManager.reAuthenticateSync(context);
+                    if (newToken != null) {
+                        token = newToken;
+                        code = sendImpression(impression, token);
+                        if (code == 200) {
+                            db.impDao().deleteAdById(impression.impressionId);
+                            continue;
+                        }
+                    }
+                }
                 allSent = false;
             }
         }
@@ -55,9 +71,13 @@ public class ImpressionRetryWorker extends Worker {
         return allSent ? Result.success() : Result.retry();
     }
 
-    private boolean sendImpression(ImpressionEntity impression, String token) {
+    /**
+     * Attempts to POST a single impression to the backend.
+     * @return HTTP response code (200 = success), or -1 on network exception.
+     */
+    private int sendImpression(ImpressionEntity impression, String token) {
         try {
-            URL url = new URL(BASE_URL + "create_impression");
+            URL url = new URL(Config.BASE_URL + "/create_impression");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
@@ -69,36 +89,22 @@ public class ImpressionRetryWorker extends Worker {
             JSONObject json = new JSONObject();
             json.put("impressionId", impression.impressionId);
             json.put("advertId", impression.advertId);
-            json.put("amountSettled", impression.amountSettled);
             json.put("contractId", impression.contractId);
-            json.put("duration", 5);
-            json.put("currency", "USD");
-            json.put("dayHour", impression.dayHour);
-            json.put("female20", 0);
-            json.put("female32", 0);
-            json.put("female40", 0);
-            json.put("female50", 0);
-            json.put("female50plus", 0);
-            json.put("male20", 0);
-            json.put("male32", 0);
-            json.put("male40", 0);
-            json.put("male50", 0);
-            json.put("male50plus", 0);
-            json.put("objectdetected", "");
-            json.put("impressioncost", 0);
-            json.put("isactivecontract", 0);
-            json.put("textdetected", "");
-            json.put("totalview", 0);
+            json.put("screenId", impression.screenId);
+            json.put("playTimeStamp", impression.playTimeStamp);
             json.put("playSec", impression.playSec);
+            json.put("impressionCost", 0);
+            json.put("type", "IMPRESSION");
             json.put("format", impression.format);
             json.put("locationType", impression.locationType);
             json.put("maxBid", impression.maxBid);
             json.put("orientation", impression.orientation);
-            json.put("playTimeStamp", impression.playTimeStamp);
             json.put("screenDevice", impression.screenDevice);
             json.put("screenPlayer", impression.screenPlayer);
-            json.put("screenId", impression.screenId);
             json.put("tags", new JSONArray(impression.tags != null ? impression.tags : new ArrayList<>()));
+            json.put("amountSettled", impression.amountSettled);
+            json.put("currency", impression.currency);
+            json.put("dayHour", impression.dayHour);
 
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(json.toString().getBytes());
@@ -106,10 +112,10 @@ public class ImpressionRetryWorker extends Worker {
 
             int responseCode = conn.getResponseCode();
             conn.disconnect();
-            return responseCode == 200;
+            return responseCode;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 }

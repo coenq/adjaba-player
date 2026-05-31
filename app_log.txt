@@ -1,0 +1,5 @@
+﻿--------- beginning of main
+05-16 13:42:55.570   429   429 D AndroidRuntime: >>>>>> START com.android.internal.os.ZygoteInit uid 0 <<<<<<
+05-16 13:42:55.803   429   429 I AndroidRuntime: Using default boot image
+05-16 13:42:55.805   429   429 I AndroidRuntime: Leaving lock profiling enabled
+05-16 13:43:47.764  1200  1200 I AndroidRuntime: VM exiting with result code 0, cleanup skipped.

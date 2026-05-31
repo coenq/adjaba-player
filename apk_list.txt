@@ -1,0 +1,11 @@
+﻿
+
+    Directory: C:\project\adjaba-player\app\build\outputs\apk\debug
+
+
+Mode                 LastWriteTime         Length Name                                                                                            
+----                 -------------         ------ ----                                                                                            
+-a----        16/05/2026     13:34       31097884 app-debug.apk                                                                                   
+-a----        16/05/2026     13:34            394 output-metadata.json                                                                            
+
+

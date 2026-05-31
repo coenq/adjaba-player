@@ -24,4 +24,14 @@ public interface AdDao {
 
     @Query("DELETE FROM ads")
     Completable deleteAllAds();
+
+    // ── Smart Sync Queries ────────────────────────────────────────────────
+    @Query("SELECT advertId FROM ads WHERE screenId = :screenId")
+    List<String> getAdIdsByScreen(String screenId);
+
+    @Query("DELETE FROM ads WHERE advertId = :advertId")
+    void deleteAdById(String advertId);
+
+    @Query("DELETE FROM ads WHERE screenId = :screenId AND advertId NOT IN (:keepIds)")
+    void deleteAdsNotInList(String screenId, List<String> keepIds);
 }

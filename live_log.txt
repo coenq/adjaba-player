@@ -1,0 +1,80 @@
+﻿--------- beginning of system
+05-16 13:41:36.466   224   224 E keystore2: system/security/keystore2/src/error.rs:183 - system/security/keystore2/src/security_level.rs:680
+05-16 13:41:36.466   224   224 E keystore2: 
+05-16 13:41:36.466   224   224 E keystore2: Caused by:
+05-16 13:41:36.466   224   224 E keystore2:     0: system/security/keystore2/src/security_level.rs:674: While generating without a provided attestation key and params: [KeyParameter { tag: r#ALGORITHM, value: Algorithm(r#AES) }, KeyParameter { tag: r#KEY_SIZE, value: Integer(256) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#ENCRYPT) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#DECRYPT) }, KeyParameter { tag: r#BLOCK_MODE, value: BlockMode(r#GCM) }, KeyParameter { tag: r#PADDING, value: PaddingMode(r#NONE) }, KeyParameter { tag: r#MIN_MAC_LENGTH, value: Integer(128) }, KeyParameter { tag: r#NO_AUTH_REQUIRED, value: BoolValue(true) }, KeyParameter { tag: r#ROLLBACK_RESISTANCE, value: BoolValue(true) }, KeyParameter { tag: r#CREATION_DATETIME, value: DateTime(1778935296463) }].
+05-16 13:41:36.466   224   224 E keystore2:     1: Error::Km(r#ROLLBACK_RESISTANCE_UNAVAILABLE)
+05-16 13:41:36.466   211   211 E vold    : keystore2 Keystore generateKey returned service specific error: -67
+05-16 13:41:42.455   211   211 E vold    : Error getting bootctrl v1.0 module.
+05-16 13:41:42.625   224   224 E keystore2: system/security/keystore2/src/error.rs:183 - system/security/keystore2/src/security_level.rs:680
+05-16 13:41:42.625   224   224 E keystore2: 
+05-16 13:41:42.625   224   224 E keystore2: Caused by:
+05-16 13:41:42.625   224   224 E keystore2:     0: system/security/keystore2/src/security_level.rs:674: While generating without a provided attestation key and params: [KeyParameter { tag: r#ALGORITHM, value: Algorithm(r#AES) }, KeyParameter { tag: r#KEY_SIZE, value: Integer(256) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#ENCRYPT) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#DECRYPT) }, KeyParameter { tag: r#BLOCK_MODE, value: BlockMode(r#GCM) }, KeyParameter { tag: r#PADDING, value: PaddingMode(r#NONE) }, KeyParameter { tag: r#MIN_MAC_LENGTH, value: Integer(128) }, KeyParameter { tag: r#NO_AUTH_REQUIRED, value: BoolValue(true) }, KeyParameter { tag: r#ROLLBACK_RESISTANCE, value: BoolValue(true) }, KeyParameter { tag: r#CREATION_DATETIME, value: DateTime(1778935302625) }].
+05-16 13:41:42.625   224   224 E keystore2:     1: Error::Km(r#ROLLBACK_RESISTANCE_UNAVAILABLE)
+05-16 13:41:42.627   211   211 E vold    : keystore2 Keystore generateKey returned service specific error: -67
+05-16 13:41:42.822   224   224 E keystore2: system/security/keystore2/src/keystore2_main.rs:69 - [SQLITE3] 17: statement aborts at 29: [CREATE TABLE IF NOT EXISTS persistent.version (
+05-16 13:41:42.822   224   224 E keystore2:                 id INTEGER PRIMARY KEY,
+05-16 13:41:42.822   224   224 E keystore2:                 version INTEGER);] database schema has changed
+05-16 13:42:50.100   224   224 E keystore2: system/security/keystore2/src/error.rs:183 - system/security/keystore2/src/security_level.rs:680
+05-16 13:42:50.100   224   224 E keystore2: 
+05-16 13:42:50.100   224   224 E keystore2: Caused by:
+05-16 13:42:50.100   224   224 E keystore2:     0: system/security/keystore2/src/security_level.rs:674: While generating without a provided attestation key and params: [KeyParameter { tag: r#ALGORITHM, value: Algorithm(r#AES) }, KeyParameter { tag: r#KEY_SIZE, value: Integer(256) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#ENCRYPT) }, KeyParameter { tag: r#PURPOSE, value: KeyPurpose(r#DECRYPT) }, KeyParameter { tag: r#BLOCK_MODE, value: BlockMode(r#GCM) }, KeyParameter { tag: r#PADDING, value: PaddingMode(r#NONE) }, KeyParameter { tag: r#MIN_MAC_LENGTH, value: Integer(128) }, KeyParameter { tag: r#NO_AUTH_REQUIRED, value: BoolValue(true) }, KeyParameter { tag: r#ROLLBACK_RESISTANCE, value: BoolValue(true) }, KeyParameter { tag: r#CREATION_DATETIME, value: DateTime(1778935370100) }].
+05-16 13:42:50.100   224   224 E keystore2:     1: Error::Km(r#ROLLBACK_RESISTANCE_UNAVAILABLE)
+05-16 13:42:50.100   211   211 E vold    : keystore2 Keystore generateKey returned service specific error: -67
+--------- beginning of main
+05-16 13:42:52.474   430   430 E kcmdlinectrl: Failed to read from misc: failed to find /misc partition
+05-16 13:42:52.681   426   426 E HidlServiceManagement: Service android.system.net.netd@1.1::INetd/default must be in VINTF manifest in order to register/get.
+05-16 13:42:52.681   426   426 E Netd    : Unable to start HIDL NetdHwService: -2147483648
+05-16 13:42:53.174   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.soundtrigger@2.3::ISoundTriggerHw/default.
+05-16 13:42:53.175   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.soundtrigger@2.2::ISoundTriggerHw/default.
+05-16 13:42:53.175   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.soundtrigger@2.1::ISoundTriggerHw/default.
+05-16 13:42:53.175   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.soundtrigger@2.0::ISoundTriggerHw/default.
+05-16 13:42:53.175   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.bluetooth.audio@2.2::IBluetoothAudioProvidersFactory/default.
+05-16 13:42:53.181   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.bluetooth.audio@2.1::IBluetoothAudioProvidersFactory/default.
+05-16 13:42:53.181   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.bluetooth.audio@2.0::IBluetoothAudioProvidersFactory/default.
+05-16 13:42:53.181   437   437 E LegacySupport: Could not get passthrough implementation for android.hardware.bluetooth.a2dp@1.0::IBluetoothAudioOffload/default.
+05-16 13:42:53.564   437   437 E audiohalservice: Failed to dlopen android.hardware.audio.sounddose-vendor-impl.so: dlopen failed: library "android.hardware.audio.sounddose-vendor-impl.so" not found
+05-16 13:42:53.648   452   452 E Codec2-FilterWrapper: plugin not OK: -19
+05-16 13:42:53.999   442   442 E GCH_CameraProvider: Initialize: HWL doesn't support vendor buffer allocation Function not implemented(-38)
+05-16 13:42:54.257   494   494 E misctrl : Could not read misctrl message: failed to find /misc partition
+05-16 13:42:54.257   494   494 E misctrl : Could not read reserved space: failed to find /misc partition
+05-16 13:42:54.498   504   504 E bootstat: Failed to read /metadata/bootstat/persist.sys.boot.reason: No such file or directory
+05-16 13:42:54.518   504   504 E bootstat: Failed to unlink /metadata/bootstat/persist.sys.boot.reason: No such file or directory
+05-16 13:42:54.800   518   518 E bt_vhci_forwarder: setTerminalRaw failed /dev/bluetooth0: Inappropriate ioctl for device
+05-16 13:42:55.060   531   531 E cutils  : Failed to read /data/misc/installd/layout_version: No such file or directory
+05-16 13:42:55.149   544   544 E HidlServiceManagement: Service android.system.wifi.keystore@1.0::IKeystore/default must be in VINTF manifest in order to register/get.
+05-16 13:42:55.570   429   429 D AndroidRuntime: >>>>>> START com.android.internal.os.ZygoteInit uid 0 <<<<<<
+05-16 13:42:55.803   429   429 I AndroidRuntime: Using default boot image
+05-16 13:42:55.805   429   429 I AndroidRuntime: Leaving lock profiling enabled
+05-16 13:42:56.083   463   463 E RanchuHwc: start: failed to set Vsync thread priority: Invalid argument
+05-16 13:42:56.104   491   491 E AudioFlinger: Function: getAudioPolicyConfig Line: 2618 Failed 
+05-16 13:42:56.189   491   491 E APM::AudioPolicyEngine: Policy Engine configuration is partially invalid, skipped 1 elements
+05-16 13:42:56.362   495   495 E HwcComposer: getOverlaySupport failed Status(-8, EX_SERVICE_SPECIFIC): '8: '
+05-16 13:42:56.376   495   495 E HwcComposer: getMaxLayerPictureProfiles failed Status(-8, EX_SERVICE_SPECIFIC): '8: '
+05-16 13:42:56.376   495   495 E HWComposer: getMaxLayerPictureProfiles: getMaxLayerPictureProfiles failed for display 4619827259835644672: UNSUPPORTED (8)
+05-16 13:42:56.407   495   495 E HwcComposer: getPerFrameMetadataKeys failed Status(-8, EX_SERVICE_SPECIFIC): '8: '
+05-16 13:42:56.592   437   437 E android.hardware.audio@7.1-impl.ranchu: getPresentationPosition:510 failure: Result::INVALID_STATE
+05-16 13:42:56.593   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.593   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.593   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager: invalid volume index range in the curve:
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   Can be muted  Index Min  Index Max  Index Cur [device : index]...
+05-16 13:42:56.594   491   491 E APM_AudioPolicyManager:   true          -1         -1         40000000 : 00, 

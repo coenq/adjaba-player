@@ -209,6 +209,42 @@
                         android:textSize="15sp"
                         app:buttonTint="@color/tvAccent" />
 
+                    <CheckBox
+                        android:id="@+id/weather_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="Weather"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/tvAccent" />
+
+                    <CheckBox
+                        android:id="@+id/news_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="News"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/tvAccent" />
+
+                    <CheckBox
+                        android:id="@+id/iot_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="IOT"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/tvAccent" />
+
                 </LinearLayout>
 
                 <!-- Refresh Interval -->

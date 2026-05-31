@@ -9,13 +9,18 @@ public class AdContractData {
     public String endDate;
     public String format;
     public String startDate;
-    public ArrayList<String> targetAgeGroup;
+    
+    // ── Demographic & IOT Targeting Fields ──
+    public ArrayList<String> targetAgeGroup;      // e.g. ["0-20", "20-32", "32-42", "42-50", "50+"]
     public ArrayList<String> targetDevice;
     public ArrayList<String> targetEvent;
-    public ArrayList<String> targetGender;
-    public ArrayList<Integer> targetHours;
+    public ArrayList<String> targetGender;        // e.g. ["MALE", "FEMALE"]
+    public ArrayList<Integer> targetHours;        // e.g. [9, 10, 11, 14, 15, 16]
     public Object targetLocationType;
-    public ArrayList<String> targetTags;
+    public ArrayList<String> targetTags;          // e.g. ["brand", "promo", "sports"]
+    public ArrayList<String> targetEmotion;       // e.g. ["happy", "neutral"] - NEW for IOT
+    
+    // ── Content & Display Fields ──
     public String targeturl;
     public String textBottom;
     public String textLeft;

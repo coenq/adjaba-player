@@ -487,6 +487,20 @@
                     android:text="News description goes here"
                     android:textColor="@color/tvTextSecondary"
                     android:textSize="@dimen/text_news_desc" />
+
+                <!-- News source label -->
+                <TextView
+                    android:id="@+id/newsSourceF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.10"
+                    android:text="BBC News"
+                    android:textColor="@color/tvAccent"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:visibility="gone" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -501,6 +515,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="QR Code"
         android:scaleType="fitCenter"
+        android:visibility="gone"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
