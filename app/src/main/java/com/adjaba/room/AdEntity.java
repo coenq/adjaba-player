@@ -34,12 +34,22 @@ public class AdEntity {
     public String targetTags;
     /** Comma-separated emotions this ad targets, e.g. "happy,neutral" - NEW in DB v7 */
     public String targetEmotion;
+    
+    // ── Content type fields (new in DB version 8) ──
+    /** Stream type for live streams: "HLS", "DASH", "RTSP", "HTTP" */
+    public String streamType;
+    /** Social platform for social feeds: "TWITTER", "INSTAGRAM", "FACEBOOK" */
+    public String socialPlatform;
+    /** Social hashtag/username to display feed for, e.g. "#nike" or "@nike" */
+    public String socialHashtag;
 
+    // ── Full constructor with all fields (new in DB v8) ──
     public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,
                     String textBottom, String textLeft, String textRight, int duration,
                     String orientation, String screenId, String contractId, String targetHours,
                     int insertedAt, String currency, int maxBid,
-                    String targetGender, String targetAgeGroup, String targetTags, String targetEmotion) {
+                    String targetGender, String targetAgeGroup, String targetTags, String targetEmotion,
+                    String streamType, String socialPlatform, String socialHashtag) {
         this.advertId = advertId;
         this.format = format;
         this.localPath = localPath;
@@ -59,5 +69,20 @@ public class AdEntity {
         this.targetAgeGroup = targetAgeGroup;
         this.targetTags = targetTags;
         this.targetEmotion = targetEmotion;
+        this.streamType = streamType;
+        this.socialPlatform = socialPlatform;
+        this.socialHashtag = socialHashtag;
+    }
+    
+    // ── Backward compatibility constructor (DB v7 and earlier) ──
+    @androidx.room.Ignore
+    public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,
+                    String textBottom, String textLeft, String textRight, int duration,
+                    String orientation, String screenId, String contractId, String targetHours,
+                    int insertedAt, String currency, int maxBid,
+                    String targetGender, String targetAgeGroup, String targetTags, String targetEmotion) {
+        this(advertId, format, localPath, textTop, textBottom, textLeft, textRight, duration,
+             orientation, screenId, contractId, targetHours, insertedAt, currency, maxBid,
+             targetGender, targetAgeGroup, targetTags, targetEmotion, null, null, null);
     }
 }

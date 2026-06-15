@@ -23,6 +23,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -49,6 +50,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adjaba.R;
 import com.adjaba.activities.viewmodel.APIImpression;
+import com.adjaba.content.SecureSignageWebView;
+import com.adjaba.social.SocialMediaManager;
+import com.adjaba.social.SocialPostAdapter;
 import com.adjaba.activities.viewmodel.DataHolder;
 import com.adjaba.models.DemographicData;
 import com.adjaba.models.newmodels.Forecastday;
@@ -154,6 +158,11 @@ public class AdvertLandWatch extends AppCompatActivity {
     String mediaFormat = "";
     TextView displayText, newsTitle;
     String orient;
+    SecureSignageWebView webContentView;
+    FrameLayout socialFeedLayout;
+    TextView socialPlatformLabel, socialHashtagLabel;
+    RecyclerView socialPostsRecyclerView;
+    SocialMediaManager socialMediaManager;
     List<RssItem> getNews;
     int newsIndex = 0;
     NewsHandler newsHandler;
@@ -210,6 +219,15 @@ public class AdvertLandWatch extends AppCompatActivity {
         tvStatus = findViewById(R.id.currentStatus);
         tvTemp = findViewById(R.id.weatherTemp);
         adPlayerView = findViewById(R.id.adPlayerView);
+        webContentView = findViewById(R.id.webContentView);
+        socialFeedLayout = findViewById(R.id.socialFeedLayout);
+        socialPlatformLabel = findViewById(R.id.socialPlatformLabel);
+        socialHashtagLabel = findViewById(R.id.socialHashtagLabel);
+        socialPostsRecyclerView = findViewById(R.id.socialPostsRecyclerView);
+        if (socialPostsRecyclerView != null) {
+            socialPostsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
+        socialMediaManager = new SocialMediaManager(this);
         screenId = DataHolder.getInstance().screenID;
         location = DataHolder.getInstance().location;
         // Set location label immediately so it shows the correct city even before the weather API responds
@@ -392,12 +410,21 @@ public class AdvertLandWatch extends AppCompatActivity {
             // Build MediaModel list from database
             List<MediaModel> updatedAds = new ArrayList<>();
             for (AdEntity ad : adEntities) {
-                if (ad.localPath != null) {
-                    updatedAds.add(new MediaModel(
+                boolean isStreamingType = "LIVE_STREAM".equals(ad.format)
+                        || "WEB_CONTENT".equals(ad.format)
+                        || "SOCIAL_FEED".equals(ad.format);
+                if ((ad.localPath != null && !ad.localPath.isEmpty()) || isStreamingType) {
+                    MediaModel m = new MediaModel(
                             ad.contractId, ad.currency, ad.maxBid, ad.format,
-                            ad.localPath, ad.duration, ad.textBottom, ad.textTop,
-                            "", ad.targetHours, ad.advertId
-                    ));
+                            ad.localPath != null ? ad.localPath : "",
+                            ad.duration, ad.textBottom, ad.textTop,
+                            "", ad.targetHours, ad.advertId,
+                            ad.targetGender, ad.targetAgeGroup, ad.targetTags, ad.targetEmotion
+                    );
+                    if (ad.streamType != null)     m.setStreamType(ad.streamType);
+                    if (ad.socialPlatform != null) m.setSocialPlatform(ad.socialPlatform);
+                    if (ad.socialHashtag != null)  m.setSocialHashtag(ad.socialHashtag);
+                    updatedAds.add(m);
                 }
             }
 
@@ -411,10 +438,19 @@ public class AdvertLandWatch extends AppCompatActivity {
                 android.util.Log.i("AdvertLandWatch", "   New rotation has " + (newRotation == null ? 0 : newRotation.size()) + " items");
 
                 // Update mediaList for playback
-                // Note: Current playback continues, new ads will appear in next cycle
+                boolean wasEmpty = mediaList.isEmpty();
                 mediaList.clear();
                 if (newRotation != null) {
                     mediaList.addAll(newRotation);
+                }
+                // Keep currentIndex in bounds after a playlist shrink
+                if (currentIndex >= mediaList.size()) {
+                    currentIndex = 0;
+                }
+                // Restart rotation if it had stalled on an empty list
+                if (!mediaList.isEmpty() && wasEmpty) {
+                    handler.removeCallbacks(mediaSwitcher);
+                    handler.post(mediaSwitcher);
                 }
 
                 Toast.makeText(context, "Playlist updated: " + updatedAds.size() + " ads", Toast.LENGTH_SHORT).show();
@@ -566,6 +602,7 @@ public class AdvertLandWatch extends AppCompatActivity {
             // ✅ EMOTION MATCHING: Smart emotion-based targeting
             String adEmotionStr = ad.getTargetEmotion();
             String dominantEmotion = data.getDominantEmotion();
+            if (dominantEmotion == null) dominantEmotion = "unknown";
             int happyScore = data.getHappy();
 
             if (adEmotionStr != null && !adEmotionStr.isEmpty()) {
@@ -702,6 +739,9 @@ public class AdvertLandWatch extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if (webContentView != null) webContentView.cleanup();
+        if (socialMediaManager != null) socialMediaManager.shutdown();
 
         // Disconnect MQTT
         MqttManager.getInstance().disconnect();
@@ -1099,10 +1139,12 @@ public class AdvertLandWatch extends AppCompatActivity {
                 int currentHour = Integer.parseInt(getCurrentHourFormatted());
 
                 View currentVisible = null;
-                if (adImageView.getVisibility() == View.VISIBLE)     currentVisible = adImageView;
-                else if (adPlayerView.getVisibility() == View.VISIBLE) currentVisible = adPlayerView;
-                else if (weatherLayout.getVisibility() == View.VISIBLE) currentVisible = weatherLayout;
-                else if (newsLayout.getVisibility() == View.VISIBLE)  currentVisible = newsLayout;
+                if (adImageView.getVisibility() == View.VISIBLE)       currentVisible = adImageView;
+                else if (adPlayerView.getVisibility() == View.VISIBLE)   currentVisible = adPlayerView;
+                else if (weatherLayout.getVisibility() == View.VISIBLE)  currentVisible = weatherLayout;
+                else if (newsLayout.getVisibility() == View.VISIBLE)     currentVisible = newsLayout;
+                else if (webContentView != null && webContentView.getVisibility() == View.VISIBLE) currentVisible = webContentView;
+                else if (socialFeedLayout != null && socialFeedLayout.getVisibility() == View.VISIBLE) currentVisible = socialFeedLayout;
 
                 releaseExoPlayer();
                 adPlayerView.setVisibility(View.GONE);
@@ -1110,6 +1152,8 @@ public class AdvertLandWatch extends AppCompatActivity {
                 if (currentVisible != adImageView)   adImageView.setVisibility(View.GONE);
                 if (currentVisible != weatherLayout) weatherLayout.setVisibility(View.GONE);
                 if (currentVisible != newsLayout)    newsLayout.setVisibility(View.GONE);
+                if (webContentView != null && currentVisible != webContentView) webContentView.setVisibility(View.GONE);
+                if (socialFeedLayout != null && currentVisible != socialFeedLayout) socialFeedLayout.setVisibility(View.GONE);
 
                 // Default: hide logo/QR for every slide; only ads (IMAGE/VIDEO) will re-show them
                 logoImage.setVisibility(View.GONE);
@@ -1265,6 +1309,84 @@ public class AdvertLandWatch extends AppCompatActivity {
                     }
 
                     slideTransition(newsLayout, currentVisible);
+                    handler.postDelayed(this, durationMs);
+
+                } else if (media.getType().equals("LIVE_STREAM")) {
+                    android.util.Log.d("AdvertLandWatch", "   LIVE_STREAM: " + media.getUrl());
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | LIVE_STREAM | " + (durationMs / 1000) + "s");
+                    waitingLogo.setVisibility(View.GONE);
+                    adPlayerView.setVisibility(View.INVISIBLE);
+                    logoImage.setVisibility(View.VISIBLE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+                    String liveUrl = media.getUrl();
+                    if (liveUrl != null && !liveUrl.isEmpty()) {
+                        setupExoPlayer(liveUrl, null, null);
+                    } else {
+                        android.util.Log.w("AdvertLandWatch", "⚠️ LIVE_STREAM has no URL, advancing rotation");
+                    }
+                    // Duration drives rotation; STATE_READY won't reschedule for live (C.TIME_UNSET)
+                    handler.postDelayed(this, durationMs);
+                    saveAndSendImpression(media, durationMs, context);
+
+                } else if (media.getType().equals("WEB_CONTENT")) {
+                    android.util.Log.d("AdvertLandWatch", "   WEB_CONTENT: " + media.getUrl());
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | WEB_CONTENT | " + (durationMs / 1000) + "s");
+                    waitingLogo.setVisibility(View.GONE);
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+                    if (webContentView != null) {
+                        webContentView.loadUrlSafe(media.getUrl());
+                        slideTransition(webContentView, currentVisible);
+                    }
+                    handler.postDelayed(this, durationMs);
+                    saveAndSendImpression(media, durationMs, context);
+
+                } else if (media.getType().equals("SOCIAL_FEED")) {
+                    android.util.Log.d("AdvertLandWatch", "   SOCIAL_FEED: platform=" + media.getSocialPlatform() + " hashtag=" + media.getSocialHashtag());
+                    updateDebugText("Item " + (currentIndex + 1) + "/" + mediaList.size() + " | SOCIAL_FEED | " + (durationMs / 1000) + "s");
+                    waitingLogo.setVisibility(View.GONE);
+                    logoImage.setVisibility(View.GONE);
+                    qrImage.setVisibility(View.GONE);
+                    displayText.setVisibility(View.GONE);
+                    if (socialFeedLayout != null) {
+                        String platform = media.getSocialPlatform();
+                        String hashtag = media.getSocialHashtag();
+                        if (socialPlatformLabel != null) {
+                            socialPlatformLabel.setText(platform != null ? platform : "Social");
+                        }
+                        if (socialHashtagLabel != null) {
+                            socialHashtagLabel.setText(hashtag != null ? "#" + hashtag : "");
+                        }
+                        SocialMediaManager.SocialPlatform p =
+                                "INSTAGRAM".equalsIgnoreCase(platform)
+                                        ? SocialMediaManager.SocialPlatform.INSTAGRAM
+                                        : SocialMediaManager.SocialPlatform.TWITTER;
+                        socialMediaManager.fetchMixedFeed(
+                                hashtag != null ? hashtag : "",
+                                new SocialMediaManager.SocialPlatform[]{p},
+                                8,
+                                new SocialMediaManager.SocialFeedListener() {
+                                    @Override
+                                    public void onPostsLoaded(List<SocialMediaManager.SocialPost> posts) {
+                                        if (!isFinishing() && !isDestroyed() && socialPostsRecyclerView != null) {
+                                            socialPostsRecyclerView.setAdapter(new SocialPostAdapter(posts));
+                                        }
+                                    }
+                                    @Override
+                                    public void onError(String error) {
+                                        android.util.Log.e("AdvertLandWatch", "Social feed error: " + error);
+                                    }
+                                }
+                        );
+                        slideTransition(socialFeedLayout, currentVisible);
+                    }
+                    handler.postDelayed(this, durationMs);
+                    saveAndSendImpression(media, durationMs, context);
+
+                } else {
+                    android.util.Log.w("AdvertLandWatch", "⚠️ Unknown media type: " + media.getType() + ", advancing rotation");
                     handler.postDelayed(this, durationMs);
                 }
 

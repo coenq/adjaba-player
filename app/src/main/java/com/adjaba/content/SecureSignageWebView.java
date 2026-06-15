@@ -22,6 +22,7 @@ public class SecureSignageWebView extends WebView {
 
     private WebViewLoadListener loadListener;
     private String currentUrl;
+    private boolean isCleanedUp = false;
 
     public interface WebViewLoadListener {
         void onPageLoaded(String url);
@@ -200,9 +201,17 @@ public class SecureSignageWebView extends WebView {
      * Cleanup resources
      */
     public void cleanup() {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
         stopLoading();
         clearWebViewData();
+        android.webkit.CookieManager.getInstance().removeAllCookies(null);
         removeAllViews();
+        // Must detach from parent before destroy() per Android WebView contract
+        android.view.ViewParent parent = getParent();
+        if (parent instanceof android.view.ViewGroup) {
+            ((android.view.ViewGroup) parent).removeView(this);
+        }
         destroy();
     }
 }

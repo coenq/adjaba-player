@@ -182,6 +182,47 @@ public class AdSyncWorker extends Worker {
                 android.util.Log.d("AdSyncWorker", "   Downloading new ad: " + advertId);
 
                 String videoUrl = ad.adContractData.videoUrl;
+                String adFormat = ad.adContractData.format != null
+                        ? ad.adContractData.format.toUpperCase() : "";
+
+                // Non-downloadable content types: store metadata directly, no file needed
+                if ("LIVE_STREAM".equals(adFormat) || "WEB_CONTENT".equals(adFormat)
+                        || "SOCIAL_FEED".equals(adFormat)) {
+                    // For LIVE_STREAM/WEB_CONTENT the URL is stored as localPath so it becomes
+                    // media.getUrl() when MediaModel is rebuilt from the database.
+                    String contentUrl = "SOCIAL_FEED".equals(adFormat) ? ""
+                            : (videoUrl != null ? videoUrl : "");
+                    // LIVE_STREAM and WEB_CONTENT require a URL — skip if missing
+                    if (("LIVE_STREAM".equals(adFormat) || "WEB_CONTENT".equals(adFormat))
+                            && contentUrl.isEmpty()) {
+                        android.util.Log.w("AdSyncWorker", "  ⚠️ " + adFormat + " ad " + advertId
+                                + " has no URL — skipping");
+                        continue;
+                    }
+                    AdEntity adEntity = new AdEntity(
+                            advertId, adFormat, contentUrl,
+                            ad.adContractData.textTop,
+                            ad.adContractData.textBottom,
+                            ad.adContractData.textLeft,
+                            ad.adContractData.textRight,
+                            ad.duration * 1000, "Landscape", screenId,
+                            ad.contractId,
+                            listToString(ad.adContractData.targetHours),
+                            downloadedCount, ad.currency, ad.maxBid,
+                            listStrToString(ad.adContractData.targetGender),
+                            listStrToString(ad.adContractData.targetAgeGroup),
+                            listStrToString(ad.adContractData.targetTags),
+                            listStrToString(ad.adContractData.targetEmotion),
+                            ad.adContractData.streamType,
+                            ad.adContractData.socialPlatform,
+                            ad.adContractData.socialHashtag
+                    );
+                    db.adDao().insertAd(adEntity);
+                    downloadedCount++;
+                    android.util.Log.d("AdSyncWorker", "  ✅ Saved streaming/web/social ad: " + advertId);
+                    continue;
+                }
+
                 if (videoUrl == null || videoUrl.isEmpty()) {
                     android.util.Log.w("AdSyncWorker", "  ⚠️ Ad " + advertId + " has empty path - skipping");
                     continue;
@@ -221,7 +262,8 @@ public class AdSyncWorker extends Worker {
                             listStrToString(ad.adContractData.targetGender),
                             listStrToString(ad.adContractData.targetAgeGroup),
                             listStrToString(ad.adContractData.targetTags),
-                            listStrToString(ad.adContractData.targetEmotion)
+                            listStrToString(ad.adContractData.targetEmotion),
+                            null, null, null
                     );
 
                     db.adDao().insertAd(adEntity);

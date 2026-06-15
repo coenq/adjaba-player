@@ -27,4 +27,9 @@ public class AdContractData {
     public String textRight;
     public String textTop;
     public String videoUrl;
+
+    // ── Content Type Fields (new for streaming, web, social media) ──
+    public String streamType;         // For live_stream: "HLS", "DASH", "RTSP", "HTTP"
+    public String socialPlatform;     // For social_feed: "TWITTER", "INSTAGRAM", "FACEBOOK"
+    public String socialHashtag;      // For social_feed: hashtag or @username to display
 }

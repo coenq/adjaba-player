@@ -1,4 +1,3 @@
-
 package com.adjaba.models.newmodels;
 
 import java.util.ArrayList;
@@ -24,8 +23,11 @@ public class AdData {
     public String textRight;
     public String textTop;
     public String videoUrl;
+    public String streamType;
+    public String socialPlatform;
+    public String socialHashtag;
 
-    public AdData(int adBudget, String currency, int adDuration, String adFormat, int maxBid, String orientation, String resolution, ArrayList<String> targetAgeGroup, ArrayList<String> targetDevice, ArrayList<String> targetEvent, ArrayList<String> targetGender, ArrayList<Integer> targetHours, ArrayList<String> targetLocationType, int targetMinSizeInch, ArrayList<String> targetTags, String textBottom, String textLeft, String textRight, String textTop, String videoUrl) {
+    public AdData(int adBudget, String currency, int adDuration, String adFormat, int maxBid, String orientation, String resolution, ArrayList<String> targetAgeGroup, ArrayList<String> targetDevice, ArrayList<String> targetEvent, ArrayList<String> targetGender, ArrayList<Integer> targetHours, ArrayList<String> targetLocationType, int targetMinSizeInch, ArrayList<String> targetTags, String textBottom, String textLeft, String textRight, String textTop, String videoUrl, String streamType, String socialPlatform, String socialHashtag) {
         this.adBudget = adBudget;
         this.currency = currency;
         this.adDuration = adDuration;
@@ -46,6 +48,9 @@ public class AdData {
         this.textRight = textRight;
         this.textTop = textTop;
         this.videoUrl = videoUrl;
+        this.streamType = streamType;
+        this.socialPlatform = socialPlatform;
+        this.socialHashtag = socialHashtag;
     }
 
     public int getAdBudget() {
@@ -126,5 +131,17 @@ public class AdData {
 
     public String getVideoUrl() {
         return videoUrl;
+    }
+
+    public String getStreamType() {
+        return streamType;
+    }
+
+    public String getSocialPlatform() {
+        return socialPlatform;
+    }
+
+    public String getSocialHashtag() {
+        return socialHashtag;
     }
 }
