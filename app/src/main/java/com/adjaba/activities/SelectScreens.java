@@ -134,7 +134,7 @@ public class SelectScreens extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
         logo = findViewById(R.id.loadingLogo);
-        String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait"};
+        String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait", "Split Screen"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -393,7 +393,7 @@ public class SelectScreens extends AppCompatActivity {
                                                  mediaModels.clear();
                                                  for (AdEntity ada : cachedAds) {
                                                      if (ada.localPath != null) {
-                                                         mediaModels.add(new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion));
+                                                         mediaModels.add(mediaModelFromAdEntity(ada));
                                                          DataHolder.getInstance().advertIds.add(ada.advertId);
                                                      }
                                                  }
@@ -469,7 +469,7 @@ public class SelectScreens extends AppCompatActivity {
                                                  mediaModels.clear();
                                                 for (AdEntity ada : existingAds) {
                                                     if (ada.localPath != null) {
-                                                        mediaModels.add(new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion));
+                                                        mediaModels.add(mediaModelFromAdEntity(ada));
                                                         DataHolder.getInstance().advertIds.add(ada.advertId);
                                                     }
                                                 }
@@ -528,7 +528,10 @@ public class SelectScreens extends AppCompatActivity {
                                                             ad.adContractData.targetGender,
                                                             ad.adContractData.targetAgeGroup,
                                                             ad.adContractData.targetTags,
-                                                            ad.adContractData.targetEmotion
+                                                            ad.adContractData.targetEmotion,
+                                                            ad.adContractData.streamType,
+                                                            ad.adContractData.socialPlatform,
+                                                            ad.adContractData.socialHashtag
                                                     );
                                                 }
                                             });
@@ -559,7 +562,7 @@ public class SelectScreens extends AppCompatActivity {
                                             mediaModels.clear();
                                             for (AdEntity ada : cachedAds) {
                                                 if (ada.localPath != null) {
-                                                    mediaModels.add(new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion));
+                                                    mediaModels.add(mediaModelFromAdEntity(ada));
                                                     DataHolder.getInstance().advertIds.add(ada.advertId);
                                                 }
                                             }
@@ -596,7 +599,7 @@ public class SelectScreens extends AppCompatActivity {
                                         mediaModels.clear();
                                         for (AdEntity ada : cachedAds) {
                                             if (ada.localPath != null) {
-                                                mediaModels.add(new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion));
+                                                mediaModels.add(mediaModelFromAdEntity(ada));
                                                 DataHolder.getInstance().advertIds.add(ada.advertId);
                                             }
                                         }
@@ -685,15 +688,71 @@ public class SelectScreens extends AppCompatActivity {
                 .setInterpolator(new DecelerateInterpolator())
                 .withEndAction(() -> {
                     android.util.Log.i("SelectScreens", " Launching AdvertWatching - orientation: " + orient);
-                    if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
+                    if (orient.equalsIgnoreCase("forced portrait")) {
                         startActivity(new Intent(context, AdvertLandWatch.class));
+                    } else if (orient.equalsIgnoreCase("split screen")) {
+                        startActivity(new Intent(context, AdvertSplitScreen.class));
                     } else {
                         startActivity(new Intent(context, AdvertWatching.class));
                     }
                 }).start();
     }
 
-    private void getUrl(String contractId, String currency, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder, List<String> targetGender, List<String> targetAgeGroup, List<String> targetTags, List<String> targetEmotion) {
+    /** Builds a MediaModel from a stored AdEntity, including streamType/socialPlatform/socialHashtag. */
+    private MediaModel mediaModelFromAdEntity(AdEntity ada) {
+        MediaModel m = new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath,
+                ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId,
+                ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion);
+        copySocialAndStreamFields(ada, m);
+        return m;
+    }
+
+    /** Copies the v1.1.0 content-type fields (streamType/socialPlatform/socialHashtag) from DB to model. */
+    private void copySocialAndStreamFields(AdEntity ada, MediaModel m) {
+        if (ada.streamType != null)     m.setStreamType(ada.streamType);
+        if (ada.socialPlatform != null) m.setSocialPlatform(ada.socialPlatform);
+        if (ada.socialHashtag != null)  m.setSocialHashtag(ada.socialHashtag);
+    }
+
+    private void getUrl(String contractId, String currency, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder, List<String> targetGender, List<String> targetAgeGroup, List<String> targetTags, List<String> targetEmotion, String streamType, String socialPlatform, String socialHashtag) {
+        // LIVE_STREAM / WEB_CONTENT / SOCIAL_FEED have no downloadable file — SOCIAL_FEED has no
+        // path at all, the others carry their URL in `path`. Persist them directly, no download.
+        String normalizedType = type != null ? type.toUpperCase() : "";
+        boolean isStreamingType = "SOCIAL_FEED".equals(normalizedType)
+                || "WEB_CONTENT".equals(normalizedType)
+                || "LIVE_STREAM".equals(normalizedType);
+
+        if (isStreamingType) {
+            String contentUrl = "SOCIAL_FEED".equals(normalizedType) ? "" : (path != null ? path : "");
+            if (!"SOCIAL_FEED".equals(normalizedType) && contentUrl.isEmpty()) {
+                android.util.Log.w("SelectScreens", "⚠️ " + normalizedType + " ad " + advertId + " has no URL - skipping");
+                loadedCount[0]++;
+                checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
+                return;
+            }
+
+            Executors.newSingleThreadExecutor().execute(() -> {
+                AdEntity ad = new AdEntity(
+                        advertId, normalizedType, contentUrl,
+                        txtTop, info, txtLeft, txtRight,
+                        duration * 1000, "Landscape", screenId,
+                        contractId, listToString(targetHours), serverOrder, currency, maxBid,
+                        listStrToString(targetGender), listStrToString(targetAgeGroup),
+                        listStrToString(targetTags), listStrToString(targetEmotion),
+                        streamType, socialPlatform, socialHashtag
+                );
+                AdDatabase db = AdDatabase.getInstance(context);
+                db.adDao().insertAd(ad);
+                android.util.Log.d("SelectScreens", "   Inserted " + normalizedType + " ad " + advertId + " to Room DB");
+
+                loadedCount[0]++;
+                targetHoursList.add(new TargetHours(advertId, targetHours));
+                updateDownloadProgress(loadedCount[0], totalCount);
+                checkAndLaunchAdvertWatchingIfAllProcessed(loadedCount[0], totalCount, screenId, contractId, maxBid, orient, context);
+            });
+            return;
+        }
+
         if (path == null || path.isEmpty()) {
             android.util.Log.w("SelectScreens", "⚠️ Ad " + advertId + " has empty path - skipping");
             loadedCount[0]++;
@@ -737,7 +796,8 @@ public class SelectScreens extends AppCompatActivity {
                         listStrToString(targetGender),
                         listStrToString(targetAgeGroup),
                         listStrToString(targetTags),
-                        listStrToString(targetEmotion)
+                        listStrToString(targetEmotion),
+                        null, null, null
                 );
                 AdDatabase db = AdDatabase.getInstance(context);
                 db.adDao().insertAd(ad);
@@ -786,7 +846,9 @@ public class SelectScreens extends AppCompatActivity {
                 if (ads != null && !ads.isEmpty()) {
                     for (AdEntity ada : ads) {
                         if (ada != null && ada.localPath != null) {
-                            mediaModels.add(new MediaModel(contractId, "", maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion));
+                            MediaModel m = new MediaModel(contractId, "", maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion);
+                            copySocialAndStreamFields(ada, m);
+                            mediaModels.add(m);
                         }
                     }
                 }
