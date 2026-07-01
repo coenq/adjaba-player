@@ -17,7 +17,7 @@
 
     <application
         android:name=".App"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:banner="@mipmap/app_icon"
         android:icon="@mipmap/app_icon"
         android:installLocation="internalOnly"
@@ -40,7 +40,7 @@
             android:exported="false" /> <!-- شاشة المعاينة -->
         <activity
             android:name=".activities.PreviewAds"
-            android:exported="true" /> <!-- شاشة تسجيل الدخول، هي Main للموبايل وTV -->
+            android:exported="false" /> <!-- شاشة تسجيل الدخول، هي Main للموبايل وTV -->
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"
@@ -63,11 +63,11 @@
         <activity
             android:name=".activities.AdvertWatching"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="true"
+            android:exported="false"
             />
         <activity
             android:name=".activities.SelectScreens"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".activities.TvLoginActivity"
             android:exported="false" />

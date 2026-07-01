@@ -83,8 +83,17 @@ public class MqttManager {
             return;
         }
 
+        // Already connected to this screen's topic — just swap the listener,
+        // otherwise a second connect() would leak the previous client.
+        String topic = "store/" + screenId;
+        if (isConnected() && topic.equals(currentTopic)) {
+            this.listener = listener;
+            return;
+        }
+        disconnect();
+
         this.listener  = listener;
-        this.currentTopic = "store/" + screenId;
+        this.currentTopic = topic;
 
         new Thread(() -> {
             try {
