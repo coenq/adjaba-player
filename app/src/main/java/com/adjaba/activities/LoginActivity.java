@@ -57,10 +57,8 @@ public class LoginActivity extends AppCompatActivity {
                 ContextCompat.getColor(this, R.color.colorRed),
                 PorterDuff.Mode.SRC_IN
         );
-        Executors.newSingleThreadExecutor().execute(() -> {
-            AdDatabase adDatabase = AdDatabase.getInstance(this);
-            adDatabase.adDao().deleteAllAds();
-        });
+        // NOTE: the ad cache is intentionally NOT wiped here anymore — it is the offline
+        // playback source. It is now cleared only on explicit logout (SelectScreens).
         // Access SharedPreferences
         checkBox.setChecked(true);
         SharedPreferences sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
@@ -90,6 +88,13 @@ public class LoginActivity extends AppCompatActivity {
         retrofitBuilder = new RetrofitBuilder();
         if (Objects.equals(token, "null")) {
             token = AuthManager.getToken(this);
+        }
+
+        // Offline mode: no internet but an existing session — skip login so the
+        // cached ads can play. SelectScreens/getAds handle the offline fallback.
+        if (token != null && !Objects.equals(token, "null") && !isInternetAvailable()) {
+            Toast.makeText(this, "No internet — continuing in offline mode", Toast.LENGTH_LONG).show();
+            intentToPreview();
         }
 
         btnLogin.setOnClickListener(new View.OnClickListener() {

@@ -98,6 +98,8 @@ public class SelectScreens extends AppCompatActivity {
     int[] loadedCount = {0};
     /** Guards against re-auth retry loop: only attempt one token refresh per getAds() session. */
     private volatile boolean authRetried = false;
+    /** True when launched by BootReceiver — DataHolder is restored from prefs, not from the UI. */
+    private boolean autoPlayMode = false;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -193,6 +195,12 @@ public class SelectScreens extends AppCompatActivity {
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Explicit logout: stop boot auto-resume and clear the offline ad cache.
+                // (The cache wipe used to live in LoginActivity.onCreate, which destroyed
+                // offline playback on every app start — now it only happens here.)
+                prefs.edit().putBoolean("resume_enabled", false).apply();
+                Executors.newSingleThreadExecutor().execute(() ->
+                        AdDatabase.getInstance(context).adDao().deleteAllAds());
                 Intent intent = new Intent(view.getContext(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 view.getContext().startActivity(intent);
@@ -310,6 +318,9 @@ public class SelectScreens extends AppCompatActivity {
                     }
                     editor.apply();
 
+                    // Persist session so BootReceiver can auto-resume playback after reboot
+                    saveResumeState();
+
                     Executors.newSingleThreadExecutor().execute(() -> {
                         new Handler(Looper.getMainLooper()).post(() -> {
                             // Set current screen ID for background sync worker
@@ -339,6 +350,76 @@ public class SelectScreens extends AppCompatActivity {
                 spinnerID.setSelection(0);
             }
         });
+
+        // Auto-resume after reboot (launched by BootReceiver): skip the UI and start
+        // playback with the saved configuration. getAds() handles both cases — online
+        // it syncs with the backend, offline it plays the locally cached ads.
+        if (getIntent().getBooleanExtra("auto_play", false) && restoreResumeState()) {
+            android.util.Log.i("SelectScreens", " AUTO-PLAY: resuming screen " + screen_id + " (" + orient + ")");
+            autoPlayMode = true;
+            com.adjaba.workers.AdSyncWorker.setCurrentScreenId(context, screen_id);
+            authRetried = false;
+            setWaitingLogo();
+            getAds(0);
+        }
+    }
+
+    /**
+     * Persists everything needed to restart playback unattended (after reboot).
+     * Screen metadata may be null when PLAY was pressed offline — in that case the
+     * previously saved value is kept instead of being overwritten with null.
+     */
+    private void saveResumeState() {
+        DataHolder d = DataHolder.getInstance();
+        SharedPreferences.Editor e = prefs.edit();
+        e.putBoolean("resume_enabled", true);
+        e.putString("resume_screen_id", screen_id);
+        e.putString("resume_orient", orient);
+        e.putString("resume_time", timeRefresh);
+        e.putInt("resume_display_flag", d.displayFlag);
+        e.putInt("resume_target_hours_flag", d.targetHoursFlag);
+        e.putInt("resume_weather_flag", d.weatherFlag);
+        e.putInt("resume_news_flag", d.newsFlag);
+        if (d.screenDevice != null)  e.putString("resume_screen_device", d.screenDevice);
+        if (d.screenPlayer != null)  e.putString("resume_screen_player", d.screenPlayer);
+        if (d.locationTypes != null) e.putString("resume_location_types", d.locationTypes);
+        if (d.location != null)      e.putString("resume_location", d.location);
+        if (d.tags != null)          e.putString("resume_tags", android.text.TextUtils.join(",", d.tags));
+        e.apply();
+    }
+
+    /**
+     * Restores the saved playback session into this activity's fields and DataHolder.
+     *
+     * @return true if a complete session was restored and playback can start.
+     */
+    private boolean restoreResumeState() {
+        if (!prefs.getBoolean("resume_enabled", false)) return false;
+        String savedScreen = prefs.getString("resume_screen_id", null);
+        String savedOrient = prefs.getString("resume_orient", null);
+        if (savedScreen == null || savedOrient == null) return false;
+
+        screen_id = savedScreen;
+        orient = savedOrient;
+        timeRefresh = prefs.getString("resume_time", "0");
+
+        DataHolder d = DataHolder.getInstance();
+        d.screenID = screen_id;
+        d.orient = orient;
+        d.time = timeRefresh;
+        d.displayFlag     = prefs.getInt("resume_display_flag", 0);
+        d.targetHoursFlag = prefs.getInt("resume_target_hours_flag", 0);
+        d.weatherFlag     = prefs.getInt("resume_weather_flag", 1);
+        d.newsFlag        = prefs.getInt("resume_news_flag", 1);
+        d.screenDevice    = prefs.getString("resume_screen_device", null);
+        d.screenPlayer    = prefs.getString("resume_screen_player", null);
+        d.locationTypes   = prefs.getString("resume_location_types", null);
+        d.location        = prefs.getString("resume_location", null);
+        String tags = prefs.getString("resume_tags", null);
+        d.tags = (tags != null && !tags.isEmpty())
+                ? new ArrayList<>(Arrays.asList(tags.split(",")))
+                : new ArrayList<>();
+        return true;
     }
 
     void getAds(int flag) {
@@ -637,6 +718,13 @@ public class SelectScreens extends AppCompatActivity {
      * Helper method to set up DataHolder and launch AdvertWatching activity
      */
     private void setupDataHolderAndLaunch(String orient, Context context) {
+        // In auto-play mode DataHolder was already restored from prefs — the UI maps and
+        // checkboxes are empty/default here and would overwrite it with wrong values.
+        if (autoPlayMode) {
+            DataHolder.getInstance().allAds = new ArrayList<>();
+            launchAdvertWatchingActivity(orient, context);
+            return;
+        }
         if (!screen_id.equals("Select Screen") && !orient.equals("Orientation")) {
             DataHolder.getInstance().screenID = screen_id;
             DataHolder.getInstance().screenDevice = screenDeviceMap.get(screen_id);
@@ -950,14 +1038,32 @@ public class SelectScreens extends AppCompatActivity {
                     }
                 }
                 onFinish.run();
+                if (screenIdForDisplay.size() <= 1) addSavedScreenFallback();
             }
 
             @Override
             public void onFailure(Call<List<Root>> call, Throwable t) {
                 onFinish.run();
+                // Offline: screen list is unreachable — offer the last-played screen
+                // so cached ads can still be started manually.
+                addSavedScreenFallback();
             }
         });
         return screenOptions;
+    }
+
+    /**
+     * Adds the last-played screen to the spinner when the backend screen list is
+     * unavailable (offline), and pre-selects it. Runs after onFinish so its
+     * selection wins over the remembered spinner position.
+     */
+    private void addSavedScreenFallback() {
+        String savedId = prefs.getString("resume_screen_id", null);
+        if (savedId == null || screenIdForDisplay.contains(savedId)) return;
+        screenOptions.add(savedId + " (offline)");
+        screenIdForDisplay.add(savedId);
+        spinnerAdapter.notifyDataSetChanged();
+        spinnerID.setSelection(screenIdForDisplay.indexOf(savedId));
     }
 
     public static String downloadFileWithAuth(Context context, String fileUrl, String fileName, String token) {

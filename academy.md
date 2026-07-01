@@ -133,7 +133,8 @@ This is entirely optional. Leaving it unchecked (the default) just runs the norm
 ## 9. Day-to-Day Operation
 
 - **Keep it powered and connected.** The device needs to stay online to receive new content and report playback. Wi-Fi/Ethernet should be stable and always-on.
-- **Auto-start on reboot.** The app restarts itself automatically if the device loses power and comes back — no need to manually relaunch it after an outage.
+- **Auto-start on reboot.** Once a screen has been started with **Play**, the app resumes playback automatically if the device loses power and comes back — no need to manually relaunch it after an outage. On newer devices (Android 10 and above) this requires granting the app the **"Display over other apps"** permission once, in the device's app settings.
+- **Works offline.** Ads are downloaded and stored on the device, so if the internet drops out (or is down after a power cut), the screen keeps playing the last downloaded playlist and syncs again when the connection returns.
 - **Remote control only on TV.** All TV screens are fully navigable with a D-pad remote; no touchscreen or mouse required.
 - **Leave it running.** Don't force-close the app during business hours — it's designed to run continuously.
 
