@@ -1176,9 +1176,15 @@ public class AdvertLandWatch extends AppCompatActivity {
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
                     waitingLogo.setVisibility(View.GONE);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
-                    QRCodeMaker(media.getInfo());
                     displayText.setText(media.getDisplayText());
-                    qrImage.setVisibility(View.VISIBLE);
+                    // Only show the QR code when the ad actually has a target URL
+                    String targetUrlImg = media.getInfo();
+                    if (targetUrlImg != null && !targetUrlImg.trim().isEmpty()) {
+                        QRCodeMaker(targetUrlImg);
+                        qrImage.setVisibility(View.VISIBLE);
+                    } else {
+                        qrImage.setVisibility(View.GONE);
+                    }
                     logoImage.setVisibility(View.VISIBLE);
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
@@ -1193,8 +1199,14 @@ public class AdvertLandWatch extends AppCompatActivity {
                     displayText.setText(media.getDisplayText());
                     adPlayerView.setVisibility(View.INVISIBLE);
                     logoImage.setVisibility(View.VISIBLE);
-                    QRCodeMaker(media.getInfo());
-                    qrImage.setVisibility(View.VISIBLE);
+                    // Only show the QR code when the ad actually has a target URL
+                    String targetUrlVid = media.getInfo();
+                    if (targetUrlVid != null && !targetUrlVid.trim().isEmpty()) {
+                        QRCodeMaker(targetUrlVid);
+                        qrImage.setVisibility(View.VISIBLE);
+                    } else {
+                        qrImage.setVisibility(View.GONE);
+                    }
                     if (DataHolder.getInstance().displayFlag == 1) {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
