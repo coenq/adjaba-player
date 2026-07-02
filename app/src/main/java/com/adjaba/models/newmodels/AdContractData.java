@@ -21,10 +21,13 @@ public class AdContractData {
     public ArrayList<String> targetEmotion;       // e.g. ["happy", "neutral"] - NEW for IOT
     
     // ── Content & Display Fields ──
-    public String targeturl;
+    // NOTE: the old `targeturl` field is retired (CMS/backend dropped it, July 2026).
+    // The ad's target URL now travels in textBottom — see below.
+    /** The ad's target URL: rendered as the on-screen QR code. Empty/null = no QR shown. */
     public String textBottom;
     public String textLeft;
     public String textRight;
+    /** Display text shown as the ad's caption overlay. */
     public String textTop;
     public String videoUrl;
 

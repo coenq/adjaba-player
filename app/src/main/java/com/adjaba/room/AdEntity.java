@@ -12,7 +12,9 @@ public class AdEntity {
 
     public String format;
     public String localPath;
+    /** Display text shown as the ad's caption overlay. */
     public String textTop;
+    /** The ad's target URL — rendered as the on-screen QR code (empty = no QR). */
     public String textBottom;
     public String textLeft;
     public String textRight;

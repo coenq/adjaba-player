@@ -84,6 +84,7 @@ public class MediaModel {
     public String getTargetHours() { return targetHours; }
     public String getDisplayText() { return displayText; }
     public String getUrl()         { return url; }
+    /** The ad's target URL (from the API's textBottom field) — QR code destination. */
     public String getInfo()        { return infoLink; }
     public int    getDurationInMillis() { return durationInMillis; }
 
