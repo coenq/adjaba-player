@@ -181,6 +181,15 @@ public class SelectScreens extends AppCompatActivity {
                 }
                 spinner2.setSelection(spinner2Pos);
             }
+
+            // Auto-play (boot/power-cut resume, or a fresh TV login with remote setup from a
+            // phone) must run AFTER getIDs() completes, not before — it needs screenLocation/
+            // screenDeviceMap/etc. (populated by getIDs(), a few lines up) to fill in the
+            // screen's location for weather/news. Running it earlier left DataHolder.location
+            // null for any screen with no prior manual Play session (e.g. a screen configured
+            // entirely from a phone during TV login), which crashed AdvertWatching/AdvertLandWatch
+            // in NewsHandler.load (Kotlin non-null parameter) on launch.
+            runAutoPlayIfRequested();
         });
         adsInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,17 +386,40 @@ public class SelectScreens extends AppCompatActivity {
             }
         });
 
-        // Auto-resume after reboot (launched by BootReceiver): skip the UI and start
-        // playback with the saved configuration. getAds() handles both cases — online
-        // it syncs with the backend, offline it plays the locally cached ads.
-        if (getIntent().getBooleanExtra("auto_play", false) && restoreResumeState()) {
-            android.util.Log.i("SelectScreens", " AUTO-PLAY: resuming screen " + screen_id + " (" + orient + ")");
-            autoPlayMode = true;
-            com.adjaba.workers.AdSyncWorker.setCurrentScreenId(context, screen_id);
-            authRetried = false;
-            setWaitingLogo();
-            getAds(0);
+    }
+
+    /**
+     * Auto-resume: skip the manual UI and start playback with a saved/remote configuration.
+     * Two callers: (1) BootReceiver after a reboot/power cut — the saved config always came
+     * from a prior manual Play on this device, so screen location/device/player/tags are
+     * already correct in prefs; (2) a fresh TV login where the screen was configured remotely
+     * from a phone (see RemoteScreenSetup) — there was never a prior manual Play, so those
+     * fields are missing from prefs entirely and MUST come from this method's live getIDs()
+     * lookup instead, or weather/news crash on a null location (see call site's comment).
+     * getAds() handles both online (syncs with backend) and offline (plays cached ads) cases.
+     */
+    private void runAutoPlayIfRequested() {
+        if (!getIntent().getBooleanExtra("auto_play", false) || !restoreResumeState()) return;
+
+        android.util.Log.i("SelectScreens", " AUTO-PLAY: resuming screen " + screen_id + " (" + orient + ")");
+        autoPlayMode = true;
+
+        // Enrich with live data from getIDs() when this screen is in the just-fetched list —
+        // takes priority since it's fresher; falls back to whatever restoreResumeState()
+        // already set from prefs if the screen isn't found (e.g. offline, so getIDs() failed).
+        if (screenLocation.containsKey(screen_id)) {
+            DataHolder d = DataHolder.getInstance();
+            d.location = screenLocation.get(screen_id);
+            d.screenDevice = screenDeviceMap.get(screen_id);
+            d.screenPlayer = screenPlayerMap.get(screen_id);
+            d.locationTypes = screenLocationMap.get(screen_id);
+            d.tags = screenTags.get(screen_id);
         }
+
+        com.adjaba.workers.AdSyncWorker.setCurrentScreenId(context, screen_id);
+        authRetried = false;
+        setWaitingLogo();
+        getAds(0);
     }
 
     /**

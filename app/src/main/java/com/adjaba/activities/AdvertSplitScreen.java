@@ -569,13 +569,24 @@ public class AdvertSplitScreen extends AppCompatActivity {
         weatherRefreshHandler.postDelayed(weatherRefreshRunnable, WEATHER_REFRESH_MS);
     }
 
+    /**
+     * DataHolder.location can be null — e.g. a screen configured remotely from a phone during
+     * TV login whose location lookup hasn't completed/failed (see SelectScreens.runAutoPlayIfRequested).
+     * NewsHandler.load's cityName parameter is a Kotlin non-null String; passing null crashes
+     * the whole app on launch. Never call newsHandler.load() with the raw DataHolder value.
+     */
+    private String safeLocation() {
+        String loc = DataHolder.getInstance().location;
+        return loc != null ? loc : "";
+    }
+
     // ══════════════════════════════════════════════════════════════
     // News
     // ══════════════════════════════════════════════════════════════
 
     private void loadNews() {
         newsHandler = new NewsHandler(0);
-        newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+        newsHandler.load(safeLocation(), context, (rss, i) -> {
             rightNewsList = new ArrayList<>(rss);
             newsIndex = 0;
             return Unit.INSTANCE;

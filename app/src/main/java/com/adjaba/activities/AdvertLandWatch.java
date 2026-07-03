@@ -305,7 +305,7 @@ public class AdvertLandWatch extends AppCompatActivity {
         screenLoc = location;
         if (!isDataLoaded || orient.equals("portrait") || orient.equals("landscape") || orient.equals("forced portrait")) {
             newsHandler = new NewsHandler(0);
-            newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+            newsHandler.load(safeLocation(), context, (rss, i) -> {
                 getNews = new ArrayList<>(rss);
                 newsIndex = 0;
                 return Unit.INSTANCE;
@@ -358,7 +358,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                 if (!isFinishing() && !isDestroyed()) {
                     Utils.INSTANCE.getNewsList().clear(); // force fresh network fetch
                     newsHandler = new NewsHandler(0);
-                    newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                    newsHandler.load(safeLocation(), context, (rss, i) -> {
                         getNews = new ArrayList<>(rss);
                         newsIndex = 0;
                         return Unit.INSTANCE;
@@ -1266,7 +1266,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                         shimmer.setVisibility(View.VISIBLE);
                         newsHandler = new NewsHandler(0);
                         try {
-                            newsHandler.load(DataHolder.getInstance().location, context, (rss, i) -> {
+                            newsHandler.load(safeLocation(), context, (rss, i) -> {
                                 getNews = new ArrayList<>(rss);
                                 newsIndex = 0;
                                 shimmer.stopShimmer();
@@ -1573,6 +1573,17 @@ public class AdvertLandWatch extends AppCompatActivity {
             exoPlayer.release();
             exoPlayer = null;
         }
+    }
+
+    /**
+     * DataHolder.location can be null — e.g. a screen configured remotely from a phone during
+     * TV login whose location lookup hasn't completed/failed (see SelectScreens.runAutoPlayIfRequested).
+     * NewsHandler.load's cityName parameter is a Kotlin non-null String; passing null crashes
+     * the whole app on launch. Never call newsHandler.load() with the raw DataHolder value.
+     */
+    private String safeLocation() {
+        String loc = DataHolder.getInstance().location;
+        return loc != null ? loc : "";
     }
 
     /**
