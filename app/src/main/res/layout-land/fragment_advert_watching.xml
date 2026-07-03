@@ -634,18 +634,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Top caption: wraps up to 3 lines with a readable background band instead of marquee-scrolling -->
     <TextView
         android:id="@+id/displayText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:ellipsize="marquee"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:background="@drawable/bg_caption_band"
+        android:ellipsize="end"
         android:gravity="center"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:scrollHorizontally="true"
-        android:singleLine="true"
+        android:maxLines="3"
+        android:padding="12dp"
         android:text="Advert is Here"
         android:textColor="@color/tvTextPrimary"
         android:textSize="19sp"
@@ -653,6 +651,45 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Left side caption (e.g. "SCAN THE QR CODE") — vertically centered on the left edge.
+         Hidden entirely when the ad has no textLeft. -->
+    <TextView
+        android:id="@+id/textLeftLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_side_caption"
+        android:gravity="center"
+        android:maxLines="4"
+        android:maxWidth="140dp"
+        android:padding="10dp"
+        android:textColor="@color/tvTextPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Right side caption — mirrors textLeftLabel on the right edge. -->
+    <TextView
+        android:id="@+id/textRightLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_side_caption"
+        android:gravity="center"
+        android:maxLines="4"
+        android:maxWidth="140dp"
+        android:padding="10dp"
+        android:textColor="@color/tvTextPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar

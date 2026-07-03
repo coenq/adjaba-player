@@ -181,6 +181,7 @@ public class AdvertWatching extends AppCompatActivity {
     // ─────────────────────────────────────────────────────────────────────────
     String mediaFormat = "";
     TextView displayText, newsHeader, newsDesc, newsTitle, newsSource;
+    TextView textLeftLabel, textRightLabel;
     TextView debugOverlay; // Debug overlay for playback status
     String orient;
     SecureSignageWebView webContentView;
@@ -246,6 +247,8 @@ public class AdvertWatching extends AppCompatActivity {
         // Orientation already locked at start of onCreate
         prefs.edit().remove("data_loaded").apply();
         displayText = findViewById(R.id.displayText);
+        textLeftLabel = findViewById(R.id.textLeftLabel);
+        textRightLabel = findViewById(R.id.textRightLabel);
         debugOverlay = findViewById(R.id.debugOverlay);
         context = this;
         advertHoursMap = new HashMap<>();
@@ -498,6 +501,8 @@ public class AdvertWatching extends AppCompatActivity {
                     if (ad.streamType != null)     m.setStreamType(ad.streamType);
                     if (ad.socialPlatform != null) m.setSocialPlatform(ad.socialPlatform);
                     if (ad.socialHashtag != null)  m.setSocialHashtag(ad.socialHashtag);
+                    m.setTextLeft(ad.textLeft);
+                    m.setTextRight(ad.textRight);
                     updatedAds.add(m);
                 }
             }
@@ -893,7 +898,10 @@ public class AdvertWatching extends AppCompatActivity {
                                             List<MediaModel> mediaModels = new ArrayList<>();
                                             for (AdEntity ad : adEntities) {
                                                 if (ad.localPath != null) {
-                                                    mediaModels.add(new MediaModel(ad.contractId, ad.currency, ad.maxBid, ad.format, ad.localPath, ad.duration, ad.textBottom, ad.textTop, "", ad.targetHours, ad.advertId));
+                                                    MediaModel m = new MediaModel(ad.contractId, ad.currency, ad.maxBid, ad.format, ad.localPath, ad.duration, ad.textBottom, ad.textTop, "", ad.targetHours, ad.advertId);
+                                                    m.setTextLeft(ad.textLeft);
+                                                    m.setTextRight(ad.textRight);
+                                                    mediaModels.add(m);
                                                 }
                                             }
                                             new Handler(Looper.getMainLooper()).post(() -> {
@@ -1249,9 +1257,12 @@ public class AdvertWatching extends AppCompatActivity {
                 if (webContentView != null && currentVisible != webContentView) webContentView.setVisibility(View.GONE);
                 if (socialFeedLayout != null && currentVisible != socialFeedLayout) socialFeedLayout.setVisibility(View.GONE);
 
-                // Default: hide logo/QR for every slide; only ads (IMAGE/VIDEO) will re-show them
+                // Default: hide logo/QR/side captions for every slide; only ads (IMAGE/VIDEO)
+                // will re-show them, and only when the ad actually has that content.
                 logoImage.setVisibility(View.GONE);
                 qrImage.setVisibility(View.GONE);
+                textLeftLabel.setVisibility(View.GONE);
+                textRightLabel.setVisibility(View.GONE);
 
                 MediaModel media = mediaList.get(currentIndex);
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
@@ -1287,6 +1298,7 @@ public class AdvertWatching extends AppCompatActivity {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
+                    updateSideCaptions(media);
                     slideTransition(adImageView, currentVisible);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
@@ -1310,6 +1322,7 @@ public class AdvertWatching extends AppCompatActivity {
                         displayText.setSelected(true);
                         displayText.setVisibility(View.VISIBLE);
                     }
+                    updateSideCaptions(media);
                     setupExoPlayer(media.getUrl(), null, null);
                     handler.postDelayed(this, durationMs);
                     saveAndSendImpression(media, durationMs, context);
@@ -1643,6 +1656,28 @@ public class AdvertWatching extends AppCompatActivity {
             }
             exoPlayer.release();
             exoPlayer = null;
+        }
+    }
+
+    /**
+     * Shows/hides the left/right side captions for the current ad. Blank/null text hides the
+     * label entirely — this naturally excludes Cloud Slideshow images too, since they never
+     * carry textLeft/textRight.
+     */
+    private void updateSideCaptions(MediaModel media) {
+        String left = media.getTextLeft();
+        if (left != null && !left.trim().isEmpty()) {
+            textLeftLabel.setText(left);
+            textLeftLabel.setVisibility(View.VISIBLE);
+        } else {
+            textLeftLabel.setVisibility(View.GONE);
+        }
+        String right = media.getTextRight();
+        if (right != null && !right.trim().isEmpty()) {
+            textRightLabel.setText(right);
+            textRightLabel.setVisibility(View.VISIBLE);
+        } else {
+            textRightLabel.setVisibility(View.GONE);
         }
     }
 

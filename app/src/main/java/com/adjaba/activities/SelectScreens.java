@@ -837,6 +837,8 @@ public class SelectScreens extends AppCompatActivity {
         MediaModel m = new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath,
                 ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId,
                 ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion);
+        m.setTextLeft(ada.textLeft);
+        m.setTextRight(ada.textRight);
         copySocialAndStreamFields(ada, m);
         return m;
     }
@@ -981,6 +983,8 @@ public class SelectScreens extends AppCompatActivity {
                     for (AdEntity ada : ads) {
                         if (ada != null && ada.localPath != null) {
                             MediaModel m = new MediaModel(contractId, "", maxBid, ada.format, ada.localPath, ada.duration, ada.textBottom, ada.textTop, "", ada.targetHours, ada.advertId, ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion);
+                            m.setTextLeft(ada.textLeft);
+                            m.setTextRight(ada.textRight);
                             copySocialAndStreamFields(ada, m);
                             mediaModels.add(m);
                         }

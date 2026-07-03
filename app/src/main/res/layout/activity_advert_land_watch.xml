@@ -615,14 +615,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Scrolling display text -->
+    <!-- Top caption: readable background band added; already wraps (maxLines=3), no marquee -->
     <TextView
         android:id="@+id/displayText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:background="@drawable/bg_caption_band"
         android:gravity="center"
         android:maxLines="3"
+        android:padding="10dp"
         android:rotation="-90"
         android:text="Advert is Here"
         android:textColor="@color/tvTextPrimary"
@@ -633,6 +635,49 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Left/right side captions (e.g. "SCAN THE QR CODE"), hidden when blank. This layout's
+         content is rotated -90° for a physically portrait-mounted TV; per this file's own
+         convention (see header comment: "Left half -> TOP panel, Right half -> BOTTOM panel"),
+         the visual left/right edges correspond to the Top/Bottom constraint anchors here, not
+         Start/End. Verify placement on an actual forced-portrait-mounted device. -->
+    <TextView
+        android:id="@+id/textLeftLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_side_caption"
+        android:gravity="center"
+        android:maxLines="4"
+        android:maxWidth="160dp"
+        android:padding="10dp"
+        android:rotation="-90"
+        android:textColor="@color/tvTextPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textRightLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_side_caption"
+        android:gravity="center"
+        android:maxLines="4"
+        android:maxWidth="160dp"
+        android:padding="10dp"
+        android:rotation="-90"
+        android:textColor="@color/tvTextPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Loading indicator -->
     <ProgressBar

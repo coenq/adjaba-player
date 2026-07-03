@@ -17,6 +17,12 @@ public class MediaModel {
     String currency;
     int maxBid;
 
+    // ── Side caption text (optional, independent of the QR target URL) ──
+    /** Optional caption shown near the left edge of the ad, e.g. "SCAN THE QR CODE". Null/blank = hidden. */
+    String textLeft;
+    /** Optional caption shown near the right edge of the ad. Null/blank = hidden. */
+    String textRight;
+
     // ── Demographic targeting fields ──
     /** Comma-separated genders, e.g. "FEMALE,MALE" */
     String targetGender;
@@ -99,7 +105,12 @@ public class MediaModel {
     public String getTargetTags()      { return targetTags; }
     /** Returns comma-separated emotions this ad targets, e.g. "happy,neutral". May be null. */
     public String getTargetEmotion()   { return targetEmotion; }
-    
+
+    public String getTextLeft()  { return textLeft; }
+    public void   setTextLeft(String textLeft)   { this.textLeft = textLeft; }
+    public String getTextRight() { return textRight; }
+    public void   setTextRight(String textRight) { this.textRight = textRight; }
+
     // ── v1.1.0: Getters and setters for advanced content types ──
     
     public int getZoneId() { return zoneId; }
