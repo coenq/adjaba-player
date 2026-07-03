@@ -209,12 +209,17 @@ public class SelectScreens extends AppCompatActivity {
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Explicit logout: stop boot auto-resume and clear the offline ad cache.
-                // (The cache wipe used to live in LoginActivity.onCreate, which destroyed
-                // offline playback on every app start — now it only happens here.)
+                // Explicit logout: stop boot auto-resume and clear the offline ad + slideshow
+                // caches. (The cache wipe used to live in LoginActivity.onCreate, which
+                // destroyed offline playback on every app start — now it only happens here.)
                 prefs.edit().putBoolean("resume_enabled", false).apply();
-                Executors.newSingleThreadExecutor().execute(() ->
-                        AdDatabase.getInstance(context).adDao().deleteAllAds());
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    // deleteAllAds() returns an RxJava Completable, which is lazy and does
+                    // NOT run its query unless subscribed — blockingAwait() here actually
+                    // executes the delete (safe: already off the main thread).
+                    AdDatabase.getInstance(context).adDao().deleteAllAds().blockingAwait();
+                    com.adjaba.utilities.SlideshowManager.clearCache(context);
+                });
                 Intent intent = new Intent(view.getContext(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 view.getContext().startActivity(intent);

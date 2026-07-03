@@ -121,6 +121,41 @@ public class SlideshowManager {
     }
 
     /**
+     * Deletes all downloaded slideshow photos and their cache records — mirrors what logout
+     * already does to the ad cache ({@code adDao().deleteAllAds()}). Call on explicit logout so
+     * the next sign-in re-downloads everything fresh; offline playback between sign-ins is
+     * untouched since this is never called except on logout. Leaves the enabled/folder
+     * URL/interval settings alone (same as ads: screen/orientation settings also survive
+     * logout) — only the downloaded media is wiped. MUST be called off the main thread.
+     */
+    public static void clearCache(Context context) {
+        SlideshowImageDao dao = AdDatabase.getInstance(context).slideshowImageDao();
+        for (SlideshowImageEntity row : dao.getAllImages()) {
+            if (row.localPath != null) {
+                //noinspection ResultOfMethodCallIgnored
+                new File(row.localPath).delete();
+            }
+        }
+        dao.deleteAll();
+        // Also remove the slideshow root dir itself (covers any stray files not tracked in
+        // Room, e.g. from an interrupted download).
+        deleteRecursively(new File(context.getFilesDir(), "slideshow"));
+        cachedMediaModels = new ArrayList<>();
+        warmed = true;
+        Log.i(TAG, "Cleared slideshow cache on logout");
+    }
+
+    private static void deleteRecursively(File file) {
+        if (!file.exists()) return;
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) deleteRecursively(child);
+        }
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
+    }
+
+    /**
      * Loads the last-synced images from Room into the in-memory cache. MUST be called off the
      * main thread. Safe to call repeatedly (e.g. on app start, and after every sync).
      */
