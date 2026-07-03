@@ -103,8 +103,11 @@ public class SlideshowManager {
 
     /**
      * Returns the currently cached slideshow images as MediaModels, ready to append to a
-     * rotation. Returns an empty list when disabled, not yet synced, or no folder configured
-     * — callers don't need to check {@link #isEnabled} separately.
+     * rotation, in a freshly randomized order (unlike ads, which play in their CMS-defined
+     * order, Drive doesn't provide any curated order for photos — so each time a rotation is
+     * built, e.g. on every Play press and every periodic backend/slideshow sync, the photos are
+     * reshuffled for variety). Returns an empty list when disabled, not yet synced, or no
+     * folder configured — callers don't need to check {@link #isEnabled} separately.
      */
     public static List<MediaModel> getCachedSlideshowMediaModels(Context context) {
         if (!isEnabled(context)) return new ArrayList<>();
@@ -112,7 +115,9 @@ public class SlideshowManager {
             // First read since process start and we're off the main thread — safe to warm now.
             warmFromDatabase(context);
         }
-        return new ArrayList<>(cachedMediaModels);
+        List<MediaModel> result = new ArrayList<>(cachedMediaModels);
+        java.util.Collections.shuffle(result);
+        return result;
     }
 
     /**
@@ -261,10 +266,12 @@ public class SlideshowManager {
     }
 
     /**
-     * Best-effort fallback with no API key: parses the public folder page's embedded data blob
-     * (the `_DRIVE_ivd` variable Drive's web UI bootstraps itself from). This is an undocumented,
-     * internal Drive implementation detail — it can stop working if Google changes the page —
-     * so it exists only as a fallback; prefer configuring DRIVE_API_KEY for production use.
+     * Best-effort fallback with no API key: parses the public folder page's accessible DOM
+     * markup. Each file row carries a {@code data-id="<fileId>"} attribute, and nested inside
+     * that row is an {@code aria-label="<fileName> Image Shared"} element (added for screen
+     * readers). This is undocumented, internal Drive page structure — it can stop working if
+     * Google changes the page — so it exists only as a fallback; prefer configuring
+     * DRIVE_API_KEY for production use. Verified against a real public folder July 2026.
      */
     private static List<DriveFile> fetchFileListViaHtml(String folderId) {
         OkHttpClient client = new OkHttpClient();
@@ -278,20 +285,25 @@ public class SlideshowManager {
                 return null;
             }
             String html = response.body().string();
-            // Each visible file appears as an ["<fileId>", ... , "<fileName>", ..., "<mimeType>"]
-            // entry inside the page's bootstrap data. Match file-ID/name/mimeType triples loosely
-            // rather than depending on exact array shape, since that shape is not documented.
-            Pattern entryPattern = Pattern.compile(
-                    "\\[\"([a-zA-Z0-9_-]{20,})\",\\[?\"([^\"]*)\"]?,[^\\]]*?\"(image/[a-zA-Z0-9.+-]+)\"");
-            Matcher matcher = entryPattern.matcher(html);
             List<DriveFile> result = new ArrayList<>();
-            java.util.Set<String> seen = new java.util.HashSet<>();
-            while (matcher.find()) {
-                String id = matcher.group(1);
-                if (seen.contains(id)) continue;
-                seen.add(id);
-                result.add(new DriveFile(id, matcher.group(2), ""));
+
+            Pattern idPattern = Pattern.compile("data-id=\"([a-zA-Z0-9_-]{15,})\"");
+            Pattern imageLabelPattern = Pattern.compile("aria-label=\"([^\"]+?)\\s+Image Shared\"");
+            Matcher idMatcher = idPattern.matcher(html);
+
+            int prevEnd = -1;
+            String prevFileId = null;
+            while (idMatcher.find()) {
+                if (prevFileId != null) {
+                    addIfImageRow(result, prevFileId, html.substring(prevEnd, idMatcher.start()), imageLabelPattern);
+                }
+                prevFileId = idMatcher.group(1);
+                prevEnd = idMatcher.end();
             }
+            if (prevFileId != null) {
+                addIfImageRow(result, prevFileId, html.substring(prevEnd), imageLabelPattern);
+            }
+
             if (result.isEmpty()) {
                 Log.w(TAG, "HTML fallback found no images — folder may not be public, or Drive's page structure changed");
             }
@@ -299,6 +311,14 @@ public class SlideshowManager {
         } catch (Exception e) {
             Log.e(TAG, "Drive HTML fallback error: " + e.getMessage());
             return null;
+        }
+    }
+
+    /** Looks for an "<name> Image Shared" aria-label within one file row's HTML chunk and, if found, records it. */
+    private static void addIfImageRow(List<DriveFile> result, String fileId, String rowChunk, Pattern imageLabelPattern) {
+        Matcher m = imageLabelPattern.matcher(rowChunk);
+        if (m.find()) {
+            result.add(new DriveFile(fileId, m.group(1), ""));
         }
     }
 
