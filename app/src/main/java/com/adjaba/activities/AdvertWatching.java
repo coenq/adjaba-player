@@ -1924,29 +1924,24 @@ public class AdvertWatching extends AppCompatActivity {
     }
 
     /**
-     * Updates debug overlay with current playback status.
+     * Updates debug overlay with current playback status (dev builds only — debugOverlay is
+     * intentionally not shown in production, so its absence is expected, not an error).
      * Shows: current media type, index, ads loaded, etc.
-     * TODO: Remove this before production release
      */
     private void updateDebugText(String message) {
         String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         String fullMsg = timestamp + " | " + message;
 
-        // Always log to logcat
-        android.util.Log.e("AdvertWatching", " " + fullMsg);
+        android.util.Log.d("AdvertWatching", " " + fullMsg);
 
-        // Also try to update overlay if it exists
         if (debugOverlay != null) {
             runOnUiThread(() -> {
                 try {
                     debugOverlay.setText(fullMsg);
-                    android.util.Log.e("AdvertWatching", " Overlay updated: " + fullMsg);
                 } catch (Exception e) {
-                    android.util.Log.e("AdvertWatching", " ERROR updating overlay: " + e.getMessage());
+                    android.util.Log.w("AdvertWatching", " Error updating debug overlay: " + e.getMessage());
                 }
             });
-        } else {
-            android.util.Log.e("AdvertWatching", " WARNING: debugOverlay is NULL, can't update UI");
         }
     }
 }
