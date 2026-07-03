@@ -226,8 +226,28 @@ public class SlideshowManager {
      *
      * @return true if the sync completed (even if there was nothing to do); false on failure.
      */
+    private static final java.util.concurrent.atomic.AtomicBoolean syncInProgress =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
+
     public static boolean sync(Context context) {
         if (!isEnabled(context)) return true;
+        // The periodic worker (every 30 min) and an immediate sync (triggered by pressing Play)
+        // are two independently-scheduled WorkManager requests with different unique names, so
+        // WorkManager itself won't dedupe them — without this guard they can run concurrently
+        // and redundantly re-download the same files in parallel (observed on device: two
+        // worker threads downloading the same 50 images at once).
+        if (!syncInProgress.compareAndSet(false, true)) {
+            Log.i(TAG, "Sync already in progress — skipping duplicate run");
+            return true;
+        }
+        try {
+            return doSync(context);
+        } finally {
+            syncInProgress.set(false);
+        }
+    }
+
+    private static boolean doSync(Context context) {
         String folderId = extractFolderId(getFolderUrl(context));
         if (folderId == null) {
             Log.w(TAG, "Slideshow enabled but no valid Drive folder URL configured — skipping sync");
