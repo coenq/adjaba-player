@@ -139,9 +139,9 @@ Want the screen to also show your own photos — team pictures, event shots, a g
 1. In Google Drive, create a folder, add your photos, then share it as **"Anyone with the link"**.
 2. Copy the folder's share link.
 3. On the Select Screen setup page, tick **Cloud Slideshow**, paste the link, and set how many seconds each photo should stay on screen (default 5).
-4. Press **Play** as usual.
+4. Press **Sync Now** to fetch your photos right away, then **Play** — or just press Play, which syncs automatically before starting.
 
-The device downloads the photos in the background and caches them locally, so once synced, the slideshow keeps working even if the internet drops. It checks the folder periodically for new or removed photos and updates automatically — add or delete photos in Drive and the screen picks up the change on its own, no re-install needed.
+The device downloads the photos in the background and caches them locally, so once synced, the slideshow keeps working even if the internet drops. Ads mix back into the photo rotation every 10 photos rather than only playing once at the start. Unlike ads, the slideshow doesn't check for new/removed photos on its own schedule — added or deleted photos in Drive show up the next time you press **Sync Now** or **Play**.
 
 This is fully independent of your ad playlist: it works even on a screen with no ads assigned, and turning it off never affects your regular content. Leaving it unchecked (the default) has no effect on the screen at all.
 

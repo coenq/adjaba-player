@@ -4,27 +4,26 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.adjaba.utilities.SlideshowManager;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Background sync for the Cloud Slideshow feature: refreshes the linked Google Drive
- * folder's image list on a schedule. No-ops instantly when the feature is disabled
- * (see {@link SlideshowManager#sync}), so scheduling this unconditionally is safe and
- * costs nothing when the feature isn't in use.
+ * Sync for the Cloud Slideshow feature: refreshes the linked Google Drive folder's image
+ * list. No periodic schedule — deliberately manual-only, triggered by the "Sync Now" button
+ * and by pressing Play, so slideshow syncing never competes with ad syncing for bandwidth on
+ * its own timer. No-ops instantly when the feature is disabled (see
+ * {@link SlideshowManager#sync}).
  */
 public class SlideshowSyncWorker extends Worker {
-    private static final String PERIODIC_WORK_NAME = "slideshow_sync_work";
+    /** Formerly used for a periodic schedule (removed) — kept only so App.onCreate can cancel
+     *  any stale periodic work left over from an older app version already installed on a device. */
+    public static final String LEGACY_PERIODIC_WORK_NAME = "slideshow_sync_work";
     private static final String ONE_TIME_WORK_NAME = "slideshow_sync_immediate";
 
     public SlideshowSyncWorker(@NonNull Context context, @NonNull WorkerParameters params) {
@@ -38,22 +37,7 @@ public class SlideshowSyncWorker extends Worker {
         return success ? Result.success() : Result.retry();
     }
 
-    /** Schedules the periodic background sync. Call once from App.onCreate. */
-    public static void schedulePeriodic(Context context) {
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-
-        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
-                SlideshowSyncWorker.class, 30, TimeUnit.MINUTES)
-                .setConstraints(constraints)
-                .build();
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                PERIODIC_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request);
-    }
-
-    /** Triggers an immediate one-off sync (e.g. right after the user saves slideshow settings). */
+    /** Triggers an immediate one-off sync — from the "Sync Now" button, or right before Play. */
     public static void triggerImmediateSync(Context context) {
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

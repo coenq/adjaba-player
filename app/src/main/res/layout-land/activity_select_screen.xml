@@ -295,6 +295,17 @@
 
                         </LinearLayout>
 
+                        <Button
+                            android:id="@+id/slideshow_sync_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_tv_spinner"
+                            android:text="Sync Now"
+                            android:textAllCaps="false"
+                            android:textColor="@color/tvAccent"
+                            android:textSize="12sp" />
+
                     </LinearLayout>
 
                     <!-- Refresh Interval -->

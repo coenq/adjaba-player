@@ -84,6 +84,7 @@ public class SelectScreens extends AppCompatActivity {
     CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, slideshowCheckbox;
     LinearLayout slideshowConfigContainer;
     android.widget.EditText slideshowFolderUrlInput, slideshowIntervalInput;
+    Button slideshowSyncButton;
     ImageView adsInfo, picture, logo, waitingLogo;
     List<String> screenOptions1;
     SharedPreferences prefs;
@@ -339,21 +340,9 @@ public class SelectScreens extends AppCompatActivity {
 
                     // Save Cloud Slideshow config and kick off a background refresh. Never
                     // blocks PLAY — the rotation uses whatever is already cached, if anything.
-                    if (slideshowCheckbox != null) {
-                        int intervalSeconds;
-                        try {
-                            intervalSeconds = Integer.parseInt(slideshowIntervalInput.getText().toString().trim());
-                        } catch (NumberFormatException e) {
-                            intervalSeconds = 5;
-                        }
-                        com.adjaba.utilities.SlideshowManager.saveConfig(context,
-                                slideshowCheckbox.isChecked(),
-                                slideshowFolderUrlInput.getText().toString(),
-                                intervalSeconds);
-                        if (slideshowCheckbox.isChecked()) {
-                            com.adjaba.workers.SlideshowSyncWorker.triggerImmediateSync(context);
-                        }
-                    }
+                    // (Slideshow has no periodic timer of its own — this, and the "Sync Now"
+                    // button, are the only two ways it ever syncs.)
+                    saveSlideshowConfigAndSync();
 
                     // Persist session so BootReceiver can auto-resume playback after reboot
                     saveResumeState();
@@ -835,6 +824,30 @@ public class SelectScreens extends AppCompatActivity {
         return com.adjaba.utilities.SlideshowManager.interleave(ads, slideshowImages);
     }
 
+    /**
+     * Saves the current Cloud Slideshow settings and, if enabled, triggers an immediate sync.
+     * Slideshow has no periodic background timer (unlike ads) — this is one of only two ways
+     * it ever syncs, the other being the "Sync Now" button. Shared by PLAY and that button so
+     * pressing either always uses whatever folder URL/interval is currently typed in, even if
+     * PLAY was never pressed yet.
+     */
+    private void saveSlideshowConfigAndSync() {
+        if (slideshowCheckbox == null) return;
+        int intervalSeconds;
+        try {
+            intervalSeconds = Integer.parseInt(slideshowIntervalInput.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            intervalSeconds = 5;
+        }
+        com.adjaba.utilities.SlideshowManager.saveConfig(context,
+                slideshowCheckbox.isChecked(),
+                slideshowFolderUrlInput.getText().toString(),
+                intervalSeconds);
+        if (slideshowCheckbox.isChecked()) {
+            com.adjaba.workers.SlideshowSyncWorker.triggerImmediateSync(context);
+        }
+    }
+
     /** Builds a MediaModel from a stored AdEntity, including streamType/socialPlatform/socialHashtag. */
     private MediaModel mediaModelFromAdEntity(AdEntity ada) {
         MediaModel m = new MediaModel(ada.contractId, ada.currency, ada.maxBid, ada.format, ada.localPath,
@@ -1210,6 +1223,13 @@ public class SelectScreens extends AppCompatActivity {
         slideshowConfigContainer = findViewById(R.id.slideshowConfigContainer);
         slideshowFolderUrlInput = findViewById(R.id.slideshow_folder_url);
         slideshowIntervalInput = findViewById(R.id.slideshow_interval);
+        slideshowSyncButton = findViewById(R.id.slideshow_sync_button);
+        if (slideshowSyncButton != null) {
+            slideshowSyncButton.setOnClickListener(v -> {
+                saveSlideshowConfigAndSync();
+                Toast.makeText(context, "Syncing slideshow photos…", Toast.LENGTH_SHORT).show();
+            });
+        }
         topAppBar = findViewById(R.id.topAppBar);
         bot_lay = findViewById(R.id.bot_lay);
         spinner1 = findViewById(R.id.spinner1);

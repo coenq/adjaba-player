@@ -300,6 +300,17 @@
                         android:textColorHint="@color/tvTextSecondary"
                         android:textSize="13sp" />
 
+                    <Button
+                        android:id="@+id/slideshow_sync_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:text="Sync Now"
+                        android:textAllCaps="false"
+                        android:textColor="@color/tvAccent"
+                        android:textSize="13sp" />
+
                 </LinearLayout>
 
                 <!-- Refresh Interval -->

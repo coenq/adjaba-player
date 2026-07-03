@@ -34,7 +34,11 @@ public class App extends Application {
         });
         scheduleImpressionRetryWorker();
         scheduleAdSyncWorker();
-        SlideshowSyncWorker.schedulePeriodic(this);
+        // Cloud Slideshow has no periodic schedule of its own (by design — see
+        // SlideshowSyncWorker) so it never competes with ad syncing for bandwidth; it syncs
+        // only via the "Sync Now" button and on Play. Cancel any periodic work an older app
+        // version may have already scheduled on this device.
+        WorkManager.getInstance(this).cancelUniqueWork(SlideshowSyncWorker.LEGACY_PERIODIC_WORK_NAME);
         // Warm the in-memory slideshow cache off the main thread so it's ready before the
         // first rotation is built (no-ops instantly if the feature is disabled/unconfigured).
         Executors.newSingleThreadExecutor().execute(() -> SlideshowManager.warmFromDatabase(this));
