@@ -5,6 +5,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
 
 def WEATHER_API_KEY = ""
+def DRIVE_API_KEY   = ""
 def KEYSTORE_FILE   = ""
 def KEYSTORE_PASS   = ""
 def KEY_ALIAS       = ""
@@ -15,6 +16,9 @@ def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     properties.load(new FileInputStream(localPropertiesFile))
     WEATHER_API_KEY = properties.getProperty("WEATHER_API_KEY", "")
+    // Optional: only needed for the Cloud Slideshow feature. Without it, the
+    // slideshow falls back to parsing the public Drive folder page directly.
+    DRIVE_API_KEY   = properties.getProperty("DRIVE_API_KEY", "")
     KEYSTORE_FILE   = properties.getProperty("KEYSTORE_FILE", "")
     KEYSTORE_PASS   = properties.getProperty("KEYSTORE_PASS", "")
     KEY_ALIAS       = properties.getProperty("KEY_ALIAS", "")
@@ -36,6 +40,7 @@ android {
         multiDexEnabled true
 
         buildConfigField "String", "WEATHER_API_KEY", "\"${WEATHER_API_KEY}\""
+        buildConfigField "String", "DRIVE_API_KEY", "\"${DRIVE_API_KEY}\""
     }
 
     signingConfigs {

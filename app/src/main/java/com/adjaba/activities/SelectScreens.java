@@ -81,7 +81,9 @@ public class SelectScreens extends AppCompatActivity {
     RelativeLayout loginrootlayout;
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
-    CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox;
+    CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, slideshowCheckbox;
+    LinearLayout slideshowConfigContainer;
+    android.widget.EditText slideshowFolderUrlInput, slideshowIntervalInput;
     ImageView adsInfo, picture, logo, waitingLogo;
     List<String> screenOptions1;
     SharedPreferences prefs;
@@ -153,6 +155,18 @@ public class SelectScreens extends AppCompatActivity {
             iotCheckbox.setChecked(iotEnabled);
         } else {
             android.util.Log.w("SelectScreens", "⚠️ Warning: iotCheckbox not found in layout");
+        }
+
+        // Restore Cloud Slideshow config — stored independently of the CMS/backend session,
+        // so it survives regardless of screen/orientation selection or offline state.
+        if (slideshowCheckbox != null) {
+            boolean slideshowEnabled = com.adjaba.utilities.SlideshowManager.isEnabled(context);
+            slideshowCheckbox.setChecked(slideshowEnabled);
+            slideshowFolderUrlInput.setText(com.adjaba.utilities.SlideshowManager.getFolderUrl(context));
+            slideshowIntervalInput.setText(String.valueOf(com.adjaba.utilities.SlideshowManager.getIntervalSeconds(context)));
+            slideshowConfigContainer.setVisibility(slideshowEnabled ? View.VISIBLE : View.GONE);
+            slideshowCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
+                    slideshowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
         }
 
         SharedPreferences prefsw = getSharedPreferences("SpinnerPrefs", MODE_PRIVATE);
@@ -318,6 +332,24 @@ public class SelectScreens extends AppCompatActivity {
                     }
                     editor.apply();
 
+                    // Save Cloud Slideshow config and kick off a background refresh. Never
+                    // blocks PLAY — the rotation uses whatever is already cached, if anything.
+                    if (slideshowCheckbox != null) {
+                        int intervalSeconds;
+                        try {
+                            intervalSeconds = Integer.parseInt(slideshowIntervalInput.getText().toString().trim());
+                        } catch (NumberFormatException e) {
+                            intervalSeconds = 5;
+                        }
+                        com.adjaba.utilities.SlideshowManager.saveConfig(context,
+                                slideshowCheckbox.isChecked(),
+                                slideshowFolderUrlInput.getText().toString(),
+                                intervalSeconds);
+                        if (slideshowCheckbox.isChecked()) {
+                            com.adjaba.workers.SlideshowSyncWorker.triggerImmediateSync(context);
+                        }
+                    }
+
                     // Persist session so BootReceiver can auto-resume playback after reboot
                     saveResumeState();
 
@@ -480,7 +512,7 @@ public class SelectScreens extends AppCompatActivity {
                                                  }
 
                                                 new Handler(Looper.getMainLooper()).post(() -> {
-                                                    DataHolder.getInstance().allAds = mediaModels;
+                                                    DataHolder.getInstance().allAds = withSlideshowImages(mediaModels);
                                                     launchAdvertWatchingActivity(orient, context);
                                                 });
                                             } else {
@@ -557,7 +589,7 @@ public class SelectScreens extends AppCompatActivity {
 
                                                 new Handler(Looper.getMainLooper()).post(() -> {
                                                     DataHolder.getInstance().targetHours = targetHoursList;
-                                                    DataHolder.getInstance().allAds = mediaModels;
+                                                    DataHolder.getInstance().allAds = withSlideshowImages(mediaModels);
                                                     launchAdvertWatchingActivity(orient, context);
                                                 });
                                             });
@@ -649,7 +681,7 @@ public class SelectScreens extends AppCompatActivity {
                                             }
 
                                             new Handler(Looper.getMainLooper()).post(() -> {
-                                                DataHolder.getInstance().allAds = mediaModels;
+                                                DataHolder.getInstance().allAds = withSlideshowImages(mediaModels);
                                                 launchAdvertWatchingActivity(orient, context);
                                             });
                                         } else {
@@ -686,7 +718,7 @@ public class SelectScreens extends AppCompatActivity {
                                         }
 
                                         new Handler(Looper.getMainLooper()).post(() -> {
-                                            DataHolder.getInstance().allAds = mediaModels;
+                                            DataHolder.getInstance().allAds = withSlideshowImages(mediaModels);
                                             Toast.makeText(context, "Offline mode: Using cached ads", Toast.LENGTH_LONG).show();
                                             launchAdvertWatchingActivity(orient, context);
                                         });
@@ -721,7 +753,7 @@ public class SelectScreens extends AppCompatActivity {
         // In auto-play mode DataHolder was already restored from prefs — the UI maps and
         // checkboxes are empty/default here and would overwrite it with wrong values.
         if (autoPlayMode) {
-            DataHolder.getInstance().allAds = new ArrayList<>();
+            DataHolder.getInstance().allAds = withSlideshowImages(new ArrayList<>());
             launchAdvertWatchingActivity(orient, context);
             return;
         }
@@ -732,7 +764,7 @@ public class SelectScreens extends AppCompatActivity {
             DataHolder.getInstance().locationTypes = screenLocationMap.get(screen_id);
             DataHolder.getInstance().location = screenLocation.get(screen_id);
             DataHolder.getInstance().tags = screenTags.get(screen_id);
-            DataHolder.getInstance().allAds = new ArrayList<>();
+            DataHolder.getInstance().allAds = withSlideshowImages(new ArrayList<>());
             DataHolder.getInstance().orient = orient;
             DataHolder.getInstance().time = timeRefresh;
             if (displayText.isChecked()) {
@@ -784,6 +816,20 @@ public class SelectScreens extends AppCompatActivity {
                         startActivity(new Intent(context, AdvertWatching.class));
                     }
                 }).start();
+    }
+
+    /**
+     * Appends any cached Cloud Slideshow images to the ad rotation. A pure, synchronous,
+     * in-memory operation (see {@link com.adjaba.utilities.SlideshowManager#getCachedSlideshowMediaModels})
+     * — safe to call from any thread, including the main thread, and a no-op when the feature
+     * is disabled or unconfigured, so it never disturbs the normal ad flow.
+     */
+    private List<MediaModel> withSlideshowImages(List<MediaModel> ads) {
+        List<MediaModel> slideshowImages = com.adjaba.utilities.SlideshowManager.getCachedSlideshowMediaModels(context);
+        if (slideshowImages.isEmpty()) return ads;
+        List<MediaModel> combined = new ArrayList<>(ads);
+        combined.addAll(slideshowImages);
+        return combined;
     }
 
     /** Builds a MediaModel from a stored AdEntity, including streamType/socialPlatform/socialHashtag. */
@@ -945,7 +991,7 @@ public class SelectScreens extends AppCompatActivity {
                 // Post UI updates back to main thread
                 new Handler(Looper.getMainLooper()).post(() -> {
                     DataHolder.getInstance().targetHours = targetHoursList;
-                    DataHolder.getInstance().allAds = mediaModels;
+                    DataHolder.getInstance().allAds = withSlideshowImages(mediaModels);
                     android.util.Log.i("SelectScreens", "   ✅ Updated DataHolder.allAds with " + mediaModels.size() + " MediaModels");
 
                     waitingLogo.animate()
@@ -1153,6 +1199,10 @@ public class SelectScreens extends AppCompatActivity {
         weatherCheckbox = findViewById(R.id.weather_checkbox);
         newsCheckbox = findViewById(R.id.news_checkbox);
         iotCheckbox = findViewById(R.id.iot_checkbox);
+        slideshowCheckbox = findViewById(R.id.slideshow_checkbox);
+        slideshowConfigContainer = findViewById(R.id.slideshowConfigContainer);
+        slideshowFolderUrlInput = findViewById(R.id.slideshow_folder_url);
+        slideshowIntervalInput = findViewById(R.id.slideshow_interval);
         topAppBar = findViewById(R.id.topAppBar);
         bot_lay = findViewById(R.id.bot_lay);
         spinner1 = findViewById(R.id.spinner1);

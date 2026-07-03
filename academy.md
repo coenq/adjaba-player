@@ -83,6 +83,7 @@ After logging in, you'll land on the **Select Screen** setup page. This is where
 | **Weather** | Insert weather slides into the rotation |
 | **News** | Insert news slides into the rotation |
 | **Smart Audience Targeting (IOT)** | Optional — enables real-time audience-aware ad selection (see section 8) |
+| **Cloud Slideshow** | Optional — plays photos from a public Google Drive folder mixed into the rotation (see section 8a) |
 
 Once configured, press **Play** to start the screen. These settings persist across reboots, so a screen will resume the same configuration automatically if power is cut and restored.
 
@@ -130,6 +131,22 @@ This is entirely optional. Leaving it unchecked (the default) just runs the norm
 
 ---
 
+## 8a. Cloud Slideshow (optional, no backend setup required)
+
+Want the screen to also show your own photos — team pictures, event shots, a gallery — without going through the Adjaba backend at all? Cloud Slideshow plays images straight from a **public Google Drive folder**, mixed into the normal ad rotation.
+
+**How to set it up:**
+1. In Google Drive, create a folder, add your photos, then share it as **"Anyone with the link"**.
+2. Copy the folder's share link.
+3. On the Select Screen setup page, tick **Cloud Slideshow**, paste the link, and set how many seconds each photo should stay on screen (default 5).
+4. Press **Play** as usual.
+
+The device downloads the photos in the background and caches them locally, so once synced, the slideshow keeps working even if the internet drops. It checks the folder periodically for new or removed photos and updates automatically — add or delete photos in Drive and the screen picks up the change on its own, no re-install needed.
+
+This is fully independent of your ad playlist: it works even on a screen with no ads assigned, and turning it off never affects your regular content. Leaving it unchecked (the default) has no effect on the screen at all.
+
+---
+
 ## 9. Day-to-Day Operation
 
 - **Keep it powered and connected.** The device needs to stay online to receive new content and report playback. Wi-Fi/Ethernet should be stable and always-on.
@@ -151,6 +168,7 @@ This is entirely optional. Leaving it unchecked (the default) just runs the norm
 | Content looks outdated | Check the Refresh Interval setting — lower it, or trigger a manual refresh |
 | Weather/News not showing | Make sure the relevant checkbox is enabled on the Select Screen page |
 | Smart Audience Targeting not affecting ad choice | Confirm IOT is checked, and that the analytics sensor for your location is active (ask your Adjaba contact) |
+| Cloud Slideshow shows no photos | Confirm the Drive folder is shared as "Anyone with the link" (not restricted), the link is correct, and the device has internet for the first sync |
 
 ---
 

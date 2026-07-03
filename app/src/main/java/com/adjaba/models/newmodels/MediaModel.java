@@ -44,6 +44,9 @@ public class MediaModel {
     boolean isWebContent = false;
     /** Is this a social media feed? */
     boolean isSocialFeed = false;
+    /** Is this a Cloud Slideshow photo (from a linked Google Drive folder)? Not a paid ad —
+     *  excluded from impression billing and from business-hours targeting. */
+    boolean isSlideshowImage = false;
 
     public MediaModel(String contractId, String currency, int maxBid, String type, String url,
                       int duration, String info, String displayText, String logo,
@@ -153,11 +156,26 @@ public class MediaModel {
      * Factory method for creating social feed media
      */
     public static MediaModel createSocialFeed(String platform, String hashtag, int duration, int zoneId) {
-        MediaModel media = new MediaModel(null, "USD", 0, "SOCIAL_FEED", "", 
+        MediaModel media = new MediaModel(null, "USD", 0, "SOCIAL_FEED", "",
                                           duration, "", "", "", "", "social_" + System.currentTimeMillis());
         media.setSocialPlatform(platform);
         media.setSocialHashtag(hashtag);
         media.setZoneId(zoneId);
         return media;
     }
+
+    /**
+     * Factory method for a Cloud Slideshow photo — a locally cached image downloaded from a
+     * linked Google Drive folder. Plays exactly like an IMAGE ad (same Glide load, same
+     * duration-based rotation) but carries no target URL/QR code and is excluded from
+     * impression billing and business-hours targeting.
+     */
+    public static MediaModel createSlideshowImage(String fileId, String localPath, int intervalSeconds) {
+        MediaModel media = new MediaModel(null, "", 0, "IMAGE", localPath,
+                intervalSeconds * 1000, "", "", "", "", "slideshow_" + fileId);
+        media.isSlideshowImage = true;
+        return media;
+    }
+
+    public boolean isSlideshowImage() { return isSlideshowImage; }
 }

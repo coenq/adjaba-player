@@ -1257,7 +1257,7 @@ public class AdvertWatching extends AppCompatActivity {
                 if (DataHolder.getInstance().targetHoursFlag == 1) {
                     String type = media.getType();
                     if (!stringToList(media.getTargetHours()).contains(currentHour)
-                            && !type.equals("weather") && !type.equals("news")) {
+                            && !type.equals("weather") && !type.equals("news") && !media.isSlideshowImage()) {
                         android.util.Log.d("AdvertWatching", "   ⏭️  Skipping - target hours don't match current hour");
                         currentIndex = (currentIndex + 1) % mediaList.size();
                         handler.post(this);
@@ -1647,6 +1647,8 @@ public class AdvertWatching extends AppCompatActivity {
     }
 
     public void saveAndSendImpression(MediaModel media, long durationMs, Context context) {
+        // Cloud Slideshow photos aren't paid ads — exclude them from proof-of-play billing.
+        if (media.isSlideshowImage()) return;
         ImpressionEntity impression = new ImpressionEntity();
 
         impression.impressionId = UUID.randomUUID().toString();

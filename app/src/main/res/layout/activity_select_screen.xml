@@ -245,6 +245,61 @@
                         android:textSize="15sp"
                         app:buttonTint="@color/tvAccent" />
 
+                    <CheckBox
+                        android:id="@+id/slideshow_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="Cloud Slideshow"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/tvAccent" />
+
+                </LinearLayout>
+
+                <!-- Cloud Slideshow config — a public Google Drive folder played as a photo
+                     slideshow, mixed into the ad rotation. Hidden until the checkbox above is
+                     checked. Independent of the CMS/backend: configured and stored on-device. -->
+                <LinearLayout
+                    android:id="@+id/slideshowConfigContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/slideshow_folder_url"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:hint="Google Drive folder link"
+                        android:inputType="textUri"
+                        android:maxLines="1"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textColorHint="@color/tvTextSecondary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/slideshow_interval"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_tv_spinner"
+                        android:hint="Seconds per photo (default 5)"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textColorHint="@color/tvTextSecondary"
+                        android:textSize="13sp" />
+
                 </LinearLayout>
 
                 <!-- Refresh Interval -->

@@ -10,7 +10,9 @@ import androidx.work.WorkManager;
 
 import com.adjaba.workers.ImpressionRetryWorker;
 import com.adjaba.workers.AdSyncWorker;
+import com.adjaba.workers.SlideshowSyncWorker;
 import com.adjaba.utilities.AuthManager;
+import com.adjaba.utilities.SlideshowManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,10 @@ public class App extends Application {
         });
         scheduleImpressionRetryWorker();
         scheduleAdSyncWorker();
+        SlideshowSyncWorker.schedulePeriodic(this);
+        // Warm the in-memory slideshow cache off the main thread so it's ready before the
+        // first rotation is built (no-ops instantly if the feature is disabled/unconfigured).
+        Executors.newSingleThreadExecutor().execute(() -> SlideshowManager.warmFromDatabase(this));
     }
 
     private void scheduleImpressionRetryWorker() {
