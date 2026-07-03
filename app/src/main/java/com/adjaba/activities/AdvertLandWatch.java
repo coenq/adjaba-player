@@ -1186,6 +1186,12 @@ public class AdvertLandWatch extends AppCompatActivity {
 
                 if (media.getType().equals("IMAGE") || media.getType().equals("")) {
                     waitingLogo.setVisibility(View.GONE);
+                    // Cloud Slideshow photos come in arbitrary aspect ratios (portrait phone
+                    // shots, panoramas, etc.) — centerCrop would zoom in and cut off the sides
+                    // to fill the screen. Show the whole photo instead. Ad creatives are
+                    // pre-sized for the screen, so they keep the existing fill behavior.
+                    adImageView.setScaleType(media.isSlideshowImage()
+                            ? ImageView.ScaleType.FIT_CENTER : ImageView.ScaleType.CENTER_CROP);
                     Glide.with(getApplicationContext()).load(media.getUrl()).into(adImageView);
                     displayText.setText(media.getDisplayText());
                     // Only show the QR code when the ad actually has a target URL
