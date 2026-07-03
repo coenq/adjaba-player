@@ -186,7 +186,19 @@ public class TvLoginActivity extends AppCompatActivity {
     private void onAuthApproved(TvPollAuthResponse data) {
         if (countDownTimer != null) countDownTimer.cancel();
         AuthManager.saveToken(getApplicationContext(), data.token);
-        startActivity(new Intent(this, SelectScreens.class));
+
+        Intent intent = new Intent(this, SelectScreens.class);
+        TvPollAuthResponse.ScreenSetup setup = data.screenSetup;
+        if (setup != null && setup.screenId != null && setup.orientation != null) {
+            // Screen was configured remotely from a phone during this same login (see
+            // TvPollAuthResponse.ScreenSetup) — apply it and skip straight to playback,
+            // reusing the same auto_play path built for boot/power-cut auto-resume.
+            com.adjaba.utilities.RemoteScreenSetup.apply(this, setup);
+            intent.putExtra("auto_play", true);
+        }
+        // If screenSetup is absent (current backend behavior), this is unchanged: plain
+        // navigation to SelectScreens for manual setup on the TV.
+        startActivity(intent);
         finish();
     }
 
