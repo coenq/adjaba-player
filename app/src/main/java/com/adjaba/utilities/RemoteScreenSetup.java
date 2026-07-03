@@ -36,6 +36,14 @@ public class RemoteScreenSetup {
             SlideshowManager.saveConfig(context, setup.slideshowEnabled,
                     setup.slideshowFolderUrl,
                     setup.slideshowIntervalSeconds != null ? setup.slideshowIntervalSeconds : 5);
+            // Slideshow has no periodic background sync (manual-only, by design — see
+            // SlideshowSyncWorker) and this is the only place a remotely-configured screen's
+            // slideshow gets set up at all — without this call, a screen configured entirely
+            // from a phone would never download a single photo, since it never goes through
+            // SelectScreens's own PLAY-button/Sync-Now paths that normally trigger this.
+            if (setup.slideshowEnabled) {
+                com.adjaba.workers.SlideshowSyncWorker.triggerImmediateSync(context);
+            }
         }
     }
 
