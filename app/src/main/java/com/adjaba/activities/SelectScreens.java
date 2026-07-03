@@ -832,9 +832,7 @@ public class SelectScreens extends AppCompatActivity {
     private List<MediaModel> withSlideshowImages(List<MediaModel> ads) {
         List<MediaModel> slideshowImages = com.adjaba.utilities.SlideshowManager.getCachedSlideshowMediaModels(context);
         if (slideshowImages.isEmpty()) return ads;
-        List<MediaModel> combined = new ArrayList<>(ads);
-        combined.addAll(slideshowImages);
-        return combined;
+        return com.adjaba.utilities.SlideshowManager.interleave(ads, slideshowImages);
     }
 
     /** Builds a MediaModel from a stored AdEntity, including streamType/socialPlatform/socialHashtag. */

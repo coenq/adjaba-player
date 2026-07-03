@@ -364,5 +364,10 @@ public class AdSyncWorker extends Worker {
         prefs.edit().putString(KEY_SCREEN_ID, screenId).apply();
         android.util.Log.i("AdSyncWorker", "✅ Set current screen ID for background sync: " + screenId);
     }
+
+    /** Returns the screen ID set by {@link #setCurrentScreenId}, or null if none is configured yet. */
+    public static String getCurrentScreenId(Context context) {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getString(KEY_SCREEN_ID, null);
+    }
 }
 

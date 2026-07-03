@@ -402,10 +402,11 @@ public class AdvertLandWatch extends AppCompatActivity {
         Executors.newSingleThreadExecutor().execute(() -> {
             AdDatabase db = AdDatabase.getInstance(context);
             List<AdEntity> adEntities = db.adDao().getAllAds(screenId);
-
-            if (adEntities == null || adEntities.isEmpty()) {
+            if (adEntities == null) adEntities = new ArrayList<>();
+            if (adEntities.isEmpty()) {
+                // Don't bail out here — a slideshow-only screen (no ads assigned at all) still
+                // needs this reload to reach the slideshow-append step below.
                 android.util.Log.w("AdvertLandWatch", "⚠️ No ads in database after sync");
-                return;
             }
 
             android.util.Log.i("AdvertLandWatch", " Loaded " + adEntities.size() + " ads from database");
@@ -432,14 +433,22 @@ public class AdvertLandWatch extends AppCompatActivity {
                     updatedAds.add(m);
                 }
             }
+            // Include Cloud Slideshow photos too — this reload path also fires when a
+            // background slideshow sync completes (see SlideshowManager.sync), not just on
+            // ad updates, so a screen already playing when photos finish downloading still
+            // picks them up instead of being stuck on whatever it started with. Interleaved
+            // (one ad per 10 photos) rather than appended, so ads don't get buried behind a
+            // long run of photos.
+            List<MediaModel> finalAds = com.adjaba.utilities.SlideshowManager.interleave(
+                    updatedAds, com.adjaba.utilities.SlideshowManager.getCachedSlideshowMediaModels(context));
 
             // Update DataHolder and rebuild rotation on main thread
             new Handler(Looper.getMainLooper()).post(() -> {
-                DataHolder.getInstance().allAds = updatedAds;
-                android.util.Log.i("AdvertLandWatch", "✅ Updated DataHolder.allAds with " + updatedAds.size() + " ads");
+                DataHolder.getInstance().allAds = finalAds;
+                android.util.Log.i("AdvertLandWatch", "✅ Updated DataHolder.allAds with " + finalAds.size() + " ads");
 
                 // Rebuild rotation list
-                List<MediaModel> newRotation = insertWeatherEveryThreeAds(updatedAds);
+                List<MediaModel> newRotation = insertWeatherEveryThreeAds(finalAds);
                 android.util.Log.i("AdvertLandWatch", "   New rotation has " + (newRotation == null ? 0 : newRotation.size()) + " items");
 
                 // Update mediaList for playback
@@ -458,7 +467,7 @@ public class AdvertLandWatch extends AppCompatActivity {
                     handler.post(mediaSwitcher);
                 }
 
-                Toast.makeText(context, "Playlist updated: " + updatedAds.size() + " ads", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Playlist updated: " + finalAds.size() + " items", Toast.LENGTH_SHORT).show();
             });
         });
     }

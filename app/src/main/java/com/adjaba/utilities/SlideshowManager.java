@@ -120,6 +120,42 @@ public class SlideshowManager {
         return result;
     }
 
+    /** How many slideshow photos play before an ad is inserted back into the rotation. */
+    private static final int SLIDES_PER_AD = 10;
+
+    /**
+     * Mixes ads back into the slideshow instead of leaving them frontloaded once at the start
+     * of a long run of photos: one ad plays after every {@link #SLIDES_PER_AD} photos, cycling
+     * through the available ads round-robin so all of them still get airtime. If there are no
+     * ads, or no photos, this is just a concatenation (nothing to interleave) — so ad-only and
+     * slideshow-only screens are unaffected.
+     */
+    public static List<MediaModel> interleave(List<MediaModel> ads, List<MediaModel> slideshowImages) {
+        if (ads.isEmpty() || slideshowImages.isEmpty()) {
+            List<MediaModel> combined = new ArrayList<>(ads);
+            combined.addAll(slideshowImages);
+            return combined;
+        }
+        List<MediaModel> result = new ArrayList<>();
+        int adIndex = 0;
+        int count = 0;
+        for (MediaModel image : slideshowImages) {
+            result.add(image);
+            count++;
+            if (count == SLIDES_PER_AD) {
+                result.add(ads.get(adIndex % ads.size()));
+                adIndex++;
+                count = 0;
+            }
+        }
+        // Trailing photos that didn't reach a full group of SLIDES_PER_AD still get an ad,
+        // so a short slideshow (under 10 photos) isn't left with zero ads in the rotation.
+        if (count > 0) {
+            result.add(ads.get(adIndex % ads.size()));
+        }
+        return result;
+    }
+
     /**
      * Deletes all downloaded slideshow photos and their cache records — mirrors what logout
      * already does to the ad cache ({@code adDao().deleteAllAds()}). Call on explicit logout so
@@ -245,6 +281,16 @@ public class SlideshowManager {
         }
 
         warmFromDatabase(context);
+
+        // Tell any already-running playback screen to rebuild its rotation and pick up the
+        // newly synced photos — otherwise a screen that started playing before this sync
+        // finished would never see them until the next full Play press. Reuses the same
+        // LiveData channel AdSyncWorker uses for ad updates; both AdvertWatching and
+        // AdvertLandWatch already include cached slideshow images when they reload.
+        String screenId = com.adjaba.workers.AdSyncWorker.getCurrentScreenId(context);
+        if (screenId != null && !screenId.isEmpty()) {
+            PlaylistSyncManager.getInstance().notifyPlaylistUpdated(screenId, cachedMediaModels.size());
+        }
         return true;
     }
 
