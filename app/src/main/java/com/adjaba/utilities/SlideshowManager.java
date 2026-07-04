@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,36 @@ public class SlideshowManager {
      *  cheaply by rotation-building code — never triggers a DB query on the caller's thread. */
     private static volatile List<MediaModel> cachedMediaModels = new ArrayList<>();
     private static volatile boolean warmed = false;
+
+    /** Minimum free space required to keep downloading — below this, a low-end device
+     *  (e.g. a Fire TV Stick, which commonly ships with very little free internal storage)
+     *  can fail writes silently; this turns that into a clear, actionable log line instead. */
+    private static final long MIN_FREE_BYTES = 50L * 1024 * 1024; // 50MB
+
+    /** Shared client, reused across every list/download call. Previously each call created its
+     *  own OkHttpClient — for a 50-image folder that meant ~100 separate client instances, each
+     *  spinning up its own thread/connection pool, needlessly heavy on constrained hardware
+     *  (e.g. a Fire TV Stick has far less RAM/CPU than a tablet or phone). Explicit timeouts
+     *  since Cloud Slideshow devices may be on slower/less reliable networks than a dev tablet. */
+    private static volatile OkHttpClient httpClient;
+
+    private static OkHttpClient client() {
+        OkHttpClient local = httpClient;
+        if (local == null) {
+            synchronized (SlideshowManager.class) {
+                local = httpClient;
+                if (local == null) {
+                    local = new OkHttpClient.Builder()
+                            .connectTimeout(20, TimeUnit.SECONDS)
+                            .readTimeout(30, TimeUnit.SECONDS)
+                            .writeTimeout(20, TimeUnit.SECONDS)
+                            .build();
+                    httpClient = local;
+                }
+            }
+        }
+        return local;
+    }
 
     private SlideshowManager() {}
 
@@ -334,7 +365,6 @@ public class SlideshowManager {
     }
 
     private static List<DriveFile> fetchFileListViaApi(String folderId) {
-        OkHttpClient client = new OkHttpClient();
         String q = "'" + folderId + "' in parents and trashed=false and "
                 + "(mimeType contains 'image/')";
         String url = "https://www.googleapis.com/drive/v3/files"
@@ -344,7 +374,7 @@ public class SlideshowManager {
                 + "&key=" + BuildConfig.DRIVE_API_KEY;
 
         Request request = new Request.Builder().url(url).build();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client().newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
                 Log.w(TAG, "Drive API HTTP " + response.code());
                 return null;
@@ -361,7 +391,10 @@ public class SlideshowManager {
             }
             return result;
         } catch (Exception e) {
-            Log.e(TAG, "Drive API error: " + e.getMessage());
+            // Log the exception TYPE too, not just getMessage() — for network/TLS failures
+            // (e.g. an older/lower-spec device like a Fire TV Stick) the message alone is
+            // often too vague ("Connection reset", "handshake failed") to diagnose remotely.
+            Log.e(TAG, "Drive API error: " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
             return null;
         }
     }
@@ -375,12 +408,11 @@ public class SlideshowManager {
      * DRIVE_API_KEY for production use. Verified against a real public folder July 2026.
      */
     private static List<DriveFile> fetchFileListViaHtml(String folderId) {
-        OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://drive.google.com/drive/folders/" + folderId)
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
                 .build();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client().newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
                 Log.w(TAG, "Drive folder page HTTP " + response.code());
                 return null;
@@ -410,7 +442,7 @@ public class SlideshowManager {
             }
             return result;
         } catch (Exception e) {
-            Log.e(TAG, "Drive HTML fallback error: " + e.getMessage());
+            Log.e(TAG, "Drive HTML fallback error: " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
             return null;
         }
     }
@@ -424,13 +456,23 @@ public class SlideshowManager {
     }
 
     private static String downloadImage(Context context, DriveFile file, File folderDir) {
+        long freeBytes = folderDir.getUsableSpace();
+        if (freeBytes < MIN_FREE_BYTES) {
+            // A silent full-disk write failure would otherwise look identical to a network
+            // error in the logs. Low-end devices (e.g. a Fire TV Stick, which commonly ships
+            // with only a few GB of usable internal storage) are far more likely to hit this
+            // than a phone/tablet, so it's worth a clear, distinct log line.
+            Log.e(TAG, "Skipping download of " + file.name + " — low storage ("
+                    + (freeBytes / (1024 * 1024)) + "MB free, need " + (MIN_FREE_BYTES / (1024 * 1024)) + "MB)");
+            return null;
+        }
+
         String downloadUrl = (BuildConfig.DRIVE_API_KEY != null && !BuildConfig.DRIVE_API_KEY.isEmpty())
                 ? "https://www.googleapis.com/drive/v3/files/" + file.id + "?alt=media&key=" + BuildConfig.DRIVE_API_KEY
                 : "https://drive.google.com/uc?export=download&id=" + file.id;
 
-        OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(downloadUrl).build();
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = client().newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
                 Log.w(TAG, "Download HTTP " + response.code() + " for " + file.name);
                 return null;
@@ -447,7 +489,7 @@ public class SlideshowManager {
             }
             return outFile.getAbsolutePath();
         } catch (IOException e) {
-            Log.e(TAG, "Download error for " + file.name + ": " + e.getMessage());
+            Log.e(TAG, "Download error for " + file.name + ": " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
             return null;
         }
     }
