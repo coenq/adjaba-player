@@ -467,10 +467,26 @@ public class SlideshowManager {
             return null;
         }
 
-        String downloadUrl = (BuildConfig.DRIVE_API_KEY != null && !BuildConfig.DRIVE_API_KEY.isEmpty())
-                ? "https://www.googleapis.com/drive/v3/files/" + file.id + "?alt=media&key=" + BuildConfig.DRIVE_API_KEY
-                : "https://drive.google.com/uc?export=download&id=" + file.id;
+        // Mirror fetchFileList()'s fallback discipline: API endpoint first (when a key is
+        // configured), then the keyless public endpoint. Previously downloads had NO fallback —
+        // if the key worked for listing during development but fails from the device in the
+        // field (typical cause: an "Android apps"/referrer restriction added to the key in
+        // Cloud Console, which 403s raw OkHttp calls that don't carry those headers), the
+        // listing quietly succeeded via the HTML fallback while every download 403'd,
+        // yielding a synced folder with zero images.
+        String publicUrl = "https://drive.google.com/uc?export=download&id=" + file.id;
+        if (BuildConfig.DRIVE_API_KEY != null && !BuildConfig.DRIVE_API_KEY.isEmpty()) {
+            String apiUrl = "https://www.googleapis.com/drive/v3/files/" + file.id
+                    + "?alt=media&key=" + BuildConfig.DRIVE_API_KEY;
+            String path = fetchToFile(apiUrl, file, folderDir);
+            if (path != null) return path;
+            Log.w(TAG, "API download failed for " + file.name + " — retrying via public endpoint");
+        }
+        return fetchToFile(publicUrl, file, folderDir);
+    }
 
+    /** Downloads one URL to the slideshow cache dir. Returns the saved path, or null on any failure. */
+    private static String fetchToFile(String downloadUrl, DriveFile file, File folderDir) {
         Request request = new Request.Builder().url(downloadUrl).build();
         try (Response response = client().newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
