@@ -79,6 +79,17 @@ public class SlideshowManager {
                             .connectTimeout(20, TimeUnit.SECONDS)
                             .readTimeout(30, TimeUnit.SECONDS)
                             .writeTimeout(20, TimeUnit.SECONDS)
+                            // OkHttp's default is MODERN_TLS only. Fire OS 5 devices (classic
+                            // Fire TV / 1st-2nd gen sticks) run Android 5.1 with a 2015-era
+                            // TLS stack and — having no Google Play Services — never receive
+                            // security-provider updates, so the modern cipher handshake can
+                            // fail against Google's endpoints (googleapis.com/drive.google.com)
+                            // while newer Fire OS 6/7 devices work fine. COMPATIBLE_TLS is
+                            // retried automatically only when the modern handshake fails, so
+                            // up-to-date devices negotiate exactly as before.
+                            .connectionSpecs(java.util.Arrays.asList(
+                                    okhttp3.ConnectionSpec.MODERN_TLS,
+                                    okhttp3.ConnectionSpec.COMPATIBLE_TLS))
                             .build();
                     httpClient = local;
                 }
