@@ -85,6 +85,9 @@ import retrofit2.Response;
  *    after sync (not present when the activity was built) will not retroactively appear.
  *  - A NEWS_TICKER zone fetches its headlines once at zone start and rotates through them every
  *    15s; unlike AdvertSplitScreen it does not periodically re-fetch from the network.
+ *  - RSS_TICKER (a new ad type, not a zone type) renders in an AD_ROTATION zone only — add it
+ *    to AdvertWatching/AdvertLandWatch/AdvertSplitScreen too if it needs to work there; those
+ *    don't have a ticker-shaped view to reuse yet, so it was scoped out of this increment.
  */
 public class AdvertDynamicCanvas extends AppCompatActivity {
 
@@ -113,6 +116,7 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         ImageView imageView, placeholderView;
         PlayerView playerView;
         SecureSignageWebView webView;
+        TextView tickerView;
         ExoPlayer exoPlayer;
         Player.Listener playerListener;
 
@@ -282,6 +286,8 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
 
     // ══════════════════════════════════════════════════════════════
     // AD_ROTATION zone — same per-item dispatch as the single-zone activities
+    // (IMAGE/VIDEO/LIVE_STREAM/WEB_CONTENT), plus RSS_TICKER, which only this
+    // activity's AD_ROTATION zone understands for now (see loadRssTickerInto).
     // ══════════════════════════════════════════════════════════════
 
     private void startAdRotationZone(ZoneRuntime rt) {
@@ -297,6 +303,15 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         rt.webView = new SecureSignageWebView(this);
         rt.webView.setVisibility(View.GONE);
         rt.container.addView(rt.webView, matchParent());
+
+        rt.tickerView = new TextView(this);
+        rt.tickerView.setTextColor(Color.WHITE);
+        rt.tickerView.setTextSize(15);
+        rt.tickerView.setGravity(Gravity.CENTER);
+        rt.tickerView.setPadding(dp(20), dp(20), dp(20), dp(20));
+        rt.tickerView.setBackgroundColor(Color.parseColor("#0A0A0A"));
+        rt.tickerView.setVisibility(View.GONE);
+        rt.container.addView(rt.tickerView, matchParent());
 
         rt.placeholderView = new ImageView(this);
         rt.placeholderView.setImageResource(R.drawable.adjaba_logo_white);
@@ -348,6 +363,20 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
                         saveImpression(media, durMs);
                         break;
                     }
+                    case "RSS_TICKER": {
+                        // Generic live-feed widget — sports scores, stock headlines, anything
+                        // with an RSS feed — reusing NewsHandler's already-proven fetch/parse
+                        // instead of embedding unverified third-party widget markup.
+                        rt.tickerView.setText("Loading…");
+                        rt.tickerView.setVisibility(View.VISIBLE);
+                        String feedUrl = media.getUrl();
+                        if (feedUrl != null && !feedUrl.isEmpty()) {
+                            loadRssTickerInto(rt, feedUrl);
+                        }
+                        rt.handler.postDelayed(this, durMs);
+                        saveImpression(media, durMs);
+                        break;
+                    }
                     default:
                         Log.w(TAG, "Zone " + rt.zone.zoneId + ": unrecognised type '" + type + "'");
                         rt.handler.postDelayed(this, durMs);
@@ -364,6 +393,7 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         if (rt.imageView != null) rt.imageView.setVisibility(View.GONE);
         if (rt.playerView != null) rt.playerView.setVisibility(View.GONE);
         if (rt.webView != null) rt.webView.setVisibility(View.GONE);
+        if (rt.tickerView != null) rt.tickerView.setVisibility(View.GONE);
     }
 
     private void setupZoneExoPlayer(ZoneRuntime rt, String url) {
@@ -397,6 +427,39 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
             rt.exoPlayer.release();
             rt.exoPlayer = null;
         }
+    }
+
+    /**
+     * Fetches an arbitrary RSS/Atom feed and shows its top few headlines in rt.tickerView —
+     * the same fetch/parse NewsHandler already uses for the News feature, just pointed at
+     * whatever feed URL this ad carries (sports scores, stock headlines, a store's own feed,
+     * etc.) instead of the location-based world-news lookup. Best-effort: on failure the
+     * ticker just shows a quiet fallback rather than blocking the ad rotation.
+     */
+    private void loadRssTickerInto(ZoneRuntime rt, String feedUrl) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            String text;
+            try {
+                java.io.InputStream stream = new java.net.URL(feedUrl).openConnection().getInputStream();
+                List<RssItem> items = new NewsHandler(0).parseRss(stream, "");
+                StringBuilder sb = new StringBuilder();
+                int shown = 0;
+                for (RssItem item : items) {
+                    if (item.getTitle() == null || item.getTitle().isEmpty()) continue;
+                    if (shown > 0) sb.append("   •   ");
+                    sb.append(item.getTitle());
+                    if (++shown >= 3) break;
+                }
+                text = shown > 0 ? sb.toString() : "No items in feed";
+            } catch (Exception e) {
+                Log.e(TAG, "Zone " + rt.zone.zoneId + " RSS ticker error (" + feedUrl + "): " + e.getMessage());
+                text = "Feed unavailable";
+            }
+            String finalText = text;
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (rt.tickerView != null) rt.tickerView.setText(finalText);
+            });
+        });
     }
 
     // ══════════════════════════════════════════════════════════════
