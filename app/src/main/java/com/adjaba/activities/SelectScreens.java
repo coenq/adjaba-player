@@ -1287,6 +1287,12 @@ public class SelectScreens extends AppCompatActivity {
         loginrootlayout = findViewById(R.id.loginrootlayout);
         picture = findViewById(R.id.picture);
 
+        Button proofOfPlayButton = findViewById(R.id.proofOfPlayButton);
+        if (proofOfPlayButton != null) {
+            proofOfPlayButton.setOnClickListener(v ->
+                    startActivity(new Intent(context, ProofOfPlayActivity.class)));
+        }
+
         previewIdle = findViewById(R.id.previewIdle);
         previewLandscape = findViewById(R.id.previewLandscape);
         previewPortrait = findViewById(R.id.previewPortrait);

@@ -71,7 +71,7 @@ public class APIImpression {
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
                     AdDatabase adDatabase = AdDatabase.getInstance(context);
-                    adDatabase.impDao().deleteAdById(impression.impressionId);
+                    adDatabase.impDao().markSent(impression.impressionId);
                     android.util.Log.i("APIImpression", "✅ Impression sent: " + impression.impressionId);
                 } else {
                     // Leave in DB — ImpressionRetryWorker will retry

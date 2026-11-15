@@ -31,7 +31,16 @@ public class ImpressionRetryWorker extends Worker {
     public Result doWork() {
         Context context = getApplicationContext();
         AdDatabase db = AdDatabase.getInstance(context);
-        List<ImpressionEntity> pending = db.impDao().getAllImpressions();
+
+        // Bound table growth: drop only already-acknowledged rows older than 30 days. Never
+        // touches anything still pending upload.
+        java.util.Calendar cutoff = java.util.Calendar.getInstance();
+        cutoff.add(java.util.Calendar.DAY_OF_YEAR, -30);
+        String cutoffIso = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault())
+                .format(cutoff.getTime());
+        db.impDao().trimOldSentImpressions(cutoffIso);
+
+        List<ImpressionEntity> pending = db.impDao().getPendingImpressions();
 
         if (pending == null || pending.isEmpty()) {
             return Result.success();
@@ -48,7 +57,7 @@ public class ImpressionRetryWorker extends Worker {
         for (ImpressionEntity impression : pending) {
             int code = sendImpression(impression, token);
             if (code == 200) {
-                db.impDao().deleteAdById(impression.impressionId);
+                db.impDao().markSent(impression.impressionId);
             } else {
                 // On first 401, refresh the token and retry this impression once
                 if (code == 401 && !tokenRefreshed) {
@@ -59,7 +68,7 @@ public class ImpressionRetryWorker extends Worker {
                         token = newToken;
                         code = sendImpression(impression, token);
                         if (code == 200) {
-                            db.impDao().deleteAdById(impression.impressionId);
+                            db.impDao().markSent(impression.impressionId);
                             continue;
                         }
                     }
