@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-    @Database(entities = {AdEntity.class,ImpressionEntity.class,InfoEntity.class,SlideshowImageEntity.class}, version = 8, exportSchema = false)
+    @Database(entities = {AdEntity.class,ImpressionEntity.class,InfoEntity.class,SlideshowImageEntity.class}, version = 9, exportSchema = false)
     public abstract class AdDatabase extends RoomDatabase {
 
         private static volatile AdDatabase INSTANCE;

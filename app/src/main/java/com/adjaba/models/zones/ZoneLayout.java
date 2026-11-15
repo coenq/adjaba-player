@@ -44,6 +44,11 @@ public class ZoneLayout {
     }
     
     public enum ZoneContentType {
+        /** Plays whichever ads (IMAGE/VIDEO/WEB_CONTENT/LIVE_STREAM/weather) are assigned to
+         *  this zone's id, dispatching per-item exactly like the single-zone activities do.
+         *  This is what a normal "ad zone" uses — VIDEO/IMAGE below are for a zone pinned to
+         *  one fixed type only. */
+        AD_ROTATION,
         VIDEO,
         IMAGE,
         WEB_VIEW,
@@ -65,6 +70,14 @@ public class ZoneLayout {
         this.isActive = false;
         initializeZonesForLayout();
     }
+
+    /** Builds a CUSTOM layout directly from caller-supplied zones (percentage-based, arbitrary
+     *  count), bypassing the LayoutType presets below entirely. */
+    public ZoneLayout(java.util.List<Zone> customZones) {
+        this.layoutType = LayoutType.CUSTOM;
+        this.isActive = false;
+        this.zones = customZones.toArray(new Zone[0]);
+    }
     
     /**
      * Initialize zones based on layout type with predefined dimensions
@@ -73,22 +86,22 @@ public class ZoneLayout {
         switch (layoutType) {
             case SINGLE_FULL_SCREEN:
                 zones = new Zone[1];
-                zones[0] = new Zone(1, "Main", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Main", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 100f;
                 zones[0].heightPercent = 100f;
                 zones[0].xPercent = 0f;
                 zones[0].yPercent = 0f;
                 break;
-                
+
             case SPLIT_HORIZONTAL_2:
                 zones = new Zone[2];
                 // Top zone (main content)
-                zones[0] = new Zone(1, "Main", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Main", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 100f;
                 zones[0].heightPercent = 70f;
                 zones[0].xPercent = 0f;
                 zones[0].yPercent = 0f;
-                
+
                 // Bottom zone (weather/news)
                 zones[1] = new Zone(2, "Bottom Bar", ZoneContentType.WEATHER);
                 zones[1].widthPercent = 100f;
@@ -96,16 +109,52 @@ public class ZoneLayout {
                 zones[1].xPercent = 0f;
                 zones[1].yPercent = 70f;
                 break;
-                
+
+            case SPLIT_HORIZONTAL_3:
+                zones = new Zone[3];
+                zones[0] = new Zone(1, "Top", ZoneContentType.AD_ROTATION);
+                zones[0].widthPercent = 100f;
+                zones[0].heightPercent = 60f;
+                zones[0].xPercent = 0f;
+                zones[0].yPercent = 0f;
+
+                zones[1] = new Zone(2, "Middle", ZoneContentType.WEATHER);
+                zones[1].widthPercent = 100f;
+                zones[1].heightPercent = 20f;
+                zones[1].xPercent = 0f;
+                zones[1].yPercent = 60f;
+
+                zones[2] = new Zone(3, "Bottom", ZoneContentType.NEWS_TICKER);
+                zones[2].widthPercent = 100f;
+                zones[2].heightPercent = 20f;
+                zones[2].xPercent = 0f;
+                zones[2].yPercent = 80f;
+                break;
+
+            case SPLIT_VERTICAL_2:
+                zones = new Zone[2];
+                zones[0] = new Zone(1, "Left", ZoneContentType.AD_ROTATION);
+                zones[0].widthPercent = 70f;
+                zones[0].heightPercent = 100f;
+                zones[0].xPercent = 0f;
+                zones[0].yPercent = 0f;
+
+                zones[1] = new Zone(2, "Right", ZoneContentType.SOCIAL_FEED);
+                zones[1].widthPercent = 30f;
+                zones[1].heightPercent = 100f;
+                zones[1].xPercent = 70f;
+                zones[1].yPercent = 0f;
+                break;
+
             case MAIN_PLUS_BOTTOM_BAR:
                 zones = new Zone[2];
                 // Main content zone
-                zones[0] = new Zone(1, "Main Content", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Main Content", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 100f;
                 zones[0].heightPercent = 75f;
                 zones[0].xPercent = 0f;
                 zones[0].yPercent = 0f;
-                
+
                 // Bottom info bar
                 zones[1] = new Zone(2, "Info Bar", ZoneContentType.NEWS_TICKER);
                 zones[1].widthPercent = 100f;
@@ -113,23 +162,38 @@ public class ZoneLayout {
                 zones[1].xPercent = 0f;
                 zones[1].yPercent = 75f;
                 break;
-                
+
+            case MAIN_PLUS_SIDE_BAR:
+                zones = new Zone[2];
+                zones[0] = new Zone(1, "Main Content", ZoneContentType.AD_ROTATION);
+                zones[0].widthPercent = 75f;
+                zones[0].heightPercent = 100f;
+                zones[0].xPercent = 0f;
+                zones[0].yPercent = 0f;
+
+                zones[1] = new Zone(2, "Sidebar", ZoneContentType.NEWS_TICKER);
+                zones[1].widthPercent = 25f;
+                zones[1].heightPercent = 100f;
+                zones[1].xPercent = 75f;
+                zones[1].yPercent = 0f;
+                break;
+
             case L_SHAPE:
                 zones = new Zone[3];
                 // Main video zone (top-left)
-                zones[0] = new Zone(1, "Main Video", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Main Video", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 70f;
                 zones[0].heightPercent = 70f;
                 zones[0].xPercent = 0f;
                 zones[0].yPercent = 0f;
-                
+
                 // Bottom zone
                 zones[1] = new Zone(2, "Bottom", ZoneContentType.WEATHER);
                 zones[1].widthPercent = 100f;
                 zones[1].heightPercent = 30f;
                 zones[1].xPercent = 0f;
                 zones[1].yPercent = 70f;
-                
+
                 // Right sidebar
                 zones[2] = new Zone(3, "Sidebar", ZoneContentType.NEWS_TICKER);
                 zones[2].widthPercent = 30f;
@@ -137,37 +201,37 @@ public class ZoneLayout {
                 zones[2].xPercent = 70f;
                 zones[2].yPercent = 0f;
                 break;
-                
+
             case GRID_2X2:
                 zones = new Zone[4];
-                zones[0] = new Zone(1, "Top-Left", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Top-Left", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 50f;
                 zones[0].heightPercent = 50f;
                 zones[0].xPercent = 0f;
                 zones[0].yPercent = 0f;
-                
+
                 zones[1] = new Zone(2, "Top-Right", ZoneContentType.WEATHER);
                 zones[1].widthPercent = 50f;
                 zones[1].heightPercent = 50f;
                 zones[1].xPercent = 50f;
                 zones[1].yPercent = 0f;
-                
+
                 zones[2] = new Zone(3, "Bottom-Left", ZoneContentType.NEWS_TICKER);
                 zones[2].widthPercent = 50f;
                 zones[2].heightPercent = 50f;
                 zones[2].xPercent = 0f;
                 zones[2].yPercent = 50f;
-                
-                zones[3] = new Zone(4, "Bottom-Right", ZoneContentType.WEB_VIEW);
+
+                zones[3] = new Zone(4, "Bottom-Right", ZoneContentType.SOCIAL_FEED);
                 zones[3].widthPercent = 50f;
                 zones[3].heightPercent = 50f;
                 zones[3].xPercent = 50f;
                 zones[3].yPercent = 50f;
                 break;
-                
+
             default:
                 zones = new Zone[1];
-                zones[0] = new Zone(1, "Main", ZoneContentType.VIDEO);
+                zones[0] = new Zone(1, "Main", ZoneContentType.AD_ROTATION);
                 zones[0].widthPercent = 100f;
                 zones[0].heightPercent = 100f;
                 break;

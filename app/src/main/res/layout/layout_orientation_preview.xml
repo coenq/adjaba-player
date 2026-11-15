@@ -144,6 +144,66 @@
                 </FrameLayout>
             </LinearLayout>
 
+            <!-- Dynamic Canvas: arbitrary N-zone grid (shown here as 2x2) -->
+            <LinearLayout
+                android:id="@+id/previewDynamicCanvas"
+                android:layout_width="176dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_tv_card"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            style="@style/OrientationPreviewAdBadge"
+                            android:layout_gravity="center"
+                            android:textSize="9sp" />
+                    </FrameLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/tvBorder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tvDivider" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/tvBorder" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tvSurface" />
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/tvBorder" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tvDivider" />
+                </LinearLayout>
+            </LinearLayout>
+
         </FrameLayout>
 
         <TextView

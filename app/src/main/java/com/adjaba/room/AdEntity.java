@@ -45,13 +45,21 @@ public class AdEntity {
     /** Social hashtag/username to display feed for, e.g. "#nike" or "@nike" */
     public String socialHashtag;
 
-    // ── Full constructor with all fields (new in DB v8) ──
+    // ── Multi-zone canvas fields (new in DB version 9) ──
+    /** Which zone (1-4) this ad plays in; 0 = zone 1 / the default single zone. */
+    public int zoneId;
+    /** Screen-level layout name (ZoneLayout.LayoutType), e.g. "GRID_2X2". Stored per-row like
+     *  `orientation` already is — redundant across a screen's ads, but keeps every read path
+     *  (including the offline/cached-from-Room ones) able to resolve it with no extra lookup. */
+    public String zoneLayoutType;
+
+    // ── Full constructor with all fields (new in DB v9) ──
     public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,
                     String textBottom, String textLeft, String textRight, int duration,
                     String orientation, String screenId, String contractId, String targetHours,
                     int insertedAt, String currency, int maxBid,
                     String targetGender, String targetAgeGroup, String targetTags, String targetEmotion,
-                    String streamType, String socialPlatform, String socialHashtag) {
+                    String streamType, String socialPlatform, String socialHashtag, int zoneId) {
         this.advertId = advertId;
         this.format = format;
         this.localPath = localPath;
@@ -74,8 +82,23 @@ public class AdEntity {
         this.streamType = streamType;
         this.socialPlatform = socialPlatform;
         this.socialHashtag = socialHashtag;
+        this.zoneId = zoneId;
     }
-    
+
+    // ── Backward compatibility constructor (DB v8) ──
+    @androidx.room.Ignore
+    public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,
+                    String textBottom, String textLeft, String textRight, int duration,
+                    String orientation, String screenId, String contractId, String targetHours,
+                    int insertedAt, String currency, int maxBid,
+                    String targetGender, String targetAgeGroup, String targetTags, String targetEmotion,
+                    String streamType, String socialPlatform, String socialHashtag) {
+        this(advertId, format, localPath, textTop, textBottom, textLeft, textRight, duration,
+             orientation, screenId, contractId, targetHours, insertedAt, currency, maxBid,
+             targetGender, targetAgeGroup, targetTags, targetEmotion, streamType, socialPlatform,
+             socialHashtag, 0);
+    }
+
     // ── Backward compatibility constructor (DB v7 and earlier) ──
     @androidx.room.Ignore
     public AdEntity(@NonNull String advertId, String format, String localPath, String textTop,

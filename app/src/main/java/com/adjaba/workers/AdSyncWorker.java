@@ -215,8 +215,10 @@ public class AdSyncWorker extends Worker {
                             listStrToString(ad.adContractData.targetEmotion),
                             ad.adContractData.streamType,
                             ad.adContractData.socialPlatform,
-                            ad.adContractData.socialHashtag
+                            ad.adContractData.socialHashtag,
+                            ad.adContractData.zoneId != null ? ad.adContractData.zoneId : 0
                     );
+                    adEntity.zoneLayoutType = ad.adContractData.zoneLayoutType;
                     db.adDao().insertAd(adEntity);
                     downloadedCount++;
                     android.util.Log.d("AdSyncWorker", "  ✅ Saved streaming/web/social ad: " + advertId);
@@ -263,8 +265,10 @@ public class AdSyncWorker extends Worker {
                             listStrToString(ad.adContractData.targetAgeGroup),
                             listStrToString(ad.adContractData.targetTags),
                             listStrToString(ad.adContractData.targetEmotion),
-                            null, null, null
+                            null, null, null,
+                            ad.adContractData.zoneId != null ? ad.adContractData.zoneId : 0
                     );
+                    adEntity.zoneLayoutType = ad.adContractData.zoneLayoutType;
 
                     db.adDao().insertAd(adEntity);
                     downloadedCount++;

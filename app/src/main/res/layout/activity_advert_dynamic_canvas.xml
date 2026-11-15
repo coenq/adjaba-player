@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Dynamic Canvas: landscape TV only. Renders an arbitrary number of zones (1-4) from a
+    ZoneLayout resolved at runtime from the synced ads' zoneLayoutType/zoneId fields — see
+    AdvertDynamicCanvas.java. Zone containers are added to zoneCanvasRoot entirely in code
+    (percentage-based pixel math against its measured size), so this XML only holds the
+    always-present chrome: the splash logo and the double-tap-to-exit brand mark.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainCanvasLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tvBg">
+
+    <ImageView
+        android:id="@+id/waitingLogo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000000"
+        android:padding="80dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/adjaba_logo_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/zoneCanvasRoot"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="12dp"
+        android:src="@drawable/final_logo"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,4 +35,12 @@ public class AdContractData {
     public String streamType;         // For live_stream: "HLS", "DASH", "RTSP", "HTTP"
     public String socialPlatform;     // For social_feed: "TWITTER", "INSTAGRAM", "FACEBOOK"
     public String socialHashtag;      // For social_feed: hashtag or @username to display
+
+    // ── Multi-zone canvas fields (v1.3.0) ──
+    /** Which zone (1-4) this ad plays in. Null/0 = zone 1 (the default/main zone). */
+    public Integer zoneId;
+    /** Screen-level layout name, one of ZoneLayout.LayoutType, e.g. "GRID_2X2". Only needs to
+     *  be set on one ad per screen — AdvertDynamicCanvas takes the first non-null value it
+     *  finds. Null = single full-screen zone (today's existing behavior, unchanged). */
+    public String zoneLayoutType;
 }

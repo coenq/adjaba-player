@@ -36,6 +36,8 @@ public class MediaModel {
     // ── v1.1.0: Advanced content type fields ──
     /** Zone ID for multi-zone layouts (1-4), 0 = full screen */
     int zoneId = 0;
+    /** Screen-level layout name (ZoneLayout.LayoutType), e.g. "GRID_2X2". Null = single zone. */
+    String zoneLayoutType;
     /** For web content: HTML content or URL */
     String webContent;
     /** For live streams: Stream type (HLS, DASH, RTSP, HTTP) */
@@ -115,7 +117,10 @@ public class MediaModel {
     
     public int getZoneId() { return zoneId; }
     public void setZoneId(int zoneId) { this.zoneId = zoneId; }
-    
+
+    public String getZoneLayoutType() { return zoneLayoutType; }
+    public void setZoneLayoutType(String zoneLayoutType) { this.zoneLayoutType = zoneLayoutType; }
+
     public String getWebContent() { return webContent; }
     public void setWebContent(String webContent) { 
         this.webContent = webContent;

@@ -83,7 +83,7 @@ public class SelectScreens extends AppCompatActivity {
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
     CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, slideshowCheckbox;
-    View previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit;
+    View previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit, previewDynamicCanvas;
     TextView previewCaption;
     LinearLayout slideshowConfigContainer;
     android.widget.EditText slideshowFolderUrlInput, slideshowIntervalInput;
@@ -143,7 +143,7 @@ public class SelectScreens extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinnerID.setAdapter(spinnerAdapter);
         logo = findViewById(R.id.loadingLogo);
-        String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait", "Split Screen"};
+        String[] orientationOptions = {"Orientation", "Landscape", "Portrait", "Forced Portrait", "Split Screen", "Dynamic Canvas"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -675,7 +675,9 @@ public class SelectScreens extends AppCompatActivity {
                                                             ad.adContractData.targetEmotion,
                                                             ad.adContractData.streamType,
                                                             ad.adContractData.socialPlatform,
-                                                            ad.adContractData.socialHashtag
+                                                            ad.adContractData.socialHashtag,
+                                                            ad.adContractData.zoneId,
+                                                            ad.adContractData.zoneLayoutType
                                                     );
                                                 }
                                             });
@@ -843,6 +845,8 @@ public class SelectScreens extends AppCompatActivity {
                         startActivity(new Intent(context, AdvertLandWatch.class));
                     } else if (orient.equalsIgnoreCase("split screen")) {
                         startActivity(new Intent(context, AdvertSplitScreen.class));
+                    } else if (orient.equalsIgnoreCase("dynamic canvas")) {
+                        startActivity(new Intent(context, AdvertDynamicCanvas.class));
                     } else {
                         startActivity(new Intent(context, AdvertWatching.class));
                     }
@@ -892,6 +896,8 @@ public class SelectScreens extends AppCompatActivity {
                 ada.targetGender, ada.targetAgeGroup, ada.targetTags, ada.targetEmotion);
         m.setTextLeft(ada.textLeft);
         m.setTextRight(ada.textRight);
+        m.setZoneId(ada.zoneId);
+        m.setZoneLayoutType(ada.zoneLayoutType);
         copySocialAndStreamFields(ada, m);
         return m;
     }
@@ -903,7 +909,8 @@ public class SelectScreens extends AppCompatActivity {
         if (ada.socialHashtag != null)  m.setSocialHashtag(ada.socialHashtag);
     }
 
-    private void getUrl(String contractId, String currency, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder, List<String> targetGender, List<String> targetAgeGroup, List<String> targetTags, List<String> targetEmotion, String streamType, String socialPlatform, String socialHashtag) {
+    private void getUrl(String contractId, String currency, int maxBid, List<Integer> targetHours, String txtTop, String txtRight, String txtLeft, String info, String advertId, String screenId, String path, String type, int[] loadedCount, int totalCount, int duration, Context context, int flag, int serverOrder, List<String> targetGender, List<String> targetAgeGroup, List<String> targetTags, List<String> targetEmotion, String streamType, String socialPlatform, String socialHashtag, Integer zoneId, String zoneLayoutType) {
+        int resolvedZoneId = zoneId != null ? zoneId : 0;
         // LIVE_STREAM / WEB_CONTENT / SOCIAL_FEED have no downloadable file — SOCIAL_FEED has no
         // path at all, the others carry their URL in `path`. Persist them directly, no download.
         String normalizedType = type != null ? type.toUpperCase() : "";
@@ -928,8 +935,9 @@ public class SelectScreens extends AppCompatActivity {
                         contractId, listToString(targetHours), serverOrder, currency, maxBid,
                         listStrToString(targetGender), listStrToString(targetAgeGroup),
                         listStrToString(targetTags), listStrToString(targetEmotion),
-                        streamType, socialPlatform, socialHashtag
+                        streamType, socialPlatform, socialHashtag, resolvedZoneId
                 );
+                ad.zoneLayoutType = zoneLayoutType;
                 AdDatabase db = AdDatabase.getInstance(context);
                 db.adDao().insertAd(ad);
                 android.util.Log.d("SelectScreens", "   Inserted " + normalizedType + " ad " + advertId + " to Room DB");
@@ -986,8 +994,9 @@ public class SelectScreens extends AppCompatActivity {
                         listStrToString(targetAgeGroup),
                         listStrToString(targetTags),
                         listStrToString(targetEmotion),
-                        null, null, null
+                        null, null, null, resolvedZoneId
                 );
+                ad.zoneLayoutType = zoneLayoutType;
                 AdDatabase db = AdDatabase.getInstance(context);
                 db.adDao().insertAd(ad);
                 android.util.Log.d("SelectScreens", "   Inserted ad " + advertId + " to Room DB");
@@ -1283,6 +1292,7 @@ public class SelectScreens extends AppCompatActivity {
         previewPortrait = findViewById(R.id.previewPortrait);
         previewForcedPortrait = findViewById(R.id.previewForcedPortrait);
         previewSplit = findViewById(R.id.previewSplit);
+        previewDynamicCanvas = findViewById(R.id.previewDynamicCanvas);
         previewCaption = findViewById(R.id.previewCaption);
 
     }
@@ -1292,7 +1302,7 @@ public class SelectScreens extends AppCompatActivity {
      * spinner value (one of orientationOptions, or its "Orientation" placeholder).
      */
     private void updateOrientationPreview(String orientValue) {
-        View[] states = {previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit};
+        View[] states = {previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit, previewDynamicCanvas};
         View active;
         String caption;
         if ("Landscape".equals(orientValue)) {
@@ -1307,6 +1317,9 @@ public class SelectScreens extends AppCompatActivity {
         } else if ("Split Screen".equals(orientValue)) {
             active = previewSplit;
             caption = "Ads (and weather) rotate on the left 70% · news or a live social feed on the right 30%.";
+        } else if ("Dynamic Canvas".equals(orientValue)) {
+            active = previewDynamicCanvas;
+            caption = "An arbitrary N-zone grid driven by the synced playlist — ads, weather, news and social feed, each in its own zone.";
         } else {
             active = previewIdle;
             caption = "Pick an orientation above to preview its layout.";
