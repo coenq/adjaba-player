@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -82,6 +83,8 @@ public class SelectScreens extends AppCompatActivity {
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
     CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, slideshowCheckbox;
+    View previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit;
+    TextView previewCaption;
     LinearLayout slideshowConfigContainer;
     android.widget.EditText slideshowFolderUrlInput, slideshowIntervalInput;
     Button slideshowSyncButton;
@@ -126,6 +129,7 @@ public class SelectScreens extends AppCompatActivity {
         adList = new ArrayList<>();
         targetHoursList = new ArrayList<>();
         findViews();
+        updateOrientationPreview(orient);
         screenPlayerMap = new HashMap<>();
         mediaModels = new ArrayList<>();
         screenDeviceMap = new HashMap<>();
@@ -256,6 +260,7 @@ public class SelectScreens extends AppCompatActivity {
                     editor.apply();
                 }
                 orient = orientationOptions[position];
+                updateOrientationPreview(orient);
 
             }
 
@@ -1273,6 +1278,52 @@ public class SelectScreens extends AppCompatActivity {
         loginrootlayout = findViewById(R.id.loginrootlayout);
         picture = findViewById(R.id.picture);
 
+        previewIdle = findViewById(R.id.previewIdle);
+        previewLandscape = findViewById(R.id.previewLandscape);
+        previewPortrait = findViewById(R.id.previewPortrait);
+        previewForcedPortrait = findViewById(R.id.previewForcedPortrait);
+        previewSplit = findViewById(R.id.previewSplit);
+        previewCaption = findViewById(R.id.previewCaption);
+
+    }
+
+    /**
+     * Crossfades the "LAYOUT PREVIEW" card to match the given SCREEN ORIENTATION
+     * spinner value (one of orientationOptions, or its "Orientation" placeholder).
+     */
+    private void updateOrientationPreview(String orientValue) {
+        View[] states = {previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit};
+        View active;
+        String caption;
+        if ("Landscape".equals(orientValue)) {
+            active = previewLandscape;
+            caption = "Ads, weather and news rotate full-screen, one at a time.";
+        } else if ("Portrait".equals(orientValue)) {
+            active = previewPortrait;
+            caption = "Same full-screen rotation, laid out for a device that is natively portrait.";
+        } else if ("Forced Portrait".equals(orientValue)) {
+            active = previewForcedPortrait;
+            caption = "For a landscape TV mounted sideways — content is rotated 90° in software to read upright.";
+        } else if ("Split Screen".equals(orientValue)) {
+            active = previewSplit;
+            caption = "Ads (and weather) rotate on the left 70% · news or a live social feed on the right 30%.";
+        } else {
+            active = previewIdle;
+            caption = "Pick an orientation above to preview its layout.";
+        }
+        for (View state : states) {
+            if (state != null && state != active) {
+                state.setVisibility(View.GONE);
+            }
+        }
+        if (active != null && active.getVisibility() != View.VISIBLE) {
+            active.setAlpha(0f);
+            active.setVisibility(View.VISIBLE);
+            active.animate().alpha(1f).setDuration(180).start();
+        }
+        if (previewCaption != null) {
+            previewCaption.setText(caption);
+        }
     }
 
     @Override

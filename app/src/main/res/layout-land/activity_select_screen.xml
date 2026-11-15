@@ -405,55 +405,54 @@
             android:layout_height="match_parent"
             android:background="@color/tvDivider" />
 
-        <!-- Right: branding panel -->
-        <LinearLayout
-            android:id="@+id/logosLayout"
+        <!-- Right: branding + live orientation preview -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/tvSurface"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="40dp">
+            android:background="@color/tvSurface">
 
-            <ImageView
-                android:id="@+id/ads_info"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="end"
-                android:layout_marginBottom="32dp"
-                android:background="@drawable/baseline_info_24"
-                android:scaleType="fitCenter" />
-
-            <ImageView
-                android:id="@+id/Logo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:contentDescription="Logo"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/logo1" />
-
-            <ImageView
-                android:id="@+id/imgLogo"
-                android:layout_width="260dp"
-                android:layout_height="260dp"
-                android:layout_marginTop="24dp"
-                android:contentDescription="Logo"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/picture" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/logosLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="sans-serif-light"
-                android:letterSpacing="0.12"
-                android:text="DIGITAL SIGNAGE"
-                android:textAllCaps="true"
-                android:textColor="@color/tvTextSecondary"
-                android:textSize="12sp" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="32dp">
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/ads_info"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="end"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/baseline_info_24"
+                    android:scaleType="fitCenter" />
+
+                <ImageView
+                    android:id="@+id/Logo"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_marginBottom="28dp"
+                    android:contentDescription="Logo"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/logo1" />
+
+                <include layout="@layout/layout_orientation_preview" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-light"
+                    android:letterSpacing="0.12"
+                    android:text="DIGITAL SIGNAGE"
+                    android:textAllCaps="true"
+                    android:textColor="@color/tvTextSecondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

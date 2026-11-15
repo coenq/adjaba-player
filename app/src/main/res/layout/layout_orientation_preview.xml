@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Live mock-up of the currently selected SCREEN ORIENTATION spinner value.
+    SelectScreens toggles exactly one of the five states below (one Spinner
+    position -> one state) and updates previewCaption to match. Shared between
+    the portrait and landscape activity_select_screen.xml via <include> so both
+    orientations stay in sync with a single source of truth.
+-->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-light"
+        android:letterSpacing="0.06"
+        android:text="LAYOUT PREVIEW"
+        android:textAllCaps="true"
+        android:textColor="@color/tvTextSecondary"
+        android:textSize="11sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_tv_card"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="170dp">
+
+            <!-- Idle: no orientation chosen yet -->
+            <View
+                android:id="@+id/previewIdle"
+                android:layout_width="176dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_preview_bezel_idle" />
+
+            <!-- Landscape: single full-bleed ad zone, wide -->
+            <FrameLayout
+                android:id="@+id/previewLandscape"
+                android:layout_width="176dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_tv_card"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/OrientationPreviewAdBadge"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+
+            <!-- Portrait: single full-bleed ad zone, native portrait device -->
+            <FrameLayout
+                android:id="@+id/previewPortrait"
+                android:layout_width="92dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_tv_card"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/OrientationPreviewAdBadge"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+
+            <!-- Forced Portrait: landscape hardware (dashed outline) mounted sideways,
+                 content rotated in software to read upright -->
+            <FrameLayout
+                android:id="@+id/previewForcedPortrait"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="176dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_preview_bezel_idle" />
+
+                <FrameLayout
+                    android:layout_width="92dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_tv_card">
+
+                    <TextView
+                        style="@style/OrientationPreviewAdBadge"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- Split Screen: ads 70% left / news-or-social 30% right -->
+            <LinearLayout
+                android:id="@+id/previewSplit"
+                android:layout_width="176dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_tv_card"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.70">
+
+                    <TextView
+                        style="@style/OrientationPreviewAdBadge"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/tvBorder" />
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.30">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_preview_badge_neutral"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        android:letterSpacing="0.04"
+                        android:lineSpacingMultiplier="0.95"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="NEWS /\nSOCIAL"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="8sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/previewCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Pick an orientation above to preview its layout."
+            android:textColor="@color/tvTextSecondary"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</merge>

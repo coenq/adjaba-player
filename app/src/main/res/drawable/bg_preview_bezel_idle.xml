@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dashed "ghost" frame: used both for the unselected preview state and as the
+     landscape-hardware outline behind the Forced Portrait mock-up. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@android:color/transparent" />
+    <corners android:radius="8dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/tvBorder"
+        android:dashWidth="6dp"
+        android:dashGap="4dp" />
+</shape>

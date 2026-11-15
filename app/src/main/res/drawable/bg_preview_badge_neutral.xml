@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral pill, same shape as bg_news_badge, for the non-ad zone label in the
+     Split Screen preview (keeps it visually subordinate to the accent "ADS" pill). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/tvInput" />
+    <corners android:radius="4dp" />
+</shape>

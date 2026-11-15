@@ -131,6 +131,8 @@
                     android:prompt="@string/screen_prompt"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
+                <include layout="@layout/layout_orientation_preview" />
+
                 <!-- Screen ID -->
                 <TextView
                     android:layout_width="wrap_content"

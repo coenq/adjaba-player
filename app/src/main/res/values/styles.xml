@@ -25,6 +25,23 @@
     </style>
 
 
+    <!-- "ADS" pill reused across every single-zone state in layout_orientation_preview.xml -->
+    <style name="OrientationPreviewAdBadge">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_news_badge</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:text">ADS</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!--Style of edit text -->
     <style name="editText" >
         <item name="android:background">@drawable/edit_text_bg</item>
