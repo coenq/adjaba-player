@@ -82,7 +82,7 @@ public class SelectScreens extends AppCompatActivity {
     RelativeLayout loginrootlayout;
     Spinner spinner1, spinner2, spinnerID;
     ProgressBar loadingBar;
-    CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, slideshowCheckbox;
+    CheckBox rememberMe, displayText, businessRules, weatherCheckbox, newsCheckbox, iotCheckbox, privacyModeCheckbox, slideshowCheckbox;
     View previewIdle, previewLandscape, previewPortrait, previewForcedPortrait, previewSplit, previewDynamicCanvas;
     TextView previewCaption;
     LinearLayout slideshowConfigContainer;
@@ -160,6 +160,13 @@ public class SelectScreens extends AppCompatActivity {
             iotCheckbox.setChecked(iotEnabled);
         } else {
             android.util.Log.w("SelectScreens", "⚠️ Warning: iotCheckbox not found in layout");
+        }
+
+        // Restore Privacy Mode preference (default: true - checked). When on, IOT ad selection
+        // scores only on aggregate signals (hour/dwell/audience size), never gender/age/emotion.
+        boolean privacyMode = prefs.getBoolean("privacy_mode", true);
+        if (privacyModeCheckbox != null) {
+            privacyModeCheckbox.setChecked(privacyMode);
         }
 
         // Restore Cloud Slideshow config — stored independently of the CMS/backend session,
@@ -349,6 +356,10 @@ public class SelectScreens extends AppCompatActivity {
                     // Save IOT preference
                     if (iotCheckbox != null) {
                         editor.putBoolean("iot_enabled", iotCheckbox.isChecked());
+                    }
+                    // Save Privacy Mode preference
+                    if (privacyModeCheckbox != null) {
+                        editor.putBoolean("privacy_mode", privacyModeCheckbox.isChecked());
                     }
                     editor.apply();
 
@@ -1265,6 +1276,7 @@ public class SelectScreens extends AppCompatActivity {
         weatherCheckbox = findViewById(R.id.weather_checkbox);
         newsCheckbox = findViewById(R.id.news_checkbox);
         iotCheckbox = findViewById(R.id.iot_checkbox);
+        privacyModeCheckbox = findViewById(R.id.privacy_mode_checkbox);
         slideshowCheckbox = findViewById(R.id.slideshow_checkbox);
         slideshowConfigContainer = findViewById(R.id.slideshowConfigContainer);
         slideshowFolderUrlInput = findViewById(R.id.slideshow_folder_url);

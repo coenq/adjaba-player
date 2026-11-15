@@ -254,6 +254,30 @@ if (iotEnabled) {
 }
 ```
 
+### Privacy Mode (v1.3.0)
+
+2026-era DOOH/signage research flags facial-attribute-driven ad selection (gender/age/emotion,
+exactly what this feature does by default) as sliding toward EU AI Act-prohibited territory and
+increasingly excluded from accepted measurement standards generally — the industry is moving
+toward anonymized, aggregate-only signals (presence count, dwell time) instead. This toggle is
+the player-side mitigation.
+
+**User-Facing Toggle**: SelectScreens activity checkbox, right below "IOT"
+- Label: "Privacy Mode (IOT: aggregate signals only)"
+- Default: **Checked (enabled)** — opt-out, not opt-in, given the compliance exposure
+- Persistence: SharedPreferences key `privacy_mode`
+
+**Effect on `selectBestAdForDemographic()`** (`AdvertWatching.java` and `AdvertLandWatch.java`,
+identical in both): when on, the GENDER/AGE BRACKET/TAG/EMOTION matching blocks and the
+happiness-threshold bonus are skipped entirely — scoring uses only HOUR MATCHING, ENGAGEMENT TIME
+MATCHING, and AUDIENCE SIZE BONUS. Logging also omits gender/age/emotion/tag values when privacy
+mode is on, both in the per-ad score line and the raw-payload debug log.
+
+**Scope boundary**: this only changes what the *player* reads and logs. It cannot stop the
+separate OnlyCamera app from computing or publishing gender/age/emotion over MQTT — that data can
+still arrive on `store/{screenId}`, Privacy Mode just means this player never scores or logs on
+it.
+
 ### Logging & Debugging
 
 **Key Log Tags**: `AdvertWatching`, `AdvertLandWatch`, `MqttManager`
@@ -291,6 +315,9 @@ if (iotEnabled) {
 - [ ] Ad scoring produces expected winner
 - [ ] All 3 orientations behave identically
 - [ ] Logging shows detailed scoring breakdown
+- [ ] Privacy Mode checkbox defaults to checked and persists across app restart
+- [ ] With Privacy Mode on, winning ad's score reflects only hour/dwell/audience-size bonuses
+- [ ] With Privacy Mode on, logs never print gender/age/emotion/tag values
 
 ### Future Enhancements
 
@@ -299,5 +326,7 @@ if (iotEnabled) {
 3. **ML-Based Scoring**: Replace weighted scoring with trained model
 4. **A/B Testing**: Compare demographic vs. random selection performance
 5. **Analytics**: Send impression metrics back to backend
-6. **Facial Recognition Integration**: Direct video analytics → ad selection
+6. **Facial Recognition Integration**: Direct video analytics → ad selection — superseded by
+   Privacy Mode above; the industry direction this feature should follow is the opposite one
+   (aggregate-only signals), not deeper per-person attribute integration
 7. **Advanced Queue Management**: Insert demographic match into rotation intelligently

@@ -564,20 +564,34 @@ public class AdvertWatching extends AppCompatActivity {
             return;
         }
 
-        android.util.Log.i("AdvertWatching", " Initializing MQTT demographics for screen: " + screenId);
+        // Privacy Mode (default ON): when enabled, ad selection uses only aggregate signals
+        // (hour, audience count, average dwell time) and never scores on the gender/age/emotion
+        // attributes OnlyCamera infers per-person — those fields can still arrive over MQTT (this
+        // player doesn't control what OnlyCamera publishes), but are never read or logged here.
+        // See CLAUDE.md "MQTT IOT Demographic-Based Ad Selection" for why this defaults to on.
+        boolean privacyMode = prefs.getBoolean("privacy_mode", true);
+        android.util.Log.i("AdvertWatching", " Initializing MQTT demographics for screen: " + screenId
+                + " (privacy mode: " + (privacyMode ? "ON — aggregate signals only" : "OFF — full attribute targeting") + ")");
 
         MqttManager.getInstance().connect(this, screenId, new MqttManager.OnDemographicDataListener() {
             @Override
             public void onDemographicDataReceived(DemographicData data) {
-                android.util.Log.d("AdvertWatching", " Demographic data received: " + data.toString());
+                if (privacyMode) {
+                    android.util.Log.d("AdvertWatching", " Demographic data received — audience="
+                            + data.getCustomerCount() + " avgDwellSec=" + data.getAvgDwellSec());
+                } else {
+                    android.util.Log.d("AdvertWatching", " Demographic data received: " + data.toString());
+                }
 
                 // Select best ad based on demographics
-                MediaModel selectedAd = selectBestAdForDemographic(data);
+                MediaModel selectedAd = selectBestAdForDemographic(data, privacyMode);
 
                 if (selectedAd != null) {
                     android.util.Log.i("AdvertWatching", "✅ Selected ad based on demographics: " + selectedAd.getAdvertId());
-                    android.util.Log.i("AdvertWatching", "   Age: " + data.getAgeRange() + ", Gender: " + data.getGender());
-                    android.util.Log.i("AdvertWatching", "   Dominant emotion: " + data.getDominantEmotion());
+                    if (!privacyMode) {
+                        android.util.Log.i("AdvertWatching", "   Age: " + data.getAgeRange() + ", Gender: " + data.getGender());
+                        android.util.Log.i("AdvertWatching", "   Dominant emotion: " + data.getDominantEmotion());
+                    }
 
                     // Schedule the selected ad to play next (queue it instead of interrupting current ad)
                     scheduleNextAd(selectedAd);
@@ -604,9 +618,11 @@ public class AdvertWatching extends AppCompatActivity {
      * Scores each ad by matching age group, gender, and target hours.
      *
      * @param data Demographic data from MQTT
+     * @param privacyMode When true, scores only on aggregate signals (hour, audience count,
+     *                    dwell time) — gender/age/tag/emotion matching is skipped entirely.
      * @return Best matching MediaModel or null if no match
      */
-    private MediaModel selectBestAdForDemographic(DemographicData data) {
+    private MediaModel selectBestAdForDemographic(DemographicData data, boolean privacyMode) {
         if (DataHolder.getInstance().allAds == null || DataHolder.getInstance().allAds.isEmpty()) {
             return null;
         }
@@ -644,98 +660,103 @@ public class AdvertWatching extends AppCompatActivity {
                 android.util.Log.d("AdvertWatching", "  ⏰ Hour match: " + currentHour);
             }
 
-            // ✅ GENDER MATCHING: match MQTT gender against ad's targetGender list (+15 pts)
-            String adGenderStr = ad.getTargetGender();
-            if (viewerGender != null && !viewerGender.isEmpty()) {
-                if (adGenderStr != null && !adGenderStr.isEmpty()) {
-                    // Ad has explicit gender targeting — reward a real match
-                    if (adGenderStr.toUpperCase().contains(viewerGenderApi)) {
-                        score += 15;
-                        android.util.Log.d("AdvertWatching", "   Gender match: " + viewerGenderApi);
-                    }
-                } else {
-                    // Ad targets all genders — small baseline bonus
-                    score += 5;
-                    android.util.Log.d("AdvertWatching", "   Gender detected (no ad filter): " + viewerGender);
-                }
-            }
-
-            // ✅ AGE BRACKET MATCHING: match MQTT ageBracket against ad's targetAgeGroup (+15 pts)
-            String adAgeStr = ad.getTargetAgeGroup();
-            if (viewerAgeBracket != null && !viewerAgeBracket.isEmpty()) {
-                if (adAgeStr != null && !adAgeStr.isEmpty()) {
-                    if (adAgeStr.contains(viewerAgeBracket)) {
-                        score += 15;
-                        android.util.Log.d("AdvertWatching", "   Age bracket match: " + viewerAgeBracket);
-                    }
-                } else {
-                    // Rough bracket detection fallback if no stored targeting
-                    String viewerAgeRange = data.getAgeRange();
-                    if (viewerAgeRange != null) {
-                        if (viewerAgeRange.contains("20, 32")) { score += 8; }
-                        else if (viewerAgeRange.contains("32, 43")) { score += 8; }
-                        else if (viewerAgeRange.contains("43")) { score += 5; }
-                    }
-                }
-            }
-
-            // ✅ TAG MATCHING: match IOT adTarget.tags against ad's targetTags (+5 pts per match)
-            String adTagsStr = ad.getTargetTags();
-            if (viewerTags != null && !viewerTags.isEmpty() && adTagsStr != null && !adTagsStr.isEmpty()) {
-                for (String tag : viewerTags) {
-                    if (adTagsStr.toLowerCase().contains(tag.toLowerCase())) {
-                        score += 5;
-                        android.util.Log.d("AdvertWatching", "  ️ Tag match: " + tag);
-                    }
-                }
-            }
-
-            // ✅ EMOTION MATCHING: Smart emotion-based targeting
-            String adEmotionStr = ad.getTargetEmotion();
-            String dominantEmotion = data.getDominantEmotion();
-            if (dominantEmotion == null) dominantEmotion = "unknown";
-            int happyScore = data.getHappy();
-
-            if (adEmotionStr != null && !adEmotionStr.isEmpty()) {
-                // Ad HAS emotion targeting — only score if it matches viewer's emotion
-                if (adEmotionStr.toLowerCase().contains(dominantEmotion.toLowerCase())) {
-                    if ("happy".equals(dominantEmotion)) {
-                        score += 25;
-                        android.util.Log.d("AdvertWatching", "   Happy emotion MATCH: Promo/upbeat ad");
-                    } else if ("neutral".equals(dominantEmotion)) {
-                        score += 15;
-                        android.util.Log.d("AdvertWatching", "   Neutral emotion MATCH: Brand/info ad");
-                    } else if ("sad".equals(dominantEmotion) || "angry".equals(dominantEmotion)) {
-                        score += 20;
-                        android.util.Log.d("AdvertWatching", "   Negative emotion MATCH: Comfort/support ad");
-                    } else if ("surprise".equals(dominantEmotion)) {
-                        score += 18;
-                        android.util.Log.d("AdvertWatching", "   Surprise emotion MATCH");
+            // Personal-attribute scoring (gender/age/tags/emotion) — skipped entirely in Privacy
+            // Mode, which scores only on the aggregate signals below (hour, dwell, audience size).
+            String adGenderStr = null, adAgeStr = null, adTagsStr = null, adEmotionStr = null;
+            if (!privacyMode) {
+                // ✅ GENDER MATCHING: match MQTT gender against ad's targetGender list (+15 pts)
+                adGenderStr = ad.getTargetGender();
+                if (viewerGender != null && !viewerGender.isEmpty()) {
+                    if (adGenderStr != null && !adGenderStr.isEmpty()) {
+                        // Ad has explicit gender targeting — reward a real match
+                        if (adGenderStr.toUpperCase().contains(viewerGenderApi)) {
+                            score += 15;
+                            android.util.Log.d("AdvertWatching", "   Gender match: " + viewerGenderApi);
+                        }
                     } else {
-                        score += 10;
-                        android.util.Log.d("AdvertWatching", "   Other emotion MATCH: " + dominantEmotion);
+                        // Ad targets all genders — small baseline bonus
+                        score += 5;
+                        android.util.Log.d("AdvertWatching", "   Gender detected (no ad filter): " + viewerGender);
+                    }
+                }
+
+                // ✅ AGE BRACKET MATCHING: match MQTT ageBracket against ad's targetAgeGroup (+15 pts)
+                adAgeStr = ad.getTargetAgeGroup();
+                if (viewerAgeBracket != null && !viewerAgeBracket.isEmpty()) {
+                    if (adAgeStr != null && !adAgeStr.isEmpty()) {
+                        if (adAgeStr.contains(viewerAgeBracket)) {
+                            score += 15;
+                            android.util.Log.d("AdvertWatching", "   Age bracket match: " + viewerAgeBracket);
+                        }
+                    } else {
+                        // Rough bracket detection fallback if no stored targeting
+                        String viewerAgeRange = data.getAgeRange();
+                        if (viewerAgeRange != null) {
+                            if (viewerAgeRange.contains("20, 32")) { score += 8; }
+                            else if (viewerAgeRange.contains("32, 43")) { score += 8; }
+                            else if (viewerAgeRange.contains("43")) { score += 5; }
+                        }
+                    }
+                }
+
+                // ✅ TAG MATCHING: match IOT adTarget.tags against ad's targetTags (+5 pts per match)
+                adTagsStr = ad.getTargetTags();
+                if (viewerTags != null && !viewerTags.isEmpty() && adTagsStr != null && !adTagsStr.isEmpty()) {
+                    for (String tag : viewerTags) {
+                        if (adTagsStr.toLowerCase().contains(tag.toLowerCase())) {
+                            score += 5;
+                            android.util.Log.d("AdvertWatching", "  ️ Tag match: " + tag);
+                        }
+                    }
+                }
+
+                // ✅ EMOTION MATCHING: Smart emotion-based targeting
+                adEmotionStr = ad.getTargetEmotion();
+                String dominantEmotion = data.getDominantEmotion();
+                if (dominantEmotion == null) dominantEmotion = "unknown";
+                int happyScore = data.getHappy();
+
+                if (adEmotionStr != null && !adEmotionStr.isEmpty()) {
+                    // Ad HAS emotion targeting — only score if it matches viewer's emotion
+                    if (adEmotionStr.toLowerCase().contains(dominantEmotion.toLowerCase())) {
+                        if ("happy".equals(dominantEmotion)) {
+                            score += 25;
+                            android.util.Log.d("AdvertWatching", "   Happy emotion MATCH: Promo/upbeat ad");
+                        } else if ("neutral".equals(dominantEmotion)) {
+                            score += 15;
+                            android.util.Log.d("AdvertWatching", "   Neutral emotion MATCH: Brand/info ad");
+                        } else if ("sad".equals(dominantEmotion) || "angry".equals(dominantEmotion)) {
+                            score += 20;
+                            android.util.Log.d("AdvertWatching", "   Negative emotion MATCH: Comfort/support ad");
+                        } else if ("surprise".equals(dominantEmotion)) {
+                            score += 18;
+                            android.util.Log.d("AdvertWatching", "   Surprise emotion MATCH");
+                        } else {
+                            score += 10;
+                            android.util.Log.d("AdvertWatching", "   Other emotion MATCH: " + dominantEmotion);
+                        }
+                    } else {
+                        android.util.Log.d("AdvertWatching", "  ⏭️ Emotion filter: ad wants " + adEmotionStr + ", viewer is " + dominantEmotion);
                     }
                 } else {
-                    android.util.Log.d("AdvertWatching", "  ⏭️ Emotion filter: ad wants " + adEmotionStr + ", viewer is " + dominantEmotion);
+                    // Ad has NO emotion filter — give baseline emotion bonus to all ads
+                    if ("happy".equals(dominantEmotion)) {
+                        score += 8;
+                        android.util.Log.d("AdvertWatching", "   Happy viewer: Baseline bonus");
+                    } else if ("neutral".equals(dominantEmotion)) {
+                        score += 5;
+                        android.util.Log.d("AdvertWatching", "   Neutral viewer: Baseline bonus");
+                    } else {
+                        score += 3;
+                        android.util.Log.d("AdvertWatching", "   " + dominantEmotion + " viewer: Baseline bonus");
+                    }
                 }
-            } else {
-                // Ad has NO emotion filter — give baseline emotion bonus to all ads
-                if ("happy".equals(dominantEmotion)) {
-                    score += 8;
-                    android.util.Log.d("AdvertWatching", "   Happy viewer: Baseline bonus");
-                } else if ("neutral".equals(dominantEmotion)) {
-                    score += 5;
-                    android.util.Log.d("AdvertWatching", "   Neutral viewer: Baseline bonus");
-                } else {
-                    score += 3;
-                    android.util.Log.d("AdvertWatching", "   " + dominantEmotion + " viewer: Baseline bonus");
-                }
-            }
 
-            // Bonus if happiness score is very high (> 60%)
-            if (happyScore > 60 && (adEmotionStr == null || adEmotionStr.toLowerCase().contains("happy"))) {
-                score += 15;
-                android.util.Log.d("AdvertWatching", "  ⭐ Very high happiness threshold met");
+                // Bonus if happiness score is very high (> 60%)
+                if (happyScore > 60 && (adEmotionStr == null || adEmotionStr.toLowerCase().contains("happy"))) {
+                    score += 15;
+                    android.util.Log.d("AdvertWatching", "  ⭐ Very high happiness threshold met");
+                }
             }
 
             // ✅ ENGAGEMENT TIME MATCHING (+8 if long dwell)
@@ -757,8 +778,12 @@ public class AdvertWatching extends AppCompatActivity {
                 android.util.Log.d("AdvertWatching", "   Multi-person audience: Select group-appeal ads");
             }
 
-            android.util.Log.d("AdvertWatching", "   Ad " + ad.getAdvertId()
-                    + " [gender=" + adGenderStr + " age=" + adAgeStr + " tags=" + adTagsStr + " emotion=" + adEmotionStr + "] score: " + score);
+            if (privacyMode) {
+                android.util.Log.d("AdvertWatching", "   Ad " + ad.getAdvertId() + " score: " + score);
+            } else {
+                android.util.Log.d("AdvertWatching", "   Ad " + ad.getAdvertId()
+                        + " [gender=" + adGenderStr + " age=" + adAgeStr + " tags=" + adTagsStr + " emotion=" + adEmotionStr + "] score: " + score);
+            }
 
             if (score > highestScore) {
                 highestScore = score;
@@ -768,9 +793,14 @@ public class AdvertWatching extends AppCompatActivity {
 
         if (bestAd != null) {
             android.util.Log.i("AdvertWatching", " DEMOGRAPHIC MATCH WINNER: " + bestAd.getAdvertId() + " (score: " + highestScore + ")");
-            android.util.Log.i("AdvertWatching", "   Viewer: " + viewerGender + " " + viewerAgeBracket
-                    + " | Emotion: " + data.getDominantEmotion() + " | Audience: " + data.getCustomerCount()
-                    + " | Tags: " + viewerTags);
+            if (privacyMode) {
+                android.util.Log.i("AdvertWatching", "   Audience: " + data.getCustomerCount()
+                        + " | avgDwellSec: " + data.getAvgDwellSec());
+            } else {
+                android.util.Log.i("AdvertWatching", "   Viewer: " + viewerGender + " " + viewerAgeBracket
+                        + " | Emotion: " + data.getDominantEmotion() + " | Audience: " + data.getCustomerCount()
+                        + " | Tags: " + viewerTags);
+            }
         } else {
             android.util.Log.d("AdvertWatching", "⏭️ No suitable ad found for demographics");
         }

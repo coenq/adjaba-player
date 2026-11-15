@@ -248,6 +248,18 @@
                         app:buttonTint="@color/tvAccent" />
 
                     <CheckBox
+                        android:id="@+id/privacy_mode_checkbox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="Privacy Mode (IOT: aggregate signals only)"
+                        android:textColor="@color/tvTextPrimary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/tvAccent" />
+
+                    <CheckBox
                         android:id="@+id/slideshow_checkbox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
