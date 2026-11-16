@@ -5,6 +5,7 @@ import android.content.Context;
 import com.adjaba.room.AdDatabase;
 import com.adjaba.room.ImpressionEntity;
 import com.adjaba.utilities.AuthManager;
+import com.adjaba.utilities.Config;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,12 +16,11 @@ import java.net.URL;
 
 
 public class APIImpression {
-    private static final String BASE_URL = "https://api.buyir.uk/";
 
     public static void sendImpression(Context context, ImpressionEntity impression) {
         new Thread(() -> {
             try {
-                URL url = new URL(BASE_URL + "create_impression");
+                URL url = new URL(Config.BASE_URL + "/create_impression");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");

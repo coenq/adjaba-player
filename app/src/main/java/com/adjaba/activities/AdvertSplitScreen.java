@@ -535,7 +535,10 @@ public class AdvertSplitScreen extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) return;
                 if (!response.isSuccessful() || response.body() == null
                         || response.body().current == null
-                        || response.body().current.condition == null) return;
+                        || response.body().current.condition == null) {
+                    android.util.Log.w("AdvertSplitScreen", "Weather response unusable (HTTP " + response.code() + ") — leaving current weather display as-is");
+                    return;
+                }
 
                 Current cur = response.body().current;
                 String iconUrl = "https:" + cur.condition.icon.replace("/64x64/", "/128x128/");

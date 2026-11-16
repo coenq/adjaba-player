@@ -1095,6 +1095,7 @@ public class AdvertWatching extends AppCompatActivity {
 
                 } else {
                     // Response came back but body/current is null — still update location label
+                    android.util.Log.w("AdvertWatching", "Weather response unusable (HTTP " + response.code() + ") — leaving current weather display as-is");
                     if (tvLoc != null) {
                         tvLoc.setText(DataHolder.getInstance().location != null ? DataHolder.getInstance().location : "");
                     }

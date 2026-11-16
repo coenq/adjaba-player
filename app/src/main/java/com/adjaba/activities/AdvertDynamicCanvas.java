@@ -542,7 +542,10 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
             @Override public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
                 if (isFinishing() || isDestroyed()) return;
                 if (!response.isSuccessful() || response.body() == null
-                        || response.body().current == null || response.body().current.condition == null) return;
+                        || response.body().current == null || response.body().current.condition == null) {
+                    Log.w(TAG, "Zone " + rt.zone.zoneId + " weather response unusable (HTTP " + response.code() + ") — leaving current weather display as-is");
+                    return;
+                }
                 Current cur = response.body().current;
                 String iconUrl = "https:" + cur.condition.icon.replace("/64x64/", "/128x128/");
                 Glide.with(AdvertDynamicCanvas.this).load(iconUrl).into(rt.weatherIcon);
