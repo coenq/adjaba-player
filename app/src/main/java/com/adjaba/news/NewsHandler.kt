@@ -86,7 +86,7 @@ class NewsHandler(var index: Int) {
 
     // Derive a friendly source name from the RSS URL
     private fun sourceNameFromUrl(url: String): String = when {
-        url.contains("bbc.co.uk")         -> "BBC News"
+        url.contains("bbci.co.uk")        -> "BBC News"
         url.contains("cnn.com")           -> "CNN"
         url.contains("reuters.com")       -> "Reuters"
         url.contains("aljazeera.com")     -> "Al Jazeera"
