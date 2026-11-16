@@ -25,6 +25,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
+
 import com.adjaba.R;
 import com.adjaba.activities.viewmodel.APIImpression;
 import com.adjaba.activities.viewmodel.DataHolder;
@@ -75,8 +78,10 @@ import retrofit2.Response;
  * for its two zones), so one zone's rotation timing never disrupts another's.
  *
  * Known scope limits in this first increment (documented, not silent):
- *  - Per-ad display-text/QR overlays are not rendered per zone (global-only in the single-zone
- *    activities today).
+ *  - Per-ad QR overlays ARE rendered per zone (bottom-right corner, sized to that zone) for
+ *    IMAGE/VIDEO items with a target URL — see showQrIfPresent(). Per-ad display-text overlays
+ *    (textLeft/textRight captions) are still not rendered per zone (global-only in the
+ *    single-zone activities today).
  *  - WEB_VIEW/DATA_WIDGET zones render ZoneLayout.Zone#contentSource, but nothing in the synced
  *    playlist sets it yet — the CMS/backend needs a field for that before it's end-to-end live.
  *  - QR_CODE and CUSTOM (raw backend-supplied zone arrays) are modeled but not wired to a parser.
@@ -113,7 +118,7 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         final Handler handler = new Handler(Looper.getMainLooper());
         Runnable switcher;
 
-        ImageView imageView, placeholderView;
+        ImageView imageView, placeholderView, qrImage;
         PlayerView playerView;
         SecureSignageWebView webView;
         TextView tickerView;
@@ -320,6 +325,15 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         rt.placeholderView.setPadding(dp(16), dp(16), dp(16), dp(16));
         rt.container.addView(rt.placeholderView, matchParent());
 
+        rt.qrImage = new ImageView(this);
+        rt.qrImage.setVisibility(View.GONE);
+        int qrSize = Math.max(dp(48), Math.min(rt.container.getLayoutParams().width,
+                rt.container.getLayoutParams().height) / 4);
+        FrameLayout.LayoutParams qrLp = new FrameLayout.LayoutParams(qrSize, qrSize);
+        qrLp.gravity = Gravity.BOTTOM | Gravity.END;
+        qrLp.setMargins(0, 0, dp(12), dp(12));
+        rt.container.addView(rt.qrImage, qrLp);
+
         rt.switcher = new Runnable() {
             @Override public void run() {
                 if (rt.items.isEmpty()) {
@@ -339,6 +353,7 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
                     case "":
                         Glide.with(getApplicationContext()).load(media.getUrl()).into(rt.imageView);
                         rt.imageView.setVisibility(View.VISIBLE);
+                        showQrIfPresent(rt, media);
                         rt.handler.postDelayed(this, durMs);
                         saveImpression(media, durMs);
                         break;
@@ -347,6 +362,7 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
                         String url = media.getUrl();
                         if (url != null && !url.isEmpty()) {
                             setupZoneExoPlayer(rt, url);
+                            showQrIfPresent(rt, media);
                         } else {
                             rt.handler.postDelayed(this, durMs);
                         }
@@ -394,6 +410,28 @@ public class AdvertDynamicCanvas extends AppCompatActivity {
         if (rt.playerView != null) rt.playerView.setVisibility(View.GONE);
         if (rt.webView != null) rt.webView.setVisibility(View.GONE);
         if (rt.tickerView != null) rt.tickerView.setVisibility(View.GONE);
+        if (rt.qrImage != null) rt.qrImage.setVisibility(View.GONE);
+    }
+
+    /** Shows a QR code in the zone's bottom-right corner when the ad carries a target URL
+     *  (MediaModel#getInfo) — same per-ad opt-in pattern as AdvertWatching/AdvertLandWatch. */
+    private void showQrIfPresent(ZoneRuntime rt, MediaModel media) {
+        String targetUrl = media.getInfo();
+        if (targetUrl != null && !targetUrl.trim().isEmpty()) {
+            QRGEncoder qrgEncoder = new QRGEncoder(targetUrl, null, QRGContents.Type.TEXT,
+                    rt.qrImage.getLayoutParams().width);
+            qrgEncoder.setColorBlack(Color.WHITE);
+            qrgEncoder.setColorWhite(Color.BLACK);
+            try {
+                rt.qrImage.setImageBitmap(qrgEncoder.getBitmap());
+                rt.qrImage.setVisibility(View.VISIBLE);
+            } catch (Exception e) {
+                Log.e(TAG, "Zone " + rt.zone.zoneId + " QR generation failed: " + e.getMessage());
+                rt.qrImage.setVisibility(View.GONE);
+            }
+        } else {
+            rt.qrImage.setVisibility(View.GONE);
+        }
     }
 
     private void setupZoneExoPlayer(ZoneRuntime rt, String url) {
