@@ -1079,15 +1079,19 @@ public class SelectScreens extends AppCompatActivity {
                             .setInterpolator(new DecelerateInterpolator())
                             .withEndAction(() -> {
                                 android.util.Log.i("SelectScreens", " Launching AdvertWatching with " + mediaModels.size() + " ads");
-                                if (orient.toLowerCase().equalsIgnoreCase("forced portrait")) {
-                                    Intent intent = new Intent(context, AdvertLandWatch.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    context.startActivity(intent);
+                                Class<?> targetActivity;
+                                if (orient.equalsIgnoreCase("forced portrait")) {
+                                    targetActivity = AdvertLandWatch.class;
+                                } else if (orient.equalsIgnoreCase("split screen")) {
+                                    targetActivity = AdvertSplitScreen.class;
+                                } else if (orient.equalsIgnoreCase("dynamic canvas")) {
+                                    targetActivity = AdvertDynamicCanvas.class;
                                 } else {
-                                    Intent intent = new Intent(context, AdvertWatching.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    context.startActivity(intent);
+                                    targetActivity = AdvertWatching.class;
                                 }
+                                Intent intent = new Intent(context, targetActivity);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                context.startActivity(intent);
                             })
                             .start();
                 });
